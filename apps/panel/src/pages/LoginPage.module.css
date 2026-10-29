@@ -1,0 +1,245 @@
+.page {
+  min-height: 100svh;
+  display: flex;
+}
+
+/* ---- Mobile (<768px): navy fullscreen ---- */
+.mobile {
+  flex: 1;
+  background: var(--navy);
+  padding: 0 28px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.mobileBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 34px;
+  padding: 40px 0;
+}
+
+.brandBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.brandCircle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.brandTextWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.brandName {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.brandTag {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+}
+.dividerLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.footer {
+  padding: 22px 0;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.roleToggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--r-8);
+  padding: 4px;
+}
+
+.roleToggleLight {
+  background: var(--chip-neutral-bg);
+  border: 1px solid var(--border);
+}
+
+.roleBtn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 9px 10px;
+  border-radius: var(--r-6);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  font-family: inherit;
+}
+.roleBtnLight {
+  color: var(--muted);
+}
+
+.roleBtnActive {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--white);
+}
+.roleBtnActiveLight {
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: 0 1px 3px rgba(11, 42, 74, 0.12);
+}
+
+/* ---- Desktop (>=768px): split layout ---- */
+.desktop {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.desktopCard {
+  width: 100%;
+  max-width: 1000px;
+  min-height: 560px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-12);
+  overflow: hidden;
+  box-shadow: var(--shadow-screen);
+  display: flex;
+}
+
+.desktopLeft {
+  width: 44%;
+  background: var(--navy);
+  padding: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--white);
+}
+
+.desktopLeftBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.desktopLeftCircle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+
+.desktopLeftTitle {
+  font-family: var(--font-serif);
+  font-size: 34px;
+  line-height: 1.15;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.desktopLeftText {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  max-width: 340px;
+}
+
+.desktopRight {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px;
+}
+
+.desktopForm {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.desktopHeading {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.desktopSub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.rowBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rememberRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.desktopDivider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.desktopDividerLine {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.desktopDividerLabel {
+  font-size: 11px;
+  color: var(--state-none-dot);
+}

@@ -1,0 +1,45 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.control {
+  border: 1px solid var(--border-input);
+  border-radius: var(--r-8);
+  padding: 11px 13px;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--white);
+  outline: none;
+  width: 100%;
+}
+.control:focus {
+  border-color: var(--un-blue);
+}
+
+.textarea {
+  resize: none;
+  line-height: 1.5;
+}
+
+.onNavy {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--white);
+}
+.onNavy::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.onNavy:focus {
+  border-color: var(--gold);
+}
+.onNavyLabel {
+  color: rgba(255, 255, 255, 0.72);
+}

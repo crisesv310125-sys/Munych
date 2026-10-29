@@ -1,0 +1,41 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.none {
+  background: var(--state-none-bg);
+  color: var(--state-none-fg);
+}
+.none .dot {
+  background: var(--state-none-dot);
+}
+
+.progress {
+  background: var(--state-progress-bg);
+  color: var(--state-progress-fg);
+}
+.progress .dot {
+  background: var(--state-progress-dot);
+}
+
+.done {
+  background: var(--state-done-bg);
+  color: var(--state-done-fg);
+}
+.done .dot {
+  background: var(--state-done-dot);
+}

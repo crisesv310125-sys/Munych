@@ -1,0 +1,79 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--r-8);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 18px;
+  border: none;
+  transition: background-color 140ms, border-color 140ms, color 140ms;
+  white-space: nowrap;
+}
+
+.primary {
+  background: var(--navy);
+  color: var(--white);
+}
+.primary:hover {
+  background: var(--navy-light);
+}
+
+.secondary {
+  background: var(--white);
+  color: var(--navy);
+  border: 1px solid var(--border-input);
+}
+.secondary:hover {
+  border-color: var(--navy);
+}
+.danger {
+  background: var(--red);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.gold {
+  background: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+}
+.gold:hover {
+  background: var(--gold-hover);
+}
+
+.onNavy {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: var(--white);
+}
+.onNavy:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.link {
+  background: transparent;
+  color: var(--un-blue);
+  padding: 4px;
+  font-size: 12px;
+}
+.link:hover {
+  color: var(--navy);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+  .mobileFull {
+    width: 100%;
+    min-height: 44px;
+  }
+}

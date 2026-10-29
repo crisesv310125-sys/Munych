@@ -1,0 +1,284 @@
+/* Mobile list */
+.mobileHeader {
+  background: var(--navy);
+  padding: 14px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  padding: 0;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.committeeName {
+  font-family: var(--font-serif);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.subLine {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.searchInput {
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9px;
+  padding: 11px 13px;
+  color: var(--white);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+.searchInput:focus {
+  border-color: var(--gold);
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.8);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.chipActive {
+  background: var(--white);
+  color: var(--navy);
+}
+
+.listBody {
+  flex: 1;
+  overflow: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.countryRow {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  transition: border-color 140ms;
+  cursor: pointer;
+}
+.countryRow:hover {
+  border-color: var(--un-blue);
+}
+
+.stripe {
+  width: 4px;
+  align-self: stretch;
+  border-radius: 2px;
+}
+
+.countryInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.countryName {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.countryStatus {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.scoreBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: none;
+}
+
+.scoreValue {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.scoreOf {
+  font-size: 10px;
+  color: var(--state-none-dot);
+}
+
+.chevron {
+  color: var(--state-none-dot);
+  flex: none;
+}
+
+/* Desktop master-detail */
+.desktopHeader {
+  background: var(--navy);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.desktopTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.desktopBackBtn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+}
+
+.desktopProgress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.masterDetail {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.listPanel {
+  width: 360px;
+  border-right: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+
+.listPanelHeader {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.desktopSearchInput {
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  background: var(--white);
+  outline: none;
+  width: 100%;
+}
+.desktopSearchInput:focus {
+  border-color: var(--un-blue);
+}
+
+.desktopChip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.desktopChipActive {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+
+.desktopListBody {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  overflow: auto;
+}
+
+.desktopCountryRow {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  cursor: pointer;
+  transition: border-color 140ms;
+}
+.desktopCountryRow:hover {
+  border-color: var(--un-blue);
+}
+
+.desktopCountryRowSelected {
+  border-color: var(--navy);
+}
+
+@media (max-width: 1099px) {
+  .masterDetail {
+    flex-direction: column;
+  }
+  .listPanel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}

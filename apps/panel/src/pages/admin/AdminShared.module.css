@@ -1,0 +1,289 @@
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.topbarTitle {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.topbarSub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.topbarActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.content {
+  padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+  min-width: 0;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kpiCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-10);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kpiLabel {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.kpiValue {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.kpiSub {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.kpiInverted {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+.kpiInverted .kpiLabel {
+  color: rgba(255, 255, 255, 0.6);
+}
+.kpiInverted .kpiValue {
+  color: var(--gold);
+}
+
+.panelCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-10);
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.layoutSplit {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  min-height: 0;
+}
+
+.tableFlex {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidePanel {
+  width: 420px;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: stretch;
+  flex: none;
+}
+
+.sidePanelNarrow {
+  width: 400px;
+}
+
+@media (max-width: 1099px) {
+  .layoutSplit {
+    flex-direction: column;
+  }
+  .sidePanel,
+  .sidePanelNarrow {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .tableFlex {
+    overflow-x: auto;
+  }
+}
+
+.modalCard {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-12);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modalFooter {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 42, 74, 0.45);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.setTabsBar {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 16px 28px 0;
+  overflow-x: auto;
+}
+
+.setTab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: var(--r-10);
+  border: 1px solid var(--border);
+  background: var(--white);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  min-width: 172px;
+  flex: none;
+}
+
+.setTab:hover {
+  border-color: var(--un-blue);
+}
+
+.setTabActive {
+  border-color: var(--navy);
+  background: var(--row-selected);
+}
+
+.setTabName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.setTabMeta {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.setTabAdd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: var(--r-10);
+  border: 1px dashed var(--border-input);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  flex: none;
+}
+
+.setTabAdd:hover {
+  border-color: var(--un-blue);
+  color: var(--un-blue);
+}
+
+.searchInput {
+  border: 1px solid var(--border-input);
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 13px;
+  width: 230px;
+  outline: none;
+}
+.searchInput:focus {
+  border-color: var(--un-blue);
+}

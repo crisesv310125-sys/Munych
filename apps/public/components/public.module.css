@@ -1,0 +1,1417 @@
+/*
+ * Página pública según handoff/Resultados Publicos.dc.html (pantallas 2a, 2c, 2d y 2e).
+ * Paleta y tipografías propias del handoff, solo para apps/public: no se tocan los tokens de @munych/ui
+ * que usa el panel.
+ */
+
+.page {
+  --navy: #08243f;
+  --blue: #12466f;
+  --gold: #c9a227;
+  --gold-ink: #8a6a12;
+  --silver: #c2c6c9;
+  --bronze: #c08457;
+  --bg: #f7f6f2;
+  --bg-sunk: #ede9e3;
+  --cream: #fcfaf3;
+  --ink: #0f2b45;
+  --text-2: #5b6e80;
+  --muted: #8898a6;
+  --line: rgba(8, 36, 63, 0.12);
+  --line-soft: rgba(8, 36, 63, 0.08);
+  --line-faint: rgba(8, 36, 63, 0.06);
+  --serif: 'Source Serif 4', Georgia, serif;
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  display: flex;
+  flex-direction: column;
+}
+
+.page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page :focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.gutter {
+  padding-left: 48px;
+  padding-right: 48px;
+}
+
+.eyebrow {
+  font: 600 10px var(--mono);
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.monoMeta {
+  font: 500 11px var(--mono);
+  color: var(--muted);
+}
+
+.mobileOnly {
+  display: none;
+}
+
+/* ------------------------------------------------------------ cabecera */
+
+.header {
+  background: var(--navy);
+  color: #fff;
+}
+
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.topbarRule {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.logoLink {
+  display: flex;
+  flex: none;
+}
+
+/* display:block: dentro del <a> de la cabecera, un span inline ignoraría el tamaño. */
+.logo {
+  display: block;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold);
+  background: var(--blue);
+  flex: none;
+  overflow: hidden;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.brandName {
+  font: 600 15px/1.1 var(--serif);
+  color: #fff;
+}
+
+.brandTag {
+  font: 500 9px/1.4 var(--mono);
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.brandMobileTag {
+  font: 500 10px var(--mono);
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.siteLink {
+  font: 500 12.5px var(--sans);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.page .siteLink:hover {
+  color: #fff;
+}
+
+.crumbs {
+  font: 500 12.5px var(--sans);
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.page .crumbs a:hover {
+  color: #fff;
+}
+
+.crumbSep {
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 4px;
+}
+
+.crumbCurrent {
+  color: #fff;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex: none;
+}
+
+.ghostButton {
+  padding: 8px 14px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  font: 600 12px var(--sans);
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ghostButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.iconButton {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: #fff;
+  font: 600 16px var(--sans);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: #fff;
+  font: 500 13px var(--sans);
+  padding: 10px 16px;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(8, 36, 63, 0.25);
+  z-index: 20;
+}
+
+/* ------------------------------------------------------------ campos */
+
+.search {
+  border: 1px solid rgba(8, 36, 63, 0.18);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font: 400 13px var(--sans);
+  color: var(--navy);
+  background: #fff;
+  outline: none;
+  min-width: 0;
+}
+
+.search::placeholder {
+  color: var(--muted);
+}
+
+.search:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(18, 70, 111, 0.12);
+}
+
+.moreButton {
+  min-height: 44px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  font: 600 13px var(--sans);
+  color: var(--blue);
+  cursor: pointer;
+}
+
+.page .moreButton:hover {
+  color: var(--navy);
+}
+
+.empty {
+  padding: 28px 22px;
+  text-align: center;
+  font: 400 13px/1.5 var(--sans);
+  color: var(--text-2);
+}
+
+/* ------------------------------------------------------------ medallas */
+
+.medal {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-family: var(--mono);
+  font-weight: 700;
+  background: var(--bg-sunk);
+  color: var(--text-2);
+}
+
+.medal1 {
+  background: var(--gold);
+  color: #3a2c05;
+}
+
+.medal2 {
+  background: var(--silver);
+  color: #33393d;
+}
+
+.medal3 {
+  background: var(--bronze);
+  color: #3a2205;
+}
+
+/* ------------------------------------------------------------ 2a · portal */
+
+.hero {
+  background: var(--navy);
+  padding-top: 44px;
+  padding-bottom: 84px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.heroEyebrow {
+  font: 600 10.5px var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+
+.heroTitle {
+  margin: 10px 0 0;
+  font: 600 44px/1.08 var(--serif);
+  color: #fff;
+  max-width: 640px;
+  text-wrap: pretty;
+}
+
+.portalBody {
+  margin-top: -52px;
+  padding-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.featuredEyebrow {
+  font: 600 10px var(--mono);
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: -18px;
+  position: relative;
+}
+
+.featured {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(8, 36, 63, 0.12);
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  overflow: hidden;
+}
+
+.featuredMain {
+  padding: 30px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.featuredStatus {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pillPublished {
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #e4f0ea;
+  color: #1d5a40;
+  font: 600 10px var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.featuredName {
+  font: 700 36px/1 var(--serif);
+  color: var(--navy);
+}
+
+.featuredMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  font: 400 14px var(--sans);
+  color: var(--text-2);
+}
+
+.goldButton {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: var(--gold);
+  font: 600 14px var(--sans);
+}
+
+.page .goldButton {
+  color: #2e2204;
+}
+
+.page .goldButton:hover {
+  background: #d4ae35;
+}
+
+.featuredSide {
+  background: var(--cream);
+  border-left: 1px solid rgba(8, 36, 63, 0.1);
+  padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sideEyebrow {
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.sideRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: 400 13px var(--sans);
+  color: var(--text-2);
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 9px;
+}
+
+.sideRow b {
+  color: var(--navy);
+  font-weight: 600;
+  text-align: right;
+}
+
+.sideMore {
+  font: 600 12px var(--sans);
+}
+
+.page .sideMore {
+  color: var(--blue);
+}
+
+.listHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.listTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.listTitleText {
+  font: 600 18px var(--serif);
+  color: var(--navy);
+}
+
+.listTools {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.listSearch {
+  width: 200px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+}
+
+.segmented {
+  display: flex;
+  background: var(--bg-sunk);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.segment {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  font: 500 12px var(--sans);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.segmentActive {
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(8, 36, 63, 0.12);
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.listCard {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.yearRow {
+  padding: 8px 22px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line-soft);
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.eventRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 160px 90px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.eventRow:hover {
+  background: var(--cream);
+}
+
+.eventRowName {
+  font: 600 16px var(--serif);
+  color: var(--navy);
+}
+
+.eventRowVenue {
+  font: 400 13px var(--sans);
+  color: var(--text-2);
+}
+
+.eventRowDate {
+  font: 500 12px var(--mono);
+  color: var(--text-2);
+}
+
+.eventRowGo {
+  font: 600 12.5px var(--sans);
+  color: var(--blue);
+  text-align: right;
+}
+
+/* ------------------------------------------------------------ cabecera de evento / comité */
+
+.eventHeader {
+  padding-bottom: 30px;
+}
+
+.committeeHeader {
+  padding-bottom: 28px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 28px;
+}
+
+.eventTitle {
+  margin: 0;
+  font: 700 38px/1 var(--serif);
+  color: #fff;
+}
+
+.eventMeta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  font: 400 14px var(--sans);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+  flex: none;
+}
+
+.stat {
+  text-align: right;
+}
+
+.statValue {
+  font: 600 24px var(--serif);
+  color: #fff;
+}
+
+.statLabel {
+  font: 500 9.5px var(--mono);
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.backLink {
+  display: inline-block;
+  padding-top: 22px;
+  font: 600 12.5px var(--sans);
+}
+
+.page .backLink {
+  color: var(--gold);
+}
+
+.page .backLink:hover {
+  color: #e0bb45;
+}
+
+.committeeTitleRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 10px;
+}
+
+/* Selector "Cambiar comité" */
+
+.switcher {
+  position: relative;
+  flex: none;
+}
+
+.switcherButton {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
+  padding: 9px 12px;
+  background: transparent;
+  font: 500 12.5px var(--sans);
+  color: #fff;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.switcherButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.switcherCaret {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.switcherMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 240px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(8, 36, 63, 0.18);
+  padding: 6px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.switcherItem {
+  padding: 10px 12px;
+  border-radius: 7px;
+  font: 500 13px var(--sans);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.page .switcherItem {
+  color: var(--ink);
+}
+
+.switcherItem:hover {
+  background: var(--bg);
+}
+
+.switcherItemActive {
+  font-weight: 600;
+  background: var(--cream);
+}
+
+/* Solo en móvil (ver media query). */
+.chips {
+  display: none;
+  gap: 8px;
+  margin: 18px -20px 0;
+  padding: 0 20px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex: none;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font: 500 12.5px var(--sans);
+}
+
+.page .chip {
+  color: #fff;
+}
+
+.page .chipActive {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #2e2204;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ 2d · evento */
+
+.eventBody {
+  padding-top: 24px;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.eventSearch {
+  width: 280px;
+}
+
+.committeeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.committeeCard {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.committeeCardPending {
+  border-style: dashed;
+  border-color: rgba(8, 36, 63, 0.25);
+  gap: 10px;
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cardName {
+  font: 700 20px var(--serif);
+  color: var(--navy);
+}
+
+.page .cardLink {
+  font: 600 12.5px var(--sans);
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+.page .cardLink:hover {
+  color: var(--navy);
+}
+
+.pillPending {
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #f6ebd3;
+  color: #8a5a12;
+  font: 600 10px var(--sans);
+  white-space: nowrap;
+}
+
+.pendingText {
+  font: 400 13px/1.5 var(--sans);
+  color: var(--text-2);
+}
+
+.topAward {
+  background: var(--navy);
+  border-radius: 9px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topAwardLabel {
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.topAwardName {
+  font: 600 17px var(--serif);
+  color: #fff;
+  margin-top: 3px;
+}
+
+.topAwardDelegates {
+  text-align: right;
+  font: 400 12.5px var(--sans);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.minorAward {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.topAward + .minorAward {
+  padding-top: 4px;
+}
+
+.minorAwardText {
+  font: 400 13px var(--sans);
+  color: var(--text-2);
+}
+
+.minorAwardText b {
+  color: var(--navy);
+  font-weight: 600;
+}
+
+.minorAwardDelegates {
+  font: 400 12.5px var(--sans);
+  color: var(--text-2);
+}
+
+.singleAwardNote {
+  padding: 2px 4px 0;
+  font: 400 12.5px var(--sans);
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ 2e · comité */
+
+.committeeBody {
+  padding-top: 26px;
+  padding-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.awardsGrid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 14px;
+}
+
+.awardCard {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.awardCardFeatured {
+  background: var(--navy);
+  border-color: var(--navy);
+  gap: 16px;
+}
+
+.awardLabel {
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+
+.awardCardFeatured .awardLabel {
+  color: var(--gold);
+}
+
+.awardName {
+  font: 600 19px var(--serif);
+  color: var(--navy);
+  margin-top: 4px;
+}
+
+.awardCardFeatured .awardName {
+  font-weight: 700;
+  font-size: 24px;
+  color: #fff;
+}
+
+.awardDelegates {
+  font: 400 12.5px var(--sans);
+  color: var(--text-2);
+}
+
+.awardCardFeatured .awardDelegates {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Solo en móvil: "Francia · A. Núñez" en la misma línea (2c). */
+.awardInlineDelegates {
+  display: none;
+}
+
+.awardMedal {
+  width: 38px;
+  height: 38px;
+  font-size: 15px;
+}
+
+.awardCardFeatured .awardMedal {
+  width: 46px;
+  height: 46px;
+  font-size: 18px;
+}
+
+.rankingHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rankingSearch {
+  width: 240px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+}
+
+.table {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tableRow {
+  display: grid;
+  grid-template-columns: 70px 1.4fr 1fr 110px;
+  gap: 16px;
+  padding: 13px 24px;
+  align-items: center;
+  border-bottom: 1px solid var(--line-faint);
+}
+
+.tableNoScores .tableRow {
+  grid-template-columns: 70px 1.4fr 1fr;
+}
+
+.tableHeadRow {
+  padding: 12px 24px;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(8, 36, 63, 0.1);
+  font: 600 9.5px var(--mono);
+  letter-spacing: 0.1em;
+  color: var(--text-2);
+}
+
+.tableRowFirst {
+  background: var(--cream);
+}
+
+.posMedal {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+
+.posNumber {
+  font: 500 12px var(--mono);
+  color: var(--muted);
+  padding-left: 7px;
+}
+
+.posMono {
+  display: none;
+  font: 500 12px var(--mono);
+  color: var(--muted);
+}
+
+.posMonoTop {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.posMonoGold {
+  color: var(--gold-ink);
+}
+
+.delegationCell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.isoBadge {
+  font: 600 10px var(--mono);
+  color: var(--navy);
+  background: var(--bg-sunk);
+  border-radius: 4px;
+  padding: 3px 6px;
+  flex: none;
+}
+
+.delegationName {
+  font: 500 14px var(--sans);
+  color: var(--ink);
+}
+
+.delegationNameTop {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.delegatesCell {
+  font: 400 13px var(--sans);
+  color: var(--text-2);
+}
+
+.scoreCell {
+  text-align: right;
+  font: 500 16px var(--serif);
+  color: var(--ink);
+}
+
+.scoreCellTop {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.scoreMissing {
+  color: var(--muted);
+}
+
+.tableFoot {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 24px;
+}
+
+.tableFootNote {
+  font: 400 11.5px var(--sans);
+  color: var(--muted);
+}
+
+.tableFoot .moreButton {
+  width: auto;
+  margin-left: auto;
+  font-size: 12.5px;
+}
+
+.right {
+  text-align: right;
+}
+
+/* ------------------------------------------------------------ 2c · móvil */
+
+@media (max-width: 760px) {
+  .gutter {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .mobileOnly {
+    display: revert;
+  }
+
+  .desktopOnly {
+    display: none;
+  }
+
+  /* cabecera */
+  .topbar {
+    height: auto;
+    padding: 14px 0;
+  }
+
+  .topbarRule {
+    border-bottom: none;
+  }
+
+  .brandName,
+  .brandTag,
+  .siteLink {
+    display: none;
+  }
+
+  .logo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .ghostButton {
+    display: none;
+  }
+
+  .iconButton {
+    display: flex;
+  }
+
+  /* portal */
+  .hero {
+    padding-top: 28px;
+    padding-bottom: 76px;
+  }
+
+  .heroTitle {
+    font-size: 30px;
+  }
+
+  .featured {
+    grid-template-columns: 1fr;
+  }
+
+  .featuredMain {
+    padding: 22px 20px;
+  }
+
+  .featuredName {
+    font-size: 28px;
+  }
+
+  .featuredSide {
+    border-left: none;
+    border-top: 1px solid rgba(8, 36, 63, 0.1);
+    padding: 20px;
+  }
+
+  .goldButton {
+    align-self: stretch;
+    text-align: center;
+  }
+
+  .listTools {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .listSearch {
+    flex: 1;
+    width: auto;
+    min-height: 44px;
+  }
+
+  .eventRow {
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 14px 16px;
+  }
+
+  .eventRowVenue {
+    display: none;
+  }
+
+  .eventRowDate {
+    grid-row: 2;
+  }
+
+  .eventRowGo {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+
+  /* evento / comité */
+  .eventHeader,
+  .committeeHeader {
+    padding-bottom: 0;
+  }
+
+  .titleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    padding-top: 4px;
+    padding-bottom: 20px;
+  }
+
+  .eventTitle {
+    font-size: 28px;
+  }
+
+  .eventMeta {
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .stats {
+    gap: 24px;
+  }
+
+  .stat {
+    text-align: left;
+  }
+
+  .backLink {
+    padding-top: 2px;
+  }
+
+  .committeeTitleRow {
+    margin-top: 10px;
+  }
+
+  .switcher {
+    display: none;
+  }
+
+  .chips {
+    display: flex;
+  }
+
+  .eventBody,
+  .committeeBody {
+    padding: 18px 16px 32px;
+    gap: 10px;
+  }
+
+  .eventSearch,
+  .rankingSearch {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .committeeGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .committeeCard {
+    padding: 18px;
+  }
+
+  .cardHead {
+    flex-wrap: wrap;
+  }
+
+  /* premios como en 2c */
+  .awardsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .awardCard {
+    padding: 14px 18px;
+  }
+
+  .awardCardFeatured {
+    background: #fff;
+    border-color: var(--line);
+    border-top: 3px solid var(--gold);
+    padding: 18px;
+    gap: 14px;
+  }
+
+  .awardCardFeatured .awardLabel {
+    color: var(--gold-ink);
+  }
+
+  .awardCardFeatured .awardName {
+    color: var(--navy);
+    font-size: 22px;
+    margin-top: 3px;
+  }
+
+  .awardCardFeatured .awardDelegates {
+    color: var(--text-2);
+    font-size: 12px;
+  }
+
+  .awardCardFeatured .awardMedal {
+    width: 44px;
+    height: 44px;
+  }
+
+  .awardMedal {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .awardLabel {
+    font-size: 9px;
+  }
+
+  .awardName {
+    font-size: 17px;
+    margin-top: 2px;
+  }
+
+  .awardCard:not(.awardCardFeatured) .awardDelegates {
+    display: none;
+  }
+
+  .awardInlineDelegates {
+    display: inline;
+    font: 400 12px var(--sans);
+    color: var(--text-2);
+  }
+
+  .awardCardFeatured .awardInlineDelegates {
+    display: none;
+  }
+
+  /* clasificación compacta como en 2c */
+  .rankingHead {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 10px;
+  }
+
+  .tableHeadRow,
+  .delegatesCell,
+  .isoBadge,
+  .posMedal,
+  .posNumber {
+    display: none;
+  }
+
+  .tableRow,
+  .tableNoScores .tableRow {
+    grid-template-columns: 30px 1fr auto;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 16px;
+  }
+
+  .tableRowFirst {
+    background: transparent;
+  }
+
+  .posMono {
+    display: block;
+  }
+
+  .scoreCell {
+    font-size: 14px;
+  }
+
+  .tableFoot {
+    padding: 0 16px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .tableFootNote {
+    padding-top: 10px;
+  }
+
+  .tableFoot .moreButton {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* ------------------------------------------------------------ impresión ("Descargar PDF") */
+
+@media print {
+  .page {
+    background: #fff;
+  }
+
+  .actions,
+  .search,
+  .switcher,
+  .moreButton,
+  .chips,
+  .backLink {
+    display: none !important;
+  }
+
+  .header,
+  .hero,
+  .topAward,
+  .awardCardFeatured {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

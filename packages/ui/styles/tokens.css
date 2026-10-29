@@ -1,0 +1,101 @@
+:root {
+  /* Color — paleta oficial MUNYCH Association */
+  --orange: #f18701;
+  --yellow: #ffb800;
+  --blue: #1351aa;
+  --navy: #1a3079;
+  --navy-light: #1351aa;
+  --un-blue: #1351aa;
+  --gold: #ffb800;
+  --gold-hover: #f18701;
+  --white: #ffffff;
+  --bg: #f5f7fb;
+  --ink: #16223f;
+  --muted: #5b6b7c;
+  --border: #e3e8ef;
+  --border-soft: #eef1f5;
+  --border-input: #cbd5e1;
+  --row-hover: #f9fafc;
+  --row-selected: #f2f6ff;
+  --chip-neutral-bg: #f2f4f8;
+  --red: #e02424;
+  /* Estado */
+  --state-none-dot: #98a6b5;
+  --state-none-bg: #f2f4f8;
+  --state-none-fg: #5b6b7c;
+  --state-progress-dot: #ffb800;
+  --state-progress-bg: #fff4de;
+  --state-progress-fg: #8a5a00;
+  --state-done-dot: #2f8f6e;
+  --state-done-bg: #e7f4ef;
+  --state-done-fg: #1f6b52;
+
+  /* Medallas */
+  --medal-1-bg: #ffb800;
+  --medal-1-fg: #ffffff;
+  --medal-2-bg: #cbd5e1;
+  --medal-2-fg: #1b2733;
+  --medal-3-bg: #f18701;
+  --medal-3-fg: #ffffff;
+  --medal-rest-bg: #f2f4f8;
+  --medal-rest-fg: #5b6b7c;
+
+  /* Callout */
+  --callout-bg: #fff4de;
+  --callout-border: #ffdf9e;
+  --callout-fg: #8a5a00;
+
+  /* Escala de pesos (barra apilada) */
+  --weight-1: #1a3079;
+  --weight-2: #1351aa;
+  --weight-3: #3868c0;
+  --weight-4: #5f8fe0;
+  --weight-5: #93b8f0;
+  --weight-6: #ffb800;
+  --weight-7: #f18701;
+
+  /* Tipografía — oficial MUNYCH: Alieron (títulos) y Poppins (párrafos).
+     Alieron y Montaser Arabic son tipografías comerciales sin distribución
+     web libre; se usa Baloo 2 como sustituto redondeado/bold más cercano. */
+  --font-serif: 'Baloo 2', 'Poppins', system-ui, sans-serif;
+  --font-sans: 'Poppins', system-ui, sans-serif;
+
+  /* Espaciado */
+  --sp-2: 2px;
+  --sp-3: 3px;
+  --sp-4: 4px;
+  --sp-5: 5px;
+  --sp-6: 6px;
+  --sp-7: 7px;
+  --sp-8: 8px;
+  --sp-9: 9px;
+  --sp-10: 10px;
+  --sp-12: 12px;
+  --sp-14: 14px;
+  --sp-16: 16px;
+  --sp-18: 18px;
+  --sp-20: 20px;
+  --sp-22: 22px;
+  --sp-24: 24px;
+  --sp-26: 26px;
+  --sp-28: 28px;
+  --sp-32: 32px;
+  --sp-44: 44px;
+
+  /* Radios */
+  --r-5: 5px;
+  --r-6: 6px;
+  --r-7: 7px;
+  --r-8: 8px;
+  --r-10: 10px;
+  --r-12: 12px;
+  --r-26: 26px;
+  --r-pill: 999px;
+
+  /* Sombras */
+  --shadow-screen: 0 12px 34px rgba(26, 48, 121, 0.1);
+  --shadow-mobile-frame: 0 12px 34px rgba(26, 48, 121, 0.14);
+  --shadow-modal: 0 18px 40px rgba(26, 48, 121, 0.14);
+  --shadow-doc-preview: 0 8px 22px rgba(26, 48, 121, 0.08);
+  --shadow-thumb: 0 1px 4px rgba(26, 48, 121, 0.35);
+}

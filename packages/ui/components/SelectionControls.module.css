@@ -1,0 +1,45 @@
+.checkbox {
+  width: 17px;
+  height: 17px;
+  border-radius: var(--r-5);
+  border: 1px solid var(--border-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  cursor: pointer;
+  background: var(--white);
+}
+
+.checkboxChecked {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+  font-size: 11px;
+}
+
+.toggle {
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: var(--border-input);
+  justify-content: flex-start;
+  transition: background-color 140ms;
+}
+
+.toggleOn {
+  background: var(--state-done-dot);
+  justify-content: flex-end;
+}
+
+.thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--white);
+}

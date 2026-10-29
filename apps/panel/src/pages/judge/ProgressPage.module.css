@@ -1,0 +1,180 @@
+.mobileHeader {
+  background: var(--navy);
+  padding: 14px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.subLine {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tiles {
+  display: flex;
+  gap: 10px;
+}
+
+.tile {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-10);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tileValue {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.tileLabel {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.rankRow {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.rankName {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.rankScore {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+/* Desktop */
+.desktopHeader {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.desktopTitle {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.desktopSub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.desktopTiles {
+  display: flex;
+  gap: 14px;
+}
+
+.desktopTile {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-10);
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.desktopTileLabel {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.desktopTileValue {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.desktopLayout {
+  display: flex;
+}
+
+.desktopMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.desktopSidePanel {
+  width: 360px;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: none;
+}
+
+.pendingRow {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 1099px) {
+  .desktopLayout {
+    flex-direction: column;
+  }
+  .desktopSidePanel {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+}

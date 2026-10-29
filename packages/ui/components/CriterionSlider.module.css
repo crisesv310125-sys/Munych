@@ -1,0 +1,54 @@
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 14px 15px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.weight {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--chip-neutral-bg);
+  padding: 3px 7px;
+  border-radius: var(--r-5);
+  white-space: nowrap;
+}
+
+.value {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.scaleRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--state-none-dot);
+}

@@ -1,0 +1,121 @@
+.sidebar {
+  width: 232px;
+  background: var(--navy);
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  flex: none;
+  /* Pinned to the viewport: its height never follows the content on the right. */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+}
+
+.brandCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandName {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+.brandTag {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-7);
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 13px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 140ms, color 140ms;
+}
+.link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--white);
+}
+
+.linkActive {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.linkIcon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.event {
+  margin-top: auto;
+  padding: 12px;
+  border-radius: var(--r-8);
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eventLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.eventName {
+  font-size: 13px;
+  color: var(--white);
+  font-weight: 600;
+}
+
+@media (max-width: 1099px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    transform: translateX(-100%);
+    transition: transform 180ms ease-out;
+  }
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+}

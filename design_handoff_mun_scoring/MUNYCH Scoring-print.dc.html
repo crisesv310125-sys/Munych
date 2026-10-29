@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="omelette-print-source" content="v1788792381927801 MUNYCH Scoring.dc.html">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { animation-delay: -99s !important; animation-duration: .001s !important;
+      animation-iteration-count: 1 !important; animation-fill-mode: both !important;
+      animation-play-state: running !important; transition-duration: 0s !important; }
+  body { margin:0; color:#1B2733; font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:#418FDE; text-decoration:none; }
+  doc-page:not(:defined) { visibility:hidden; }
+  input[type=range].sl { -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:2px; background:#E3E8EF; outline:none; }
+  input[type=range].sl::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:26px; height:26px; border-radius:50%; background:#0B2A4A; border:3px solid #FFFFFF; box-shadow:0 1px 4px rgba(11,42,74,.35); }
+  @keyframes munPulse { 0%,100%{opacity:.35} 50%{opacity:1} }
+</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page orientation="landscape">
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Sistema de diseño</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">01 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<header style="display:flex; flex-direction:column; gap:14px; border-bottom:1px solid #E3E8EF; padding-bottom:28px">
+    <div style="display:flex; align-items:center; gap:12px">
+      <div style="width:34px; height:34px; border-radius:50%; background:#0B2A4A; display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-weight:700; font-size:15px">M</div>
+      <span style="font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH Association</span>
+    </div>
+    <h1 style="margin:0; font-family:'Playfair Display',serif; font-weight:600; font-size:46px; line-height:1.05; color:#0B2A4A">Sistema de calificación MUN</h1>
+    <p style="margin:0; max-width:640px; color:#5B6B7C; font-size:15px; line-height:1.6; text-wrap:pretty">Sistema de diseño e interfaz completa: vista de juez (mobile-first) y panel de administración (desktop-first).</p>
+  </header><!-- ============ SISTEMA DE DISEÑO ============ -->
+  <section style="display:flex; flex-direction:column; gap:28px">
+    <div style="display:flex; align-items:baseline; gap:14px">
+      <span style="font-family:'Playfair Display',serif; font-size:13px; color:#C9A227; font-weight:600">00</span>
+      <h2 style="margin:0; font-family:'Playfair Display',serif; font-size:28px; font-weight:600; color:#0B2A4A">Sistema de diseño</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px">
+
+      <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:16px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">Paleta</span>
+        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px">
+          <div style="display:flex; flex-direction:column; gap:6px"><div style="height:44px; border-radius:6px; background:#0B2A4A"></div><span style="font-size:11px; color:#1B2733; font-weight:600">Azul Marino</span><span style="font-size:10px; color:#5B6B7C; font-family:ui-monospace,monospace">#0B2A4A</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px"><div style="height:44px; border-radius:6px; background:#123B63"></div><span style="font-size:11px; color:#1B2733; font-weight:600">Marino claro</span><span style="font-size:10px; color:#5B6B7C; font-family:ui-monospace,monospace">#123B63</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px"><div style="height:44px; border-radius:6px; background:#418FDE"></div><span style="font-size:11px; color:#1B2733; font-weight:600">Azul ONU</span><span style="font-size:10px; color:#5B6B7C; font-family:ui-monospace,monospace">#418FDE</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px"><div style="height:44px; border-radius:6px; background:#C9A227"></div><span style="font-size:11px; color:#1B2733; font-weight:600">Dorado</span><span style="font-size:10px; color:#5B6B7C; font-family:ui-monospace,monospace">#C9A227</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px"><div style="height:44px; border-radius:6px; background:#F5F7FA; border:1px solid #E3E8EF"></div><span style="font-size:11px; color:#1B2733; font-weight:600">Fondo</span><span style="font-size:10px; color:#5B6B7C; font-family:ui-monospace,monospace">#F5F7FA</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px"><div style="height:44px; border-radius:6px; background:#1B2733"></div><span style="font-size:11px; color:#1B2733; font-weight:600">Tinta</span><span style="font-size:10px; color:#5B6B7C; font-family:ui-monospace,monospace">#1B2733</span></div>
+        </div>
+        <div style="display:flex; gap:10px; padding-top:6px; border-top:1px solid #E3E8EF">
+          <div style="flex:1; display:flex; align-items:center; gap:7px"><span style="width:10px; height:10px; border-radius:50%; background:#98A6B5"></span><span style="font-size:11px; color:#5B6B7C">Sin calificar</span></div>
+          <div style="flex:1; display:flex; align-items:center; gap:7px"><span style="width:10px; height:10px; border-radius:50%; background:#C9A227"></span><span style="font-size:11px; color:#5B6B7C">En progreso</span></div>
+          <div style="flex:1; display:flex; align-items:center; gap:7px"><span style="width:10px; height:10px; border-radius:50%; background:#2F8F6E"></span><span style="font-size:11px; color:#5B6B7C">Completo</span></div>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:16px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">Tipografía</span>
+        <div style="display:flex; flex-direction:column; gap:2px">
+          <span style="font-family:'Playfair Display',serif; font-size:34px; font-weight:600; color:#0B2A4A; line-height:1.1">Consejo de Seguridad</span>
+          <span style="font-size:11px; color:#5B6B7C; font-family:ui-monospace,monospace">Playfair Display · 600 · títulos, países, cifras</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:2px; border-top:1px solid #E3E8EF; padding-top:14px">
+          <span style="font-size:17px; font-weight:600; color:#1B2733">Interfaz, formularios y tablas</span>
+          <span style="font-size:14px; color:#5B6B7C; line-height:1.55">Inter 400/500/600 para todo el uso diario. Jerarquía por tamaño, peso y espaciado — no por color.</span>
+          <span style="font-size:11px; color:#5B6B7C; font-family:ui-monospace,monospace; margin-top:6px">Inter · 11 / 13 / 15 / 17 / 22</span>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:18px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">Componentes</span>
+        <div style="display:flex; flex-wrap:wrap; gap:8px">
+          <span style="display:inline-flex; align-items:center; gap:6px; background:#F2F4F8; color:#5B6B7C; font-size:11px; font-weight:600; padding:5px 10px; border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#98A6B5"></span>Sin calificar</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; background:#FBF4DF; color:#8A6F12; font-size:11px; font-weight:600; padding:5px 10px; border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#C9A227"></span>En progreso</span>
+          <span style="display:inline-flex; align-items:center; gap:6px; background:#E7F4EF; color:#1F6B52; font-size:11px; font-weight:600; padding:5px 10px; border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#2F8F6E"></span>Completo</span>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px">
+          <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:11px 18px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Guardar</button>
+          <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:11px 18px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Secundario</button>
+          <button style="background:transparent; color:#418FDE; border:none; padding:11px 4px; font-size:13px; font-weight:600; cursor:pointer" style-hover="color:#0B2A4A">Enlace</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#5B6B7C"><span>Progreso</span><span style="font-weight:600; color:#1B2733">64%</span></div>
+          <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:64%; height:100%; background:#C9A227; border-radius:3px"></div></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px">
+          <span style="font-size:12px; color:#5B6B7C">Campo de texto</span>
+          <input type="text" placeholder="Buscar país…" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 13px; font-size:14px; color:#1B2733; background:#FFFFFF; outline:none" style-focus="border-color:#418FDE">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Vista de juez · mobile</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">02 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<div style="display:flex; gap:32px"><!-- 1 LOGIN -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">01 · Acceso</span>
+        <div style="width:390px; height:780px; background:#0B2A4A; border-radius:26px; border:1px solid #0B2A4A; overflow:hidden; display:flex; flex-direction:column; padding:0 28px; box-shadow:0 12px 34px rgba(11,42,74,.14)">
+          <div style="height:44px; display:flex; align-items:center; justify-content:space-between; color:rgba(255,255,255,.72); font-size:11px; font-weight:600"><span>9:41</span><span>MUN · Wi‑Fi</span></div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:34px">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:16px">
+              <div style="width:60px; height:60px; border-radius:50%; border:1px solid rgba(201,162,39,.55); display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-size:26px; font-weight:700">M</div>
+              <div style="display:flex; flex-direction:column; align-items:center; gap:6px">
+                <span style="font-family:'Playfair Display',serif; font-size:26px; color:#FFFFFF; font-weight:600">MUNYCH</span>
+                <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.6)">Panel de jueces</span>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:14px">
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <label style="font-size:12px; color:rgba(255,255,255,.72); font-weight:500">Usuario</label>
+                <input type="text" value="a.reyes" style="background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.22); border-radius:9px; padding:14px; color:#FFFFFF; font-size:15px; outline:none" style-focus="border-color:#C9A227">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <label style="font-size:12px; color:rgba(255,255,255,.72); font-weight:500">Contraseña</label>
+                <input type="password" value="12345678" style="background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.22); border-radius:9px; padding:14px; color:#FFFFFF; font-size:15px; outline:none; letter-spacing:.2em" style-focus="border-color:#C9A227">
+              </div>
+              <button style="background:#C9A227; color:#0B2A4A; border:none; border-radius:9px; padding:16px; font-size:15px; font-weight:700; cursor:pointer; margin-top:6px" style-hover="background:#DDB431">Entrar</button>
+              <div style="display:flex; align-items:center; gap:12px; margin:4px 0"><div style="flex:1; height:1px; background:rgba(255,255,255,.16)"></div><span style="font-size:11px; color:rgba(255,255,255,.5)">o</span><div style="flex:1; height:1px; background:rgba(255,255,255,.16)"></div></div>
+              <button style="background:transparent; color:#FFFFFF; border:1px solid rgba(255,255,255,.28); border-radius:9px; padding:15px; font-size:14px; font-weight:600; cursor:pointer" style-hover="border-color:#C9A227">Usar código de acceso</button>
+            </div>
+          </div>
+          <div style="padding:22px 0; text-align:center; font-size:11px; color:rgba(255,255,255,.42)">MUNYCH Association · Edición 2026</div>
+        </div>
+      </div>
+
+      <!-- 2 DASHBOARD JUEZ -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">02 · Dashboard del juez</span>
+        <div style="width:390px; height:780px; background:#F5F7FA; border-radius:26px; border:1px solid #E3E8EF; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(11,42,74,.10)">
+          <div style="background:#0B2A4A; padding:14px 20px 20px; display:flex; flex-direction:column; gap:16px">
+            <div style="height:20px; display:flex; align-items:center; justify-content:space-between; color:rgba(255,255,255,.72); font-size:11px; font-weight:600"><span>9:41</span><span>MUN · Wi‑Fi</span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between">
+              <div style="display:flex; flex-direction:column; gap:3px">
+                <span style="font-size:11px; color:rgba(255,255,255,.6)">Buenos días,</span>
+                <span style="font-family:'Playfair Display',serif; font-size:22px; color:#FFFFFF; font-weight:600">Andrea Reyes</span>
+              </div>
+              <div style="width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:13px; font-weight:600">AR</div>
+            </div>
+          </div>
+          <div style="flex:1; overflow:hidden; padding:20px; display:flex; flex-direction:column; gap:14px">
+            <div style="display:flex; justify-content:space-between; align-items:baseline">
+              <span style="font-size:13px; font-weight:600; color:#1B2733">Mis comités</span>
+              <span style="font-size:12px; color:#5B6B7C">3 asignados</span>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:13px" style-hover="border-color:#418FDE">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                <div style="display:flex; flex-direction:column; gap:4px">
+                  <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A; line-height:1.2">Consejo de Seguridad</span>
+                  <span style="font-size:12px; color:#5B6B7C">Sala A‑201 · 15 países</span>
+                </div>
+                <span style="display:inline-flex; align-items:center; gap:6px; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#C9A227"></span>EN PROGRESO</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#5B6B7C"><span>9 de 15 calificados</span><span style="font-weight:700; color:#1B2733">60%</span></div>
+                <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:60%; height:100%; background:#C9A227; border-radius:3px"></div></div>
+              </div>
+              <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Continuar calificando</button>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:13px">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                <div style="display:flex; flex-direction:column; gap:4px">
+                  <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A; line-height:1.2">ECOSOC</span>
+                  <span style="font-size:12px; color:#5B6B7C">Sala B‑105 · 22 países</span>
+                </div>
+                <span style="display:inline-flex; align-items:center; gap:6px; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#98A6B5"></span>SIN INICIAR</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#5B6B7C"><span>0 de 22 calificados</span><span style="font-weight:700; color:#1B2733">0%</span></div>
+                <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:2%; height:100%; background:#98A6B5; border-radius:3px"></div></div>
+              </div>
+              <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Empezar</button>
+            </div>
+
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:13px">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                <div style="display:flex; flex-direction:column; gap:4px">
+                  <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A; line-height:1.2">DISEC</span>
+                  <span style="font-size:12px; color:#5B6B7C">Sala C‑310 · 18 países</span>
+                </div>
+                <span style="display:inline-flex; align-items:center; gap:6px; background:#E7F4EF; color:#1F6B52; font-size:10px; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#2F8F6E"></span>COMPLETO</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:#5B6B7C"><span>18 de 18 calificados</span><span style="font-weight:700; color:#1B2733">100%</span></div>
+                <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:100%; height:100%; background:#2F8F6E; border-radius:3px"></div></div>
+              </div>
+              <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Ver resumen</button>
+            </div>
+          </div>
+          <div style="border-top:1px solid #E3E8EF; background:#FFFFFF; display:flex; padding:12px 8px 22px">
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#0B2A4A"><div style="width:18px; height:18px; border-radius:4px; background:#0B2A4A"></div><span style="font-size:10px; font-weight:600">Comités</span></div>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#98A6B5"><div style="width:18px; height:18px; border-radius:4px; border:2px solid #98A6B5"></div><span style="font-size:10px; font-weight:600">Progreso</span></div>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; color:#98A6B5"><div style="width:18px; height:18px; border-radius:50%; border:2px solid #98A6B5"></div><span style="font-size:10px; font-weight:600">Perfil</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 LISTA DE PAÍSES -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">03 · Países del comité</span>
+        <div style="width:390px; height:780px; background:#F5F7FA; border-radius:26px; border:1px solid #E3E8EF; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(11,42,74,.10)">
+          <div style="background:#0B2A4A; padding:14px 20px 18px; display:flex; flex-direction:column; gap:14px">
+            <div style="height:20px; display:flex; align-items:center; justify-content:space-between; color:rgba(255,255,255,.72); font-size:11px; font-weight:600"><span>9:41</span><span>MUN · Wi‑Fi</span></div>
+            <div style="display:flex; align-items:center; gap:12px">
+              <span style="color:rgba(255,255,255,.7); font-size:18px; line-height:1">‹</span>
+              <div style="display:flex; flex-direction:column; gap:2px">
+                <span style="font-family:'Playfair Display',serif; font-size:20px; color:#FFFFFF; font-weight:600">Consejo de Seguridad</span>
+                <span style="font-size:11px; color:rgba(255,255,255,.6)">9 de 15 calificados · promedio 86.4</span>
+              </div>
+            </div>
+            <input type="text" placeholder="Buscar país…" value="{{ query }}" onChange="{{ onQuery }}" style="background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.2); border-radius:9px; padding:11px 13px; color:#FFFFFF; font-size:14px; outline:none" style-focus="border-color:#C9A227">
+            <div style="display:flex; gap:8px">
+              <span style="background:#FFFFFF; color:#0B2A4A; font-size:11px; font-weight:600; padding:6px 12px; border-radius:999px">Todos · 15</span>
+              <span style="background:rgba(255,255,255,.09); color:rgba(255,255,255,.8); font-size:11px; font-weight:600; padding:6px 12px; border-radius:999px">Pendientes · 6</span>
+              <span style="background:rgba(255,255,255,.09); color:rgba(255,255,255,.8); font-size:11px; font-weight:600; padding:6px 12px; border-radius:999px">Listos · 9</span>
+            </div>
+          </div>
+          <div style="flex:1; overflow:hidden; padding:14px 16px; display:flex; flex-direction:column; gap:9px">
+            <sc-for list="{{ countries }}" as="c" hint-placeholder-count="7">
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:13px 14px; display:flex; align-items:center; gap:12px; min-height:64px" style-hover="border-color:#418FDE">
+                <div style="width:4px; align-self:stretch; border-radius:2px; background:{{ c.color }}"></div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:3px; min-width:0">
+                  <span style="font-family:'Playfair Display',serif; font-size:17px; font-weight:600; color:#0B2A4A; line-height:1.15">{{ c.name }}</span>
+                  <span style="font-size:11px; color:#5B6B7C">{{ c.label }}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px">
+                  <span style="font-family:'Playfair Display',serif; font-size:20px; font-weight:600; color:{{ c.scoreColor }}; line-height:1">{{ c.score }}</span>
+                  <span style="font-size:10px; color:#98A6B5">/ 100</span>
+                </div>
+                <span style="color:#98A6B5; font-size:16px">›</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      </div>
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Vista de juez · mobile</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">03 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<div style="display:flex; gap:32px"><!-- 4 FORMULARIO DE CALIFICACIÓN -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">04 · Calificar país <span style="color:#C9A227">· interactivo</span></span>
+        <div style="width:390px; height:780px; background:#F5F7FA; border-radius:26px; border:1px solid #E3E8EF; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(11,42,74,.10)">
+          <div style="background:#0B2A4A; padding:14px 20px 16px; display:flex; flex-direction:column; gap:12px">
+            <div style="height:20px; display:flex; align-items:center; justify-content:space-between; color:rgba(255,255,255,.72); font-size:11px; font-weight:600"><span>9:41</span><span>MUN · Wi‑Fi</span></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px">
+              <div style="display:flex; align-items:center; gap:12px; min-width:0">
+                <span style="color:rgba(255,255,255,.7); font-size:18px; line-height:1">‹</span>
+                <div style="display:flex; flex-direction:column; gap:2px; min-width:0">
+                  <span style="font-family:'Playfair Display',serif; font-size:21px; color:#FFFFFF; font-weight:600">Francia</span>
+                  <span style="font-size:11px; color:rgba(255,255,255,.6)">Consejo de Seguridad · país 10 de 15</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end">
+                <span style="font-family:'Playfair Display',serif; font-size:30px; font-weight:600; color:#C9A227; line-height:1">{{ total }}</span>
+                <span style="font-size:10px; color:rgba(255,255,255,.55)">TOTAL PONDERADO</span>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1; overflow:auto; padding:16px; display:flex; flex-direction:column; gap:12px">
+            <sc-for list="{{ criteria }}" as="k" hint-placeholder-count="7">
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:14px 15px 12px; display:flex; flex-direction:column; gap:11px">
+                <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+                  <div style="display:flex; align-items:baseline; gap:8px; min-width:0">
+                    <span style="font-size:14px; font-weight:600; color:#1B2733">{{ k.name }}</span>
+                    <span style="font-size:10px; font-weight:700; color:#5B6B7C; background:#F2F4F8; padding:3px 7px; border-radius:5px; white-space:nowrap">{{ k.weightLabel }}</span>
+                  </div>
+                  <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A; line-height:1">{{ k.value }}</span>
+                </div>
+                <input type="range" class="sl" min="0" max="100" step="1" value="{{ k.value }}" onChange="{{ k.onChange }}">
+                <div style="display:flex; justify-content:space-between; font-size:10px; color:#98A6B5"><span>0</span><span>aporta {{ k.contrib }} pts</span><span>100</span></div>
+              </div>
+            </sc-for>
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:14px 15px; display:flex; flex-direction:column; gap:9px">
+              <span style="font-size:13px; font-weight:600; color:#1B2733">Comentario del juez</span>
+              <textarea rows="4" placeholder="Observaciones sobre la participación de la delegación…" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px; font-size:13px; color:#1B2733; line-height:1.5; resize:none; outline:none" style-focus="border-color:#418FDE"></textarea>
+              <span style="font-size:10px; color:#98A6B5">Visible solo para el equipo de chairs y admins.</span>
+            </div>
+          </div>
+          <div style="border-top:1px solid #E3E8EF; background:#FFFFFF; padding:12px 16px 20px; display:flex; flex-direction:column; gap:10px">
+            <div style="display:flex; align-items:center; justify-content:center; gap:7px; font-size:11px; color:#2F8F6E; font-weight:600">
+              <span style="width:6px; height:6px; border-radius:50%; background:#C9A227; animation:munPulse 1.6s ease-in-out infinite"></span>
+              <span>{{ saveLabel }}</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <button style="flex:1; background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:9px; padding:14px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">‹ Estonia</button>
+              <button style="flex:1.4; background:#0B2A4A; color:#FFFFFF; border:none; border-radius:9px; padding:14px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Gabón ›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 RESUMEN DE PROGRESO -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">05 · Resumen de progreso</span>
+        <div style="width:390px; height:780px; background:#F5F7FA; border-radius:26px; border:1px solid #E3E8EF; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 12px 34px rgba(11,42,74,.10)">
+          <div style="background:#0B2A4A; padding:14px 20px 20px; display:flex; flex-direction:column; gap:16px">
+            <div style="height:20px; display:flex; align-items:center; justify-content:space-between; color:rgba(255,255,255,.72); font-size:11px; font-weight:600"><span>9:41</span><span>MUN · Wi‑Fi</span></div>
+            <div style="display:flex; flex-direction:column; gap:3px">
+              <span style="font-family:'Playfair Display',serif; font-size:22px; color:#FFFFFF; font-weight:600">Mi progreso</span>
+              <span style="font-size:11px; color:rgba(255,255,255,.6)">Consejo de Seguridad · ranking parcial</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <div style="flex:1; background:rgba(255,255,255,.08); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:3px">
+                <span style="font-family:'Playfair Display',serif; font-size:24px; color:#FFFFFF; font-weight:600; line-height:1">9</span>
+                <span style="font-size:10px; color:rgba(255,255,255,.6)">CALIFICADOS</span>
+              </div>
+              <div style="flex:1; background:rgba(255,255,255,.08); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:3px">
+                <span style="font-family:'Playfair Display',serif; font-size:24px; color:#C9A227; font-weight:600; line-height:1">6</span>
+                <span style="font-size:10px; color:rgba(255,255,255,.6)">PENDIENTES</span>
+              </div>
+              <div style="flex:1; background:rgba(255,255,255,.08); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:3px">
+                <span style="font-family:'Playfair Display',serif; font-size:24px; color:#FFFFFF; font-weight:600; line-height:1">86.4</span>
+                <span style="font-size:10px; color:rgba(255,255,255,.6)">PROMEDIO</span>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1; overflow:hidden; padding:18px 16px; display:flex; flex-direction:column; gap:10px">
+            <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">RANKING PARCIAL</span>
+            <sc-for list="{{ ranking }}" as="r" hint-placeholder-count="6">
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:12px 14px; display:flex; align-items:center; gap:13px">
+                <span style="width:26px; height:26px; border-radius:50%; background:{{ r.badgeBg }}; color:{{ r.badgeFg }}; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700">{{ r.pos }}</span>
+                <div style="flex:1; display:flex; flex-direction:column; gap:5px; min-width:0">
+                  <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">{{ r.name }}</span>
+                  <div style="height:4px; border-radius:2px; background:#E3E8EF; overflow:hidden"><div style="width:{{ r.pct }}; height:100%; background:#418FDE; border-radius:2px"></div></div>
+                </div>
+                <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A">{{ r.score }}</span>
+              </div>
+            </sc-for>
+            <div style="margin-top:6px; background:#FFFFFF; border:1px dashed #CBD5E1; border-radius:11px; padding:14px; display:flex; align-items:center; justify-content:space-between">
+              <span style="font-size:12px; color:#5B6B7C">Te faltan 6 países por calificar</span>
+              <span style="font-size:12px; font-weight:600; color:#418FDE">Continuar ›</span>
+            </div>
+          </div>
+        </div>
+      </div></div>
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Vista de juez · web</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">04 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- J1 LOGIN WEB -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">01w · Acceso</span>
+        <div style="width:1340px; height:560px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex">
+          <div style="width:520px; background:#0B2A4A; padding:44px; display:flex; flex-direction:column; justify-content:space-between">
+            <div style="display:flex; align-items:center; gap:12px">
+              <div style="width:34px; height:34px; border-radius:50%; border:1px solid rgba(201,162,39,.55); display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-weight:700; font-size:15px">M</div>
+              <span style="font-size:11px; letter-spacing:.18em; color:rgba(255,255,255,.6); font-weight:600">MUNYCH ASSOCIATION</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:14px">
+              <span style="font-family:'Playfair Display',serif; font-size:38px; line-height:1.15; color:#FFFFFF; font-weight:600">Panel de jueces</span>
+              <span style="font-size:14px; color:rgba(255,255,255,.65); line-height:1.6; max-width:340px; text-wrap:pretty">Califica a las delegaciones de tus comités con los criterios ponderados del evento. Tus cambios se guardan solos.</span>
+            </div>
+            <span style="font-size:11px; color:rgba(255,255,255,.4)">MUNYCH 2026 · Sesión de marzo</span>
+          </div>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:44px">
+            <div style="width:380px; display:flex; flex-direction:column; gap:16px">
+              <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:6px">
+                <span style="font-family:'Playfair Display',serif; font-size:26px; font-weight:600; color:#0B2A4A">Iniciar sesión</span>
+                <span style="font-size:13px; color:#5B6B7C">Usa tus credenciales de chair.</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px">
+                <label style="font-size:12px; font-weight:600; color:#5B6B7C">Usuario</label>
+                <input type="text" value="a.reyes" style="border:1px solid #CBD5E1; border-radius:8px; padding:12px 13px; font-size:14px; outline:none" style-focus="border-color:#418FDE">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px">
+                <label style="font-size:12px; font-weight:600; color:#5B6B7C">Contraseña</label>
+                <input type="password" value="12345678" style="border:1px solid #CBD5E1; border-radius:8px; padding:12px 13px; font-size:14px; outline:none; letter-spacing:.2em" style-focus="border-color:#418FDE">
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between">
+                <span style="display:flex; align-items:center; gap:8px; font-size:12px; color:#5B6B7C"><span style="width:16px; height:16px; border-radius:5px; border:1px solid #CBD5E1"></span>Mantener sesión</span>
+                <a href="#" style="font-size:12px; font-weight:600">¿Olvidaste tu contraseña?</a>
+              </div>
+              <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:14px; font-size:14px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Entrar</button>
+              <div style="display:flex; align-items:center; gap:12px"><div style="flex:1; height:1px; background:#E3E8EF"></div><span style="font-size:11px; color:#98A6B5">o</span><div style="flex:1; height:1px; background:#E3E8EF"></div></div>
+              <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:13px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Usar código de acceso</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Vista de juez · web</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">05 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- J2 DASHBOARD WEB -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">02w · Dashboard del juez</span>
+        <div style="width:1340px; background:#F5F7FA; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex; flex-direction:column">
+          <div style="background:#0B2A4A; padding:16px 28px; display:flex; align-items:center; justify-content:space-between">
+            <div style="display:flex; align-items:center; gap:28px">
+              <div style="display:flex; align-items:center; gap:10px">
+                <div style="width:28px; height:28px; border-radius:50%; border:1px solid rgba(201,162,39,.5); display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-size:13px; font-weight:700">M</div>
+                <span style="font-family:'Playfair Display',serif; font-size:15px; color:#FFFFFF; font-weight:600">MUNYCH</span>
+              </div>
+              <nav style="display:flex; gap:6px">
+                <span style="padding:8px 14px; border-radius:7px; background:rgba(255,255,255,.12); color:#FFFFFF; font-size:13px; font-weight:600">Mis comités</span>
+                <span style="padding:8px 14px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Mi progreso</span>
+              </nav>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px">
+              <span style="font-size:13px; color:rgba(255,255,255,.75)">Andrea Reyes</span>
+              <div style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; color:#FFFFFF; font-size:12px; font-weight:600">AR</div>
+            </div>
+          </div>
+          <div style="padding:28px; display:flex; flex-direction:column; gap:20px">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between">
+              <div style="display:flex; flex-direction:column; gap:4px">
+                <span style="font-family:'Playfair Display',serif; font-size:26px; font-weight:600; color:#0B2A4A">Buenos días, Andrea</span>
+                <span style="font-size:13px; color:#5B6B7C">Tienes 3 comités asignados · 27 de 55 delegaciones calificadas</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:14px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:12px 18px">
+                <div style="display:flex; flex-direction:column; gap:2px"><span style="font-size:11px; color:#5B6B7C; font-weight:600">AVANCE TOTAL</span><span style="font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A; line-height:1">49%</span></div>
+                <div style="width:140px; height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:49%; height:100%; background:#C9A227"></div></div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:18px">
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:20px; display:flex; flex-direction:column; gap:16px" style-hover="border-color:#418FDE">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                  <div style="display:flex; flex-direction:column; gap:4px"><span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">Consejo de Seguridad</span><span style="font-size:12px; color:#5B6B7C">Sala A‑201 · 15 países</span></div>
+                  <span style="display:inline-flex; align-items:center; gap:6px; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#C9A227"></span>EN PROGRESO</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:7px">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#5B6B7C"><span>9 de 15 calificados</span><span style="font-weight:700; color:#1B2733">60%</span></div>
+                  <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:60%; height:100%; background:#C9A227"></div></div>
+                </div>
+                <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Continuar calificando</button>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:20px; display:flex; flex-direction:column; gap:16px" style-hover="border-color:#418FDE">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                  <div style="display:flex; flex-direction:column; gap:4px"><span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">ECOSOC</span><span style="font-size:12px; color:#5B6B7C">Sala B‑105 · 22 países</span></div>
+                  <span style="display:inline-flex; align-items:center; gap:6px; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#98A6B5"></span>SIN INICIAR</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:7px">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#5B6B7C"><span>0 de 22 calificados</span><span style="font-weight:700; color:#1B2733">0%</span></div>
+                  <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:2%; height:100%; background:#98A6B5"></div></div>
+                </div>
+                <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Empezar</button>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:11px; padding:20px; display:flex; flex-direction:column; gap:16px" style-hover="border-color:#418FDE">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+                  <div style="display:flex; flex-direction:column; gap:4px"><span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">DISEC</span><span style="font-size:12px; color:#5B6B7C">Sala C‑310 · 18 países</span></div>
+                  <span style="display:inline-flex; align-items:center; gap:6px; background:#E7F4EF; color:#1F6B52; font-size:10px; font-weight:700; padding:5px 9px; border-radius:999px; white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:#2F8F6E"></span>COMPLETO</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:7px">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#5B6B7C"><span>18 de 18 calificados</span><span style="font-weight:700; color:#1B2733">100%</span></div>
+                  <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:100%; height:100%; background:#2F8F6E"></div></div>
+                </div>
+                <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Ver resumen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Vista de juez · web</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">06 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- J3+J4 LISTA + FORMULARIO (master-detail) -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">03w + 04w · Países y calificación <span style="color:#C9A227">· interactivo</span></span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex; flex-direction:column">
+          <div style="background:#0B2A4A; padding:18px 28px; display:flex; align-items:center; justify-content:space-between">
+            <div style="display:flex; align-items:center; gap:14px">
+              <span style="color:rgba(255,255,255,.7); font-size:18px">‹</span>
+              <div style="display:flex; flex-direction:column; gap:2px">
+                <span style="font-family:'Playfair Display',serif; font-size:22px; color:#FFFFFF; font-weight:600">Consejo de Seguridad</span>
+                <span style="font-size:12px; color:rgba(255,255,255,.6)">9 de 15 calificados · promedio del juez 86.4</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px">
+              <div style="width:200px; height:6px; border-radius:3px; background:rgba(255,255,255,.16); overflow:hidden"><div style="width:60%; height:100%; background:#C9A227"></div></div>
+              <span style="font-size:13px; color:#FFFFFF; font-weight:600">60%</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:stretch">
+            <div style="width:360px; border-right:1px solid #E3E8EF; background:#F5F7FA; display:flex; flex-direction:column">
+              <div style="padding:16px; display:flex; flex-direction:column; gap:10px; border-bottom:1px solid #E3E8EF">
+                <input type="text" placeholder="Buscar país…" value="{{ query }}" onChange="{{ onQuery }}" style="border:1px solid #CBD5E1; border-radius:8px; padding:10px 12px; font-size:13px; background:#FFFFFF; outline:none" style-focus="border-color:#418FDE">
+                <div style="display:flex; gap:7px">
+                  <span style="background:#0B2A4A; color:#FFFFFF; font-size:11px; font-weight:600; padding:5px 11px; border-radius:999px">Todos · 15</span>
+                  <span style="background:#FFFFFF; border:1px solid #E3E8EF; color:#5B6B7C; font-size:11px; font-weight:600; padding:5px 11px; border-radius:999px">Pendientes · 6</span>
+                  <span style="background:#FFFFFF; border:1px solid #E3E8EF; color:#5B6B7C; font-size:11px; font-weight:600; padding:5px 11px; border-radius:999px">Listos · 9</span>
+                </div>
+              </div>
+              <div style="padding:12px; display:flex; flex-direction:column; gap:7px">
+                <sc-for list="{{ countries }}" as="c" hint-placeholder-count="7">
+                  <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:11px 13px; display:flex; align-items:center; gap:11px" style-hover="border-color:#418FDE">
+                    <div style="width:3px; align-self:stretch; border-radius:2px; background:{{ c.color }}"></div>
+                    <div style="flex:1; display:flex; flex-direction:column; gap:2px; min-width:0">
+                      <span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">{{ c.name }}</span>
+                      <span style="font-size:11px; color:#5B6B7C">{{ c.label }}</span>
+                    </div>
+                    <span style="font-family:'Playfair Display',serif; font-size:17px; font-weight:600; color:{{ c.scoreColor }}">{{ c.score }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+              <div style="padding:22px 28px; border-bottom:1px solid #E3E8EF; display:flex; align-items:center; justify-content:space-between">
+                <div style="display:flex; flex-direction:column; gap:3px">
+                  <span style="font-family:'Playfair Display',serif; font-size:28px; font-weight:600; color:#0B2A4A">Francia</span>
+                  <span style="font-size:12px; color:#5B6B7C">Delegada: M. Ocampo · país 10 de 15</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:22px">
+                  <div style="display:flex; flex-direction:column; align-items:flex-end">
+                    <span style="font-family:'Playfair Display',serif; font-size:40px; font-weight:600; color:#0B2A4A; line-height:1">{{ total }}</span>
+                    <span style="font-size:10px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">TOTAL PONDERADO / 100</span>
+                  </div>
+                  <div style="display:flex; gap:8px">
+                    <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:11px 15px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">‹ Estonia</button>
+                    <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:11px 18px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Gabón ›</button>
+                  </div>
+                </div>
+              </div>
+              <div style="padding:22px 28px; display:flex; gap:26px; align-items:flex-start">
+                <div style="flex:1.5; display:grid; grid-template-columns:1fr 1fr; gap:14px; min-width:0">
+                  <sc-for list="{{ criteria }}" as="k" hint-placeholder-count="7">
+                    <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:14px 16px 12px; display:flex; flex-direction:column; gap:10px">
+                      <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+                        <div style="display:flex; align-items:baseline; gap:8px; min-width:0">
+                          <span style="font-size:13px; font-weight:600; color:#1B2733">{{ k.name }}</span>
+                          <span style="font-size:10px; font-weight:700; color:#5B6B7C; background:#F2F4F8; padding:3px 7px; border-radius:5px; white-space:nowrap">{{ k.weightLabel }}</span>
+                        </div>
+                        <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">{{ k.value }}</span>
+                      </div>
+                      <input type="range" class="sl" min="0" max="100" step="1" value="{{ k.value }}" onChange="{{ k.onChange }}">
+                      <div style="display:flex; justify-content:space-between; font-size:10px; color:#98A6B5"><span>0</span><span>aporta {{ k.contrib }} pts</span><span>100</span></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; gap:14px; position:sticky; top:20px">
+                  <div style="background:#F5F7FA; border:1px solid #E3E8EF; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:9px">
+                    <span style="font-size:13px; font-weight:600; color:#1B2733">Comentario del juez</span>
+                    <textarea rows="7" placeholder="Observaciones sobre la participación de la delegación…" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px; font-size:13px; line-height:1.55; resize:none; outline:none; background:#FFFFFF" style-focus="border-color:#418FDE"></textarea>
+                    <span style="font-size:11px; color:#98A6B5">Visible solo para chairs y admins.</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#2F8F6E; font-weight:600">
+                    <span style="width:6px; height:6px; border-radius:50%; background:#C9A227; animation:munPulse 1.6s ease-in-out infinite"></span>
+                    <span>{{ saveLabel }}</span>
+                  </div>
+                  <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:13px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Marcar como completo</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Vista de juez · web</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">07 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- J5 RESUMEN WEB -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">05w · Resumen de progreso</span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex; flex-direction:column">
+          <div style="padding:24px 28px; border-bottom:1px solid #E3E8EF; display:flex; align-items:flex-end; justify-content:space-between">
+            <div style="display:flex; flex-direction:column; gap:3px">
+              <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:#0B2A4A">Mi progreso · Consejo de Seguridad</span>
+              <span style="font-size:12px; color:#5B6B7C">Ranking parcial según tus calificaciones. No es el resultado oficial del comité.</span>
+            </div>
+            <div style="display:flex; gap:14px">
+              <div style="background:#F5F7FA; border:1px solid #E3E8EF; border-radius:10px; padding:12px 18px; display:flex; flex-direction:column; gap:2px"><span style="font-size:10px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">CALIFICADOS</span><span style="font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A; line-height:1">9</span></div>
+              <div style="background:#F5F7FA; border:1px solid #E3E8EF; border-radius:10px; padding:12px 18px; display:flex; flex-direction:column; gap:2px"><span style="font-size:10px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">PENDIENTES</span><span style="font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#C9A227; line-height:1">6</span></div>
+              <div style="background:#F5F7FA; border:1px solid #E3E8EF; border-radius:10px; padding:12px 18px; display:flex; flex-direction:column; gap:2px"><span style="font-size:10px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">PROMEDIO</span><span style="font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A; line-height:1">86.4</span></div>
+            </div>
+          </div>
+          <div style="display:flex">
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+              <div style="display:grid; grid-template-columns:70px 2fr 3fr 100px; gap:16px; padding:11px 28px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+                <span>POS.</span><span>PAÍS</span><span>PUNTAJE</span><span style="text-align:right">TOTAL</span>
+              </div>
+              <sc-for list="{{ ranking }}" as="r" hint-placeholder-count="6">
+                <div style="display:grid; grid-template-columns:70px 2fr 3fr 100px; gap:16px; padding:14px 28px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                  <span style="width:30px; height:30px; border-radius:50%; background:{{ r.badgeBg }}; color:{{ r.badgeFg }}; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700">{{ r.pos }}</span>
+                  <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">{{ r.name }}</span>
+                  <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:{{ r.pct }}; height:100%; background:#418FDE"></div></div>
+                  <span style="justify-self:end; font-family:'Playfair Display',serif; font-size:20px; font-weight:600; color:#0B2A4A">{{ r.score }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="width:360px; border-left:1px solid #E3E8EF; background:#F5F7FA; padding:24px; display:flex; flex-direction:column; gap:14px">
+              <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">PENDIENTES</span>
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">Estonia</span><span style="font-size:12px; color:#418FDE; font-weight:600">Calificar ›</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">Gabón</span><span style="font-size:12px; color:#418FDE; font-weight:600">Calificar ›</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">India</span><span style="font-size:12px; color:#418FDE; font-weight:600">Calificar ›</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">Japón</span><span style="font-size:12px; color:#418FDE; font-weight:600">Calificar ›</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">Noruega</span><span style="font-size:12px; color:#418FDE; font-weight:600">Calificar ›</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">Federación Rusa</span><span style="font-size:12px; color:#418FDE; font-weight:600">Calificar ›</span></div>
+              </div>
+              <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:13px; font-size:13px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#123B63">Continuar con Estonia</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">08 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 6 DASHBOARD ADMIN -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">06 · Dashboard general</span>
+        <div style="width:1340px; background:#F5F7FA; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 12px 34px rgba(11,42,74,.10)">
+          <div style="width:232px; background:#0B2A4A; padding:22px 16px; display:flex; flex-direction:column; gap:26px">
+            <div style="display:flex; align-items:center; gap:10px; padding:0 6px">
+              <div style="width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.1); border:1px solid rgba(201,162,39,.5); display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-weight:700; font-size:14px">M</div>
+              <div style="display:flex; flex-direction:column">
+                <span style="font-family:'Playfair Display',serif; font-size:15px; color:#FFFFFF; font-weight:600">MUNYCH</span>
+                <span style="font-size:9px; letter-spacing:.14em; color:rgba(255,255,255,.5)">ADMIN</span>
+              </div>
+            </div>
+            <nav style="display:flex; flex-direction:column; gap:2px">
+              <span style="padding:10px 12px; border-radius:7px; background:rgba(255,255,255,.12); color:#FFFFFF; font-size:13px; font-weight:600">Dashboard</span>
+              <span style="padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Comités</span>
+              <span style="padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Países</span>
+              <span style="padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Jueces</span>
+              <span style="padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Criterios</span>
+              <span style="padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Resultados</span>
+              <span style="padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px" style-hover="background:rgba(255,255,255,.06); color:#FFFFFF">Exportar</span>
+            </nav>
+            <div style="margin-top:auto; padding:12px; border-radius:8px; background:rgba(255,255,255,.06); display:flex; flex-direction:column; gap:4px">
+              <span style="font-size:11px; color:rgba(255,255,255,.55)">Evento activo</span>
+              <span style="font-size:13px; color:#FFFFFF; font-weight:600">MUNYCH 2026</span>
+            </div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; min-width:0">
+            <div style="background:#FFFFFF; border-bottom:1px solid #E3E8EF; padding:18px 28px; display:flex; align-items:center; justify-content:space-between">
+              <div style="display:flex; flex-direction:column; gap:2px">
+                <span style="font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A">Panel general</span>
+                <span style="font-size:12px; color:#5B6B7C">Sábado 14 de marzo · sesión 2 en curso</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:14px">
+                <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:9px 15px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">Exportar todo</button>
+                <div style="width:34px; height:34px; border-radius:50%; background:#F2F4F8; border:1px solid #E3E8EF; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#0B2A4A">SG</div>
+              </div>
+            </div>
+            <div style="padding:26px 28px; display:flex; flex-direction:column; gap:22px">
+              <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px">
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:6px">
+                  <span style="font-size:11px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">COMITÉS</span>
+                  <span style="font-family:'Playfair Display',serif; font-size:32px; font-weight:600; color:#0B2A4A; line-height:1">8</span>
+                  <span style="font-size:11px; color:#5B6B7C">6 en sesión · 2 cerrados</span>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:6px">
+                  <span style="font-size:11px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">DELEGACIONES</span>
+                  <span style="font-family:'Playfair Display',serif; font-size:32px; font-weight:600; color:#0B2A4A; line-height:1">146</span>
+                  <span style="font-size:11px; color:#5B6B7C">en 8 comités</span>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:6px">
+                  <span style="font-size:11px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">JUECES ACTIVOS</span>
+                  <span style="font-family:'Playfair Display',serif; font-size:32px; font-weight:600; color:#0B2A4A; line-height:1">17</span>
+                  <span style="font-size:11px; color:#5B6B7C">14 calificando ahora</span>
+                </div>
+                <div style="background:#0B2A4A; border:1px solid #0B2A4A; border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:6px">
+                  <span style="font-size:11px; letter-spacing:.1em; color:rgba(255,255,255,.6); font-weight:600">PROGRESO GLOBAL</span>
+                  <span style="font-family:'Playfair Display',serif; font-size:32px; font-weight:600; color:#C9A227; line-height:1">62%</span>
+                  <div style="height:5px; border-radius:3px; background:rgba(255,255,255,.16); overflow:hidden; margin-top:2px"><div style="width:62%; height:100%; background:#C9A227"></div></div>
+                </div>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; overflow:hidden">
+                <div style="padding:16px 20px; border-bottom:1px solid #E3E8EF; display:flex; align-items:center; justify-content:space-between">
+                  <span style="font-size:14px; font-weight:600; color:#1B2733">Progreso por comité</span>
+                  <span style="font-size:12px; color:#418FDE; font-weight:600">Ver detalle</span>
+                </div>
+                <div style="display:flex; flex-direction:column">
+                  <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 2fr 90px; gap:16px; padding:11px 20px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+                    <span>COMITÉ</span><span>JUECES</span><span>PAÍSES</span><span>AVANCE</span><span style="text-align:right">ESTADO</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 2fr 90px; gap:16px; padding:14px 20px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                    <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Consejo de Seguridad</span>
+                    <span style="font-size:13px; color:#5B6B7C">3</span><span style="font-size:13px; color:#5B6B7C">15</span>
+                    <div style="display:flex; align-items:center; gap:10px"><div style="flex:1; height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:60%; height:100%; background:#C9A227"></div></div><span style="font-size:12px; font-weight:600; color:#1B2733">60%</span></div>
+                    <span style="justify-self:end; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">EN CURSO</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 2fr 90px; gap:16px; padding:14px 20px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                    <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">ECOSOC</span>
+                    <span style="font-size:13px; color:#5B6B7C">2</span><span style="font-size:13px; color:#5B6B7C">22</span>
+                    <div style="display:flex; align-items:center; gap:10px"><div style="flex:1; height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:18%; height:100%; background:#C9A227"></div></div><span style="font-size:12px; font-weight:600; color:#1B2733">18%</span></div>
+                    <span style="justify-self:end; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">EN CURSO</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 2fr 90px; gap:16px; padding:14px 20px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                    <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">DISEC</span>
+                    <span style="font-size:13px; color:#5B6B7C">2</span><span style="font-size:13px; color:#5B6B7C">18</span>
+                    <div style="display:flex; align-items:center; gap:10px"><div style="flex:1; height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:100%; height:100%; background:#2F8F6E"></div></div><span style="font-size:12px; font-weight:600; color:#1B2733">100%</span></div>
+                    <span style="justify-self:end; background:#E7F4EF; color:#1F6B52; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">CERRADO</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 2fr 90px; gap:16px; padding:14px 20px; align-items:center" style-hover="background:#F9FAFC">
+                    <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Corte Internacional de Justicia</span>
+                    <span style="font-size:13px; color:#5B6B7C">2</span><span style="font-size:13px; color:#5B6B7C">12</span>
+                    <div style="display:flex; align-items:center; gap:10px"><div style="flex:1; height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:3%; height:100%; background:#98A6B5"></div></div><span style="font-size:12px; font-weight:600; color:#1B2733">0%</span></div>
+                    <span style="justify-self:end; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">SIN INICIAR</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">09 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 7 GESTIÓN DE COMITÉS + MODAL -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">07 · Gestión de comités · tabla + modal</span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex; flex-direction:column">
+          <div style="padding:20px 26px; border-bottom:1px solid #E3E8EF; display:flex; align-items:center; justify-content:space-between">
+            <div style="display:flex; flex-direction:column; gap:3px">
+              <span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">Comités</span>
+              <span style="font-size:12px; color:#5B6B7C">8 comités · 146 delegaciones</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <input type="text" placeholder="Buscar comité…" style="border:1px solid #CBD5E1; border-radius:8px; padding:9px 13px; font-size:13px; width:230px; outline:none" style-focus="border-color:#418FDE">
+              <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">+ Nuevo comité</button>
+            </div>
+          </div>
+          <div style="display:flex; align-items:flex-start">
+            <div style="flex:1; min-width:0">
+              <div style="display:grid; grid-template-columns:2fr 1.1fr .8fr .8fr 1fr 70px; gap:14px; padding:11px 26px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+                <span>NOMBRE</span><span>SALA</span><span>PAÍSES</span><span>JUECES</span><span>ESTADO</span><span></span>
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.1fr .8fr .8fr 1fr 70px; gap:14px; padding:14px 26px; border-bottom:1px solid #EEF1F5; align-items:center; background:#F5F9FF">
+                <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Consejo de Seguridad</span>
+                <span style="font-size:13px; color:#5B6B7C">A‑201</span><span style="font-size:13px; color:#5B6B7C">15</span><span style="font-size:13px; color:#5B6B7C">3</span>
+                <span style="justify-self:start; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">EN CURSO</span>
+                <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.1fr .8fr .8fr 1fr 70px; gap:14px; padding:14px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">ECOSOC</span>
+                <span style="font-size:13px; color:#5B6B7C">B‑105</span><span style="font-size:13px; color:#5B6B7C">22</span><span style="font-size:13px; color:#5B6B7C">2</span>
+                <span style="justify-self:start; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">EN CURSO</span>
+                <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.1fr .8fr .8fr 1fr 70px; gap:14px; padding:14px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">DISEC</span>
+                <span style="font-size:13px; color:#5B6B7C">C‑310</span><span style="font-size:13px; color:#5B6B7C">18</span><span style="font-size:13px; color:#5B6B7C">2</span>
+                <span style="justify-self:start; background:#E7F4EF; color:#1F6B52; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">CERRADO</span>
+                <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.1fr .8fr .8fr 1fr 70px; gap:14px; padding:14px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Corte Internacional de Justicia</span>
+                <span style="font-size:13px; color:#5B6B7C">D‑002</span><span style="font-size:13px; color:#5B6B7C">12</span><span style="font-size:13px; color:#5B6B7C">2</span>
+                <span style="justify-self:start; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">SIN INICIAR</span>
+                <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.1fr .8fr .8fr 1fr 70px; gap:14px; padding:14px 26px; align-items:center" style-hover="background:#F9FAFC">
+                <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Asamblea General</span>
+                <span style="font-size:13px; color:#5B6B7C">Auditorio</span><span style="font-size:13px; color:#5B6B7C">40</span><span style="font-size:13px; color:#5B6B7C">4</span>
+                <span style="justify-self:start; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">EN CURSO</span>
+                <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+              </div>
+            </div>
+            <div style="width:420px; border-left:1px solid #E3E8EF; background:#F5F7FA; padding:24px; display:flex; flex-direction:column; gap:18px; align-self:stretch">
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; box-shadow:0 18px 40px rgba(11,42,74,.14); overflow:hidden">
+                <div style="padding:18px 20px; border-bottom:1px solid #E3E8EF; display:flex; align-items:center; justify-content:space-between">
+                  <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">Editar comité</span>
+                  <span style="color:#98A6B5; font-size:16px">✕</span>
+                </div>
+                <div style="padding:20px; display:flex; flex-direction:column; gap:15px">
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600; color:#5B6B7C">Nombre del comité</label>
+                    <input type="text" value="Consejo de Seguridad" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:14px; outline:none" style-focus="border-color:#418FDE">
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+                    <div style="display:flex; flex-direction:column; gap:6px">
+                      <label style="font-size:12px; font-weight:600; color:#5B6B7C">Sigla</label>
+                      <input type="text" value="CS" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:14px; outline:none" style-focus="border-color:#418FDE">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px">
+                      <label style="font-size:12px; font-weight:600; color:#5B6B7C">Sala</label>
+                      <input type="text" value="A‑201" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:14px; outline:none" style-focus="border-color:#418FDE">
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600; color:#5B6B7C">Idioma de trabajo</label>
+                    <select style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:14px; color:#1B2733; background:#FFFFFF; outline:none"><option>Español</option><option>Inglés</option></select>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px">
+                    <label style="font-size:12px; font-weight:600; color:#5B6B7C">Set de criterios</label>
+                    <select style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:14px; color:#1B2733; background:#FFFFFF; outline:none"><option>Estándar MUNYCH (7 criterios)</option><option>Corte de Justicia (5 criterios)</option></select>
+                  </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:#F5F7FA; border-radius:8px">
+                    <span style="font-size:13px; color:#1B2733; font-weight:500">Comité visible para jueces</span>
+                    <span style="width:40px; height:22px; border-radius:999px; background:#2F8F6E; display:flex; align-items:center; justify-content:flex-end; padding:2px"><span style="width:18px; height:18px; border-radius:50%; background:#FFFFFF"></span></span>
+                  </div>
+                </div>
+                <div style="padding:16px 20px; border-top:1px solid #E3E8EF; display:flex; justify-content:flex-end; gap:10px">
+                  <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer">Cancelar</button>
+                  <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:10px 18px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Guardar cambios</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">10 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 8 PAÍSES + CARGA MASIVA -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">08 · Países del comité · tabla + carga masiva</span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex">
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+            <div style="padding:20px 26px; border-bottom:1px solid #E3E8EF; display:flex; align-items:center; justify-content:space-between">
+              <div style="display:flex; flex-direction:column; gap:3px">
+                <span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">Países · Consejo de Seguridad</span>
+                <span style="font-size:12px; color:#5B6B7C">15 delegaciones registradas</span>
+              </div>
+              <div style="display:flex; gap:10px">
+                <select style="border:1px solid #CBD5E1; border-radius:8px; padding:9px 12px; font-size:13px; background:#FFFFFF; outline:none"><option>Consejo de Seguridad</option><option>ECOSOC</option></select>
+                <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">+ Añadir país</button>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:36px 2fr 1.6fr 1.2fr 80px; gap:14px; padding:11px 26px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+              <span></span><span>PAÍS</span><span>DELEGADO</span><span>ESTADO</span><span></span>
+            </div>
+            <div style="display:grid; grid-template-columns:36px 2fr 1.6fr 1.2fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+              <span style="width:16px; height:16px; border-radius:4px; border:1px solid #CBD5E1"></span>
+              <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Estados Unidos</span>
+              <span style="font-size:13px; color:#5B6B7C">L. Fernández</span>
+              <span style="justify-self:start; background:#E7F4EF; color:#1F6B52; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">3 / 3 JUECES</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:36px 2fr 1.6fr 1.2fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+              <span style="width:16px; height:16px; border-radius:4px; border:1px solid #CBD5E1"></span>
+              <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Francia</span>
+              <span style="font-size:13px; color:#5B6B7C">M. Ocampo</span>
+              <span style="justify-self:start; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">2 / 3 JUECES</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:36px 2fr 1.6fr 1.2fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+              <span style="width:16px; height:16px; border-radius:4px; border:1px solid #CBD5E1"></span>
+              <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Federación Rusa</span>
+              <span style="font-size:13px; color:#5B6B7C">D. Salgado</span>
+              <span style="justify-self:start; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">0 / 3 JUECES</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:36px 2fr 1.6fr 1.2fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+              <span style="width:16px; height:16px; border-radius:4px; border:1px solid #CBD5E1"></span>
+              <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Ghana</span>
+              <span style="font-size:13px; color:#5B6B7C">P. Arriaga</span>
+              <span style="justify-self:start; background:#E7F4EF; color:#1F6B52; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">3 / 3 JUECES</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:36px 2fr 1.6fr 1.2fr 80px; gap:14px; padding:13px 26px; align-items:center" style-hover="background:#F9FAFC">
+              <span style="width:16px; height:16px; border-radius:4px; border:1px solid #CBD5E1"></span>
+              <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">Emiratos Árabes Unidos</span>
+              <span style="font-size:13px; color:#5B6B7C">S. Kuri</span>
+              <span style="justify-self:start; background:#FBF4DF; color:#8A6F12; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px">1 / 3 JUECES</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+            </div>
+          </div>
+          <div style="width:400px; border-left:1px solid #E3E8EF; background:#F5F7FA; padding:24px; display:flex; flex-direction:column; gap:16px">
+            <div style="display:flex; flex-direction:column; gap:4px">
+              <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">Carga masiva</span>
+              <span style="font-size:12px; color:#5B6B7C; line-height:1.5">Sube un CSV con las columnas <span style="font-family:ui-monospace,monospace; font-size:11px">pais, delegado, correo</span>.</span>
+            </div>
+            <div style="border:1px dashed #CBD5E1; border-radius:10px; background:#FFFFFF; padding:28px 20px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center">
+              <div style="width:38px; height:38px; border-radius:8px; background:#F2F4F8; border:1px solid #E3E8EF"></div>
+              <span style="font-size:13px; color:#1B2733; font-weight:600">Arrastra el archivo aquí</span>
+              <span style="font-size:12px; color:#5B6B7C">o <span style="color:#418FDE; font-weight:600">selecciona un archivo</span></span>
+            </div>
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:14px; display:flex; align-items:center; gap:12px">
+              <div style="flex:1; display:flex; flex-direction:column; gap:6px">
+                <span style="font-size:13px; font-weight:600; color:#1B2733">paises_cs.csv</span>
+                <div style="height:5px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:100%; height:100%; background:#2F8F6E"></div></div>
+                <span style="font-size:11px; color:#2F8F6E; font-weight:600">15 filas válidas · 0 errores</span>
+              </div>
+            </div>
+            <a href="#" style="font-size:12px; font-weight:600">Descargar plantilla CSV</a>
+            <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#123B63">Importar 15 países</button>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">11 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 9 JUECES -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">09 · Jueces y asignación</span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex">
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+            <div style="padding: 20px 26px; border-bottom: 1px solid #E3E8EF; display: flex; align-items: center; justify-content: space-between; background-color: #0B2A4A">
+              <div style="display:flex; flex-direction:column; gap:3px">
+                <span style="font-family: 'Playfair Display',serif; font-size: 21px; font-weight: 600; color: #FFFFFF">Jueces</span>
+                <span style="font-size: 12px; color: #FFFFFF">17 registrados · 14 activos ahora</span>
+              </div>
+              <button style="color: #FFFFFF; border: none; border-radius: 8px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; background-color: #C9A227" style-hover="background:#123B63">+ Invitar juez</button>
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1.8fr 1.6fr 1fr 80px; gap:14px; padding:11px 26px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+              <span>JUEZ</span><span>CORREO</span><span>COMITÉS</span><span>AVANCE</span><span></span>
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1.8fr 1.6fr 1fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center; background:#F5F9FF">
+              <div style="display:flex; align-items:center; gap:10px"><span style="width:30px; height:30px; border-radius:50%; background:#0B2A4A; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600">AR</span><span style="font-size:14px; font-weight:600; color:#1B2733">Andrea Reyes</span></div>
+              <span style="font-size:13px; color:#5B6B7C">a.reyes@munych.org</span>
+              <span style="font-size:13px; color:#5B6B7C">CS · ECOSOC · DISEC</span>
+              <span style="font-size:13px; font-weight:600; color:#1B2733">53%</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Asignar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1.8fr 1.6fr 1fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+              <div style="display:flex; align-items:center; gap:10px"><span style="width:30px; height:30px; border-radius:50%; background:#123B63; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600">JM</span><span style="font-size:14px; font-weight:600; color:#1B2733">Jorge Medina</span></div>
+              <span style="font-size:13px; color:#5B6B7C">j.medina@munych.org</span>
+              <span style="font-size:13px; color:#5B6B7C">CS · AG</span>
+              <span style="font-size:13px; font-weight:600; color:#1B2733">78%</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Asignar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1.8fr 1.6fr 1fr 80px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+              <div style="display:flex; align-items:center; gap:10px"><span style="width:30px; height:30px; border-radius:50%; background:#418FDE; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600">CP</span><span style="font-size:14px; font-weight:600; color:#1B2733">Camila Prado</span></div>
+              <span style="font-size:13px; color:#5B6B7C">c.prado@munych.org</span>
+              <span style="font-size:13px; color:#5B6B7C">CIJ</span>
+              <span style="font-size:13px; font-weight:600; color:#1B2733">0%</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Asignar</span>
+            </div>
+            <div style="display:grid; grid-template-columns:2fr 1.8fr 1.6fr 1fr 80px; gap:14px; padding:13px 26px; align-items:center" style-hover="background:#F9FAFC">
+              <div style="display:flex; align-items:center; gap:10px"><span style="width:30px; height:30px; border-radius:50%; background:#5B6B7C; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600">TN</span><span style="font-size:14px; font-weight:600; color:#1B2733">Tomás Núñez</span></div>
+              <span style="font-size:13px; color:#5B6B7C">t.nunez@munych.org</span>
+              <span style="font-size:13px; color:#98A6B5">Sin asignar</span>
+              <span style="font-size:13px; font-weight:600; color:#98A6B5">—</span>
+              <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Asignar</span>
+            </div>
+          </div>
+          <div style="width:400px; border-left:1px solid #E3E8EF; background:#F5F7FA; padding:24px; display:flex; flex-direction:column; gap:16px">
+            <div style="display:flex; align-items:center; gap:12px">
+              <span style="width:40px; height:40px; border-radius:50%; background:#0B2A4A; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600">AR</span>
+              <div style="display:flex; flex-direction:column; gap:2px">
+                <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">Andrea Reyes</span>
+                <span style="font-size:12px; color:#5B6B7C">Chair senior · desde 2023</span>
+              </div>
+            </div>
+            <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">ASIGNAR A COMITÉS</span>
+            <div style="display:flex; flex-direction:column; gap:8px">
+              <div style="background:#FFFFFF; border:1px solid #0B2A4A; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between">
+                <span style="font-size:13px; font-weight:600; color:#1B2733">Consejo de Seguridad</span>
+                <span style="width:18px; height:18px; border-radius:5px; background:#0B2A4A; color:#FFFFFF; font-size:11px; display:flex; align-items:center; justify-content:center">✓</span>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #0B2A4A; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between">
+                <span style="font-size:13px; font-weight:600; color:#1B2733">ECOSOC</span>
+                <span style="width:18px; height:18px; border-radius:5px; background:#0B2A4A; color:#FFFFFF; font-size:11px; display:flex; align-items:center; justify-content:center">✓</span>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between" style-hover="border-color:#418FDE">
+                <span style="font-size:13px; color:#5B6B7C">Asamblea General</span>
+                <span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between" style-hover="border-color:#418FDE">
+                <span style="font-size:13px; color:#5B6B7C">Corte Internacional de Justicia</span>
+                <span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span>
+              </div>
+            </div>
+            <div style="background:#FBF4DF; border:1px solid #F0E2B6; border-radius:9px; padding:12px 14px; font-size:12px; color:#8A6F12; line-height:1.5">Un juez asignado a más de 3 comités difícilmente completa sus calificaciones a tiempo.</div>
+            <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#123B63">Guardar asignación</button>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">12 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 10 CRITERIOS -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">10 · Criterios y pesos</span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex">
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+            <div style="padding:20px 26px; border-bottom:1px solid #E3E8EF; display:flex; align-items:center; justify-content:space-between">
+              <div style="display:flex; flex-direction:column; gap:3px">
+                <span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">Criterios de evaluación</span>
+                <span style="font-size:12px; color:#5B6B7C">Set estándar MUNYCH · aplicado a 6 comités</span>
+              </div>
+              <button style="background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer" style-hover="border-color:#0B2A4A">+ Añadir criterio</button>
+            </div>
+            <div style="display:grid; grid-template-columns:32px 2.2fr 2.6fr 130px 70px; gap:14px; padding:11px 26px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+              <span></span><span>CRITERIO</span><span>DESCRIPCIÓN</span><span style="text-align:right">PESO</span><span></span>
+            </div>
+            <sc-for list="{{ adminCriteria }}" as="k" hint-placeholder-count="7">
+              <div style="display:grid; grid-template-columns:32px 2.2fr 2.6fr 130px 70px; gap:14px; padding:13px 26px; border-bottom:1px solid #EEF1F5; align-items:center" style-hover="background:#F9FAFC">
+                <span style="color:#CBD5E1; font-size:14px">⠿</span>
+                <span style="font-size:14px; font-weight:600; color:#1B2733">{{ k.name }}</span>
+                <span style="font-size:12px; color:#5B6B7C">{{ k.desc }}</span>
+                <div style="display:flex; align-items:center; justify-content:flex-end; gap:8px">
+                  <div style="width:52px; height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:{{ k.bar }}; height:100%; background:#418FDE"></div></div>
+                  <span style="font-family:'Playfair Display',serif; font-size:17px; font-weight:600; color:#0B2A4A; min-width:44px; text-align:right">{{ k.weightLabel }}</span>
+                </div>
+                <span style="justify-self:end; font-size:12px; color:#418FDE; font-weight:600">Editar</span>
+              </div>
+            </sc-for>
+            <div style="padding:16px 26px; display:flex; align-items:center; justify-content:space-between; background:#F5F9FF">
+              <span style="font-size:13px; font-weight:600; color:#1B2733">Suma total de pesos</span>
+              <div style="display:flex; align-items:center; gap:10px">
+                <span style="display:inline-flex; align-items:center; gap:6px; background:#E7F4EF; color:#1F6B52; font-size:11px; font-weight:700; padding:5px 10px; border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#2F8F6E"></span>VÁLIDO</span>
+                <span style="font-family:'Playfair Display',serif; font-size:26px; font-weight:600; color:#0B2A4A">100%</span>
+              </div>
+            </div>
+          </div>
+          <div style="width:400px; border-left:1px solid #E3E8EF; background:#F5F7FA; padding:24px; display:flex; flex-direction:column; gap:16px">
+            <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">Editar criterio</span>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <label style="font-size:12px; font-weight:600; color:#5B6B7C">Nombre</label>
+              <input type="text" value="Oratoria" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:14px; outline:none; background:#FFFFFF" style-focus="border-color:#418FDE">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <label style="font-size:12px; font-weight:600; color:#5B6B7C">Descripción para el juez</label>
+              <textarea rows="3" style="border:1px solid #CBD5E1; border-radius:8px; padding:11px 12px; font-size:13px; line-height:1.5; resize:none; outline:none; background:#FFFFFF" style-focus="border-color:#418FDE">Claridad, dicción, estructura del discurso y manejo del tiempo de palabra.</textarea>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px">
+              <div style="display:flex; justify-content:space-between; align-items:baseline"><label style="font-size:12px; font-weight:600; color:#5B6B7C">Peso</label><span style="font-family:'Playfair Display',serif; font-size:20px; font-weight:600; color:#0B2A4A">20%</span></div>
+              <input type="range" class="sl" min="0" max="50" value="20">
+            </div>
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:14px; display:flex; flex-direction:column; gap:9px">
+              <span style="font-size:12px; font-weight:600; color:#5B6B7C">Reparto actual</span>
+              <div style="display:flex; height:10px; border-radius:5px; overflow:hidden; background:#E3E8EF">
+                <div style="width:20%; background:#0B2A4A"></div><div style="width:20%; background:#123B63"></div><div style="width:15%; background:#2F6BA8"></div><div style="width:15%; background:#418FDE"></div><div style="width:15%; background:#7BB4E9"></div><div style="width:10%; background:#C9A227"></div><div style="width:5%; background:#E0C464"></div>
+              </div>
+              <span style="font-size:11px; color:#5B6B7C">7 criterios · suma 100% · sin sobrantes</span>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:auto">
+              <button style="flex:1; background:#FFFFFF; color:#0B2A4A; border:1px solid #CBD5E1; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer">Cancelar</button>
+              <button style="flex:1; background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:12px; font-size:13px; font-weight:600; cursor:pointer" style-hover="background:#123B63">Guardar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">13 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 11 RESULTADOS -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">11 · Resultados finales <span style="color:#C9A227">· fila expandible</span></span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex; flex-direction:column">
+          <div style="background:#0B2A4A; padding:24px 26px; display:flex; align-items:flex-end; justify-content:space-between">
+            <div style="display:flex; flex-direction:column; gap:6px">
+              <span style="font-size:11px; letter-spacing:.16em; color:rgba(255,255,255,.55); font-weight:600">RESULTADOS FINALES</span>
+              <span style="font-family:'Playfair Display',serif; font-size:28px; font-weight:600; color:#FFFFFF">Consejo de Seguridad</span>
+              <span style="font-size:12px; color:rgba(255,255,255,.6)">15 países · 3 jueces · promedio ponderado del comité 84.7</span>
+            </div>
+            <div style="display:flex; gap:10px">
+              <button style="background:rgba(255,255,255,.1); color:#FFFFFF; border:1px solid rgba(255,255,255,.22); border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer">Publicar resultados</button>
+              <button style="background:#C9A227; color:#0B2A4A; border:none; border-radius:8px; padding:10px 16px; font-size:13px; font-weight:700; cursor:pointer" style-hover="background:#DDB431">Exportar</button>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:70px 2.2fr 1fr 1fr 1fr 1fr 110px; gap:14px; padding:11px 26px; border-bottom:1px solid #EEF1F5; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600">
+            <span>POS.</span><span>PAÍS</span><span>CONOCIM.</span><span>ORATORIA</span><span>DIPLOM.</span><span>OTROS</span><span style="text-align:right">TOTAL</span>
+          </div>
+          <div style="display:grid; grid-template-columns:70px 2.2fr 1fr 1fr 1fr 1fr 110px; gap:14px; padding:16px 26px; border-bottom:1px solid #EEF1F5; align-items:center; background:#FDFBF3">
+            <span style="width:32px; height:32px; border-radius:50%; background:#C9A227; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700">1</span>
+            <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A">Estados Unidos</span>
+            <span style="font-size:14px; color:#1B2733">95.0</span><span style="font-size:14px; color:#1B2733">96.5</span><span style="font-size:14px; color:#1B2733">92.0</span><span style="font-size:14px; color:#5B6B7C">93.1</span>
+            <span style="justify-self:end; font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:#0B2A4A">94.2</span>
+          </div>
+          <div style="display:grid; grid-template-columns:70px 2.2fr 1fr 1fr 1fr 1fr 110px; gap:14px; padding:16px 26px; border-bottom:1px solid #EEF1F5; align-items:center">
+            <span style="width:32px; height:32px; border-radius:50%; background:#CBD5E1; color:#1B2733; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700">2</span>
+            <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A">Francia</span>
+            <span style="font-size:14px; color:#1B2733">92.0</span><span style="font-size:14px; color:#1B2733">93.0</span><span style="font-size:14px; color:#1B2733">90.5</span><span style="font-size:14px; color:#5B6B7C">91.0</span>
+            <span style="justify-self:end; font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:#0B2A4A">91.8</span>
+          </div>
+          <div style="background:#F9FAFC; border-bottom:1px solid #EEF1F5; padding:20px 26px 22px 96px; display:flex; gap:34px">
+            <div style="flex:1.4; display:flex; flex-direction:column; gap:12px">
+              <span style="font-size:11px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">DESGLOSE POR CRITERIO · FRANCIA</span>
+              <sc-for list="{{ breakdown }}" as="b" hint-placeholder-count="7">
+                <div style="display:grid; grid-template-columns:1.6fr 46px 1.6fr 52px; gap:14px; align-items:center">
+                  <span style="font-size:13px; color:#1B2733">{{ b.name }}</span>
+                  <span style="font-size:11px; color:#5B6B7C; font-weight:600">{{ b.weightLabel }}</span>
+                  <div style="height:6px; border-radius:3px; background:#E3E8EF; overflow:hidden"><div style="width:{{ b.pct }}; height:100%; background:#418FDE"></div></div>
+                  <span style="font-size:13px; font-weight:600; color:#0B2A4A; text-align:right">{{ b.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:12px">
+              <span style="font-size:11px; letter-spacing:.1em; color:#5B6B7C; font-weight:600">POR JUEZ</span>
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:8px; padding:11px 13px; display:flex; align-items:center; justify-content:space-between"><span style="font-size:13px; color:#1B2733">Andrea Reyes</span><span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">92.4</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:8px; padding:11px 13px; display:flex; align-items:center; justify-content:space-between"><span style="font-size:13px; color:#1B2733">Jorge Medina</span><span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">90.1</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:8px; padding:11px 13px; display:flex; align-items:center; justify-content:space-between"><span style="font-size:13px; color:#1B2733">Camila Prado</span><span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:#0B2A4A">92.9</span></div>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:8px; padding:12px 13px; display:flex; flex-direction:column; gap:5px">
+                <span style="font-size:11px; color:#5B6B7C; font-weight:600">COMENTARIO DESTACADO</span>
+                <span style="font-size:12px; color:#1B2733; line-height:1.55">“Manejo excepcional del debate informal; podría documentar mejor sus propuestas en el papel de trabajo.”</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:70px 2.2fr 1fr 1fr 1fr 1fr 110px; gap:14px; padding:16px 26px; border-bottom:1px solid #EEF1F5; align-items:center">
+            <span style="width:32px; height:32px; border-radius:50%; background:#D8A47F; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700">3</span>
+            <span style="font-family:'Playfair Display',serif; font-size:19px; font-weight:600; color:#0B2A4A">Reino Unido</span>
+            <span style="font-size:14px; color:#1B2733">90.0</span><span style="font-size:14px; color:#1B2733">88.5</span><span style="font-size:14px; color:#1B2733">91.0</span><span style="font-size:14px; color:#5B6B7C">88.9</span>
+            <span style="justify-self:end; font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:#0B2A4A">89.5</span>
+          </div>
+          <div style="display:grid; grid-template-columns:70px 2.2fr 1fr 1fr 1fr 1fr 110px; gap:14px; padding:14px 26px; border-bottom:1px solid #EEF1F5; align-items:center">
+            <span style="width:32px; height:32px; border-radius:50%; background:#F2F4F8; color:#5B6B7C; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700">4</span>
+            <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">Brasil</span>
+            <span style="font-size:14px; color:#1B2733">86.0</span><span style="font-size:14px; color:#1B2733">89.0</span><span style="font-size:14px; color:#1B2733">85.5</span><span style="font-size:14px; color:#5B6B7C">87.4</span>
+            <span style="justify-self:end; font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A">87.1</span>
+          </div>
+          <div style="display:grid; grid-template-columns:70px 2.2fr 1fr 1fr 1fr 1fr 110px; gap:14px; padding:14px 26px; align-items:center">
+            <span style="width:32px; height:32px; border-radius:50%; background:#F2F4F8; color:#5B6B7C; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700">5</span>
+            <span style="font-family:'Playfair Display',serif; font-size:18px; font-weight:600; color:#0B2A4A">Emiratos Árabes Unidos</span>
+            <span style="font-size:14px; color:#1B2733">83.0</span><span style="font-size:14px; color:#1B2733">85.5</span><span style="font-size:14px; color:#1B2733">86.0</span><span style="font-size:14px; color:#5B6B7C">84.2</span>
+            <span style="justify-self:end; font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A">84.6</span>
+          </div>
+        </div>
+      </div>
+
+      
+  </div>
+</section>
+
+<section class="page" style="padding:26px 28px; background:#F5F7FA; overflow:hidden">
+  <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #E3E8EF; padding-bottom:10px; margin-bottom:16px">
+    <span style="font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5B6B7C; font-weight:600">MUNYCH · Sistema de calificación MUN — Panel de administración</span>
+    <span style="font-size:11px; color:#98A6B5; font-weight:600">14 / 14</span>
+  </div>
+  <div style="width:1340px; transform:scale(0.742); transform-origin:top left">
+<!-- 12 EXPORTACIÓN -->
+      <div style="display:flex; flex-direction:column; gap:10px">
+        <span style="font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#5B6B7C; font-weight:600">12 · Exportación de resultados</span>
+        <div style="width:1340px; background:#FFFFFF; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; box-shadow:0 12px 34px rgba(11,42,74,.10); display:flex">
+          <div style="flex:1; padding:26px; display:flex; flex-direction:column; gap:22px; min-width:0">
+            <div style="display:flex; flex-direction:column; gap:3px">
+              <span style="font-family:'Playfair Display',serif; font-size:21px; font-weight:600; color:#0B2A4A">Exportar resultados</span>
+              <span style="font-size:12px; color:#5B6B7C">Genera el archivo oficial de premiación o el respaldo completo de calificaciones.</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+              <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">1 · COMITÉS</span>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px">
+                <div style="background:#F5F9FF; border:1px solid #0B2A4A; border-radius:9px; padding:13px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-size:13px; font-weight:600; color:#1B2733">Consejo de Seguridad</span><span style="width:18px; height:18px; border-radius:5px; background:#0B2A4A; color:#FFFFFF; font-size:11px; display:flex; align-items:center; justify-content:center">✓</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:13px 14px; display:flex; align-items:center; justify-content:space-between" style-hover="border-color:#418FDE"><span style="font-size:13px; color:#5B6B7C">ECOSOC</span><span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span></div>
+                <div style="background:#F5F9FF; border:1px solid #0B2A4A; border-radius:9px; padding:13px 14px; display:flex; align-items:center; justify-content:space-between"><span style="font-size:13px; font-weight:600; color:#1B2733">DISEC</span><span style="width:18px; height:18px; border-radius:5px; background:#0B2A4A; color:#FFFFFF; font-size:11px; display:flex; align-items:center; justify-content:center">✓</span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:13px 14px; display:flex; align-items:center; justify-content:space-between" style-hover="border-color:#418FDE"><span style="font-size:13px; color:#5B6B7C">Asamblea General</span><span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span></div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:13px 14px; display:flex; align-items:center; justify-content:space-between" style-hover="border-color:#418FDE"><span style="font-size:13px; color:#5B6B7C">CIJ</span><span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span></div>
+                <div style="background:#FFFFFF; border:1px dashed #CBD5E1; border-radius:9px; padding:13px 14px; display:flex; align-items:center; justify-content:center"><span style="font-size:13px; color:#418FDE; font-weight:600">Seleccionar todos</span></div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+              <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">2 · FORMATO</span>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px">
+                <div style="background:#F5F9FF; border:1px solid #0B2A4A; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:5px">
+                  <span style="font-size:14px; font-weight:700; color:#0B2A4A">PDF</span>
+                  <span style="font-size:12px; color:#5B6B7C; line-height:1.5">Acta oficial con ranking y medallas, membretada.</span>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:5px" style-hover="border-color:#418FDE">
+                  <span style="font-size:14px; font-weight:700; color:#1B2733">XLSX</span>
+                  <span style="font-size:12px; color:#5B6B7C; line-height:1.5">Una hoja por comité, desglose por criterio y juez.</span>
+                </div>
+                <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:5px" style-hover="border-color:#418FDE">
+                  <span style="font-size:14px; font-weight:700; color:#1B2733">CSV</span>
+                  <span style="font-size:12px; color:#5B6B7C; line-height:1.5">Datos planos para procesar externamente.</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+              <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">3 · CONTENIDO</span>
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <div style="display:flex; align-items:center; gap:10px"><span style="width:18px; height:18px; border-radius:5px; background:#0B2A4A; color:#FFFFFF; font-size:11px; display:flex; align-items:center; justify-content:center">✓</span><span style="font-size:13px; color:#1B2733">Puntaje total ponderado</span></div>
+                <div style="display:flex; align-items:center; gap:10px"><span style="width:18px; height:18px; border-radius:5px; background:#0B2A4A; color:#FFFFFF; font-size:11px; display:flex; align-items:center; justify-content:center">✓</span><span style="font-size:13px; color:#1B2733">Desglose por criterio</span></div>
+                <div style="display:flex; align-items:center; gap:10px"><span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span><span style="font-size:13px; color:#5B6B7C">Comentarios de los jueces</span></div>
+                <div style="display:flex; align-items:center; gap:10px"><span style="width:18px; height:18px; border-radius:5px; border:1px solid #CBD5E1"></span><span style="font-size:13px; color:#5B6B7C">Nombre del juez junto a cada calificación</span></div>
+              </div>
+            </div>
+          </div>
+          <div style="width:420px; border-left:1px solid #E3E8EF; background:#F5F7FA; padding:26px; display:flex; flex-direction:column; gap:16px">
+            <span style="font-size:12px; font-weight:600; color:#5B6B7C; letter-spacing:.06em">VISTA PREVIA</span>
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:14px; box-shadow:0 8px 22px rgba(11,42,74,.08)">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:5px; padding-bottom:12px; border-bottom:1px solid #E3E8EF">
+                <div style="width:26px; height:26px; border-radius:50%; background:#0B2A4A; display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-size:12px; font-weight:700">M</div>
+                <span style="font-family:'Playfair Display',serif; font-size:15px; font-weight:600; color:#0B2A4A">Consejo de Seguridad</span>
+                <span style="font-size:10px; letter-spacing:.12em; color:#5B6B7C">RESULTADOS OFICIALES · MUNYCH 2026</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <div style="display:flex; align-items:center; gap:9px"><span style="width:18px; height:18px; border-radius:50%; background:#C9A227; color:#FFFFFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">1</span><span style="flex:1; font-size:12px; color:#1B2733">Estados Unidos</span><span style="font-size:12px; font-weight:600; color:#0B2A4A">94.2</span></div>
+                <div style="display:flex; align-items:center; gap:9px"><span style="width:18px; height:18px; border-radius:50%; background:#CBD5E1; color:#1B2733; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">2</span><span style="flex:1; font-size:12px; color:#1B2733">Francia</span><span style="font-size:12px; font-weight:600; color:#0B2A4A">91.8</span></div>
+                <div style="display:flex; align-items:center; gap:9px"><span style="width:18px; height:18px; border-radius:50%; background:#D8A47F; color:#FFFFFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">3</span><span style="flex:1; font-size:12px; color:#1B2733">Reino Unido</span><span style="font-size:12px; font-weight:600; color:#0B2A4A">89.5</span></div>
+                <div style="display:flex; align-items:center; gap:9px"><span style="width:18px; height:18px; border-radius:50%; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">4</span><span style="flex:1; font-size:12px; color:#5B6B7C">Brasil</span><span style="font-size:12px; color:#5B6B7C">87.1</span></div>
+                <div style="display:flex; align-items:center; gap:9px"><span style="width:18px; height:18px; border-radius:50%; background:#F2F4F8; color:#5B6B7C; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center">5</span><span style="flex:1; font-size:12px; color:#5B6B7C">Emiratos Árabes Unidos</span><span style="font-size:12px; color:#5B6B7C">84.6</span></div>
+              </div>
+            </div>
+            <div style="background:#FFFFFF; border:1px solid #E3E8EF; border-radius:9px; padding:14px; display:flex; flex-direction:column; gap:5px">
+              <span style="font-size:12px; color:#5B6B7C">Se exportarán</span>
+              <span style="font-size:13px; font-weight:600; color:#1B2733">2 comités · 33 países · PDF</span>
+            </div>
+            <button style="background:#0B2A4A; color:#FFFFFF; border:none; border-radius:8px; padding:14px; font-size:14px; font-weight:600; cursor:pointer; margin-top:auto" style-hover="background:#123B63">Generar archivo</button>
+            <span style="font-size:11px; color:#98A6B5; text-align:center">El archivo queda registrado en el historial del evento.</span>
+          </div>
+        </div>
+      </div>
+  </div>
+</section>
+</doc-page>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1420,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  state = {
+    query: "",
+    scores: { con: 88, ora: 92, pro: 79, dip: 85, red: 90, lid: 74, act: 95 },
+    saved: true
+  };
+  defs = [
+    ["con", "Conocimiento del tema", 20],
+    ["ora", "Oratoria", 20],
+    ["pro", "Procedimiento parlamentario", 15],
+    ["dip", "Diplomacia", 15],
+    ["red", "Redacción", 15],
+    ["lid", "Liderazgo", 10],
+    ["act", "Actitud", 5]
+  ];
+  set(key, v) {
+    this.setState(s => ({ scores: { ...s.scores, [key]: v }, saved: false }));
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ saved: true }), 900);
+  }
+  renderVals() {
+    const s = this.state.scores;
+    const total = this.defs.reduce((a, [k, , w]) => a + s[k] * w / 100, 0);
+    const criteria = this.defs.map(([k, name, w]) => ({
+      name, weightLabel: w + "%", value: s[k],
+      contrib: (s[k] * w / 100).toFixed(1),
+      onChange: e => this.set(k, Number(e.target.value))
+    }));
+
+    const raw = [
+      ["Estados Unidos", 94.2, "done"], ["Francia", 91.8, "done"], ["Reino Unido", 89.5, "done"],
+      ["Brasil", 87.1, "done"], ["Emiratos Árabes Unidos", 84.6, "done"], ["Ghana", 82.3, "done"],
+      ["China", 80.9, "done"], ["Albania", 78.4, "done"], ["México", 76.2, "progress"],
+      ["Estonia", null, "todo"], ["Gabón", null, "todo"], ["India", null, "todo"],
+      ["Japón", null, "todo"], ["Noruega", null, "todo"], ["Federación Rusa", null, "todo"]
+    ];
+    const q = this.state.query.trim().toLowerCase();
+    const meta = {
+      done: { color: "#2F8F6E", label: "Completo · 7 criterios" },
+      progress: { color: "#C9A227", label: "En progreso · 4 de 7" },
+      todo: { color: "#98A6B5", label: "Sin calificar" }
+    };
+    const countries = raw
+      .filter(r => !q || r[0].toLowerCase().includes(q))
+      .slice(0, 7)
+      .map(([name, sc, st]) => ({
+        name, label: meta[st].label, color: meta[st].color,
+        score: sc == null ? "—" : sc.toFixed(1),
+        scoreColor: sc == null ? "#98A6B5" : "#0B2A4A"
+      }));
+
+    const medals = [["#C9A227", "#FFFFFF"], ["#CBD5E1", "#1B2733"], ["#D8A47F", "#FFFFFF"]];
+    const ranking = raw.filter(r => r[1] != null).slice(0, 6).map((r, i) => ({
+      pos: i + 1, name: r[0], score: r[1].toFixed(1), pct: r[1] + "%",
+      badgeBg: medals[i] ? medals[i][0] : "#F2F4F8",
+      badgeFg: medals[i] ? medals[i][1] : "#5B6B7C"
+    }));
+
+    const descs = {
+      con: "Dominio del tema, datos y política exterior del país.",
+      ora: "Claridad, dicción, estructura del discurso y manejo del tiempo.",
+      pro: "Uso correcto de mociones, puntos y reglas del comité.",
+      dip: "Negociación, respeto y construcción de consensos.",
+      red: "Calidad del papel de trabajo y de la resolución.",
+      lid: "Capacidad de articular bloques y dirigir el debate.",
+      act: "Puntualidad, protocolo y disposición durante la sesión."
+    };
+    const adminCriteria = this.defs.map(([k, name, w]) => ({
+      name, desc: descs[k], weightLabel: w + "%", bar: (w / 20 * 100) + "%"
+    }));
+    const fr = { con: 92, ora: 93, pro: 90, dip: 90.5, red: 92, lid: 91, act: 94 };
+    const breakdown = this.defs.map(([k, name, w]) => ({
+      name, weightLabel: w + "%", value: fr[k].toFixed(1), pct: fr[k] + "%"
+    }));
+
+    return {
+      criteria, countries, ranking, adminCriteria, breakdown,
+      total: total.toFixed(1),
+      query: this.state.query,
+      onQuery: e => this.setState({ query: e.target.value }),
+      saveLabel: this.state.saved ? "Guardado automáticamente · hace un momento" : "Guardando…"
+    };
+  }
+}
+</script>
+</body>
+</html>

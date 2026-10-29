@@ -1,0 +1,18 @@
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-12);
+  padding: 20px;
+}
+
+.interactive {
+  transition: border-color 140ms;
+}
+.interactive:hover {
+  border-color: var(--un-blue);
+}
+
+.dashed {
+  border-style: dashed;
+  border-color: var(--border-input);
+}

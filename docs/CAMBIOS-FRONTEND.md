@@ -182,6 +182,36 @@ TODO(cliente) resueltos con el backend: **1** (las sesiones tienen `id`: `Sessio
 
 ---
 
+## Hito 9 — Despliegue en Cloudflare con CDN
+
+Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan desde la caché del CDN, sin consultar Supabase en cada visita. El panel se sirve como estático.
+
+**Página pública (`apps/public`)**, desplegada en Workers con OpenNext (`@opennextjs/cloudflare`):
+
+- **Bug: las páginas eran dinámicas.** El build las marcaba como `ƒ (Dynamic)` porque las rutas `[locale]`, `[eventSlug]` y `[committeeSlug]` no tenían `generateStaticParams`. El `revalidate = 3600` no cacheaba nada: cada visita consultaba Supabase. Ahora cada página tiene `generateStaticParams()` que devuelve `[]`, así que salen como `● (SSG)`: se generan en la primera visita y quedan cacheadas.
+- `revalidate = false`: las páginas solo se regeneran cuando el backend llama a `/api/revalidate` al publicar o despublicar.
+- **Bug: los comités no se revalidaban.** `revalidatePath('/es/<slug>/[committeeSlug]', 'page')` mezclaba un segmento concreto con uno dinámico y no coincidía con ninguna página. Ahora se usa el patrón de la ruta, `'/[locale]/[eventSlug]/[committeeSlug]'`.
+- **Bug: un error de Supabase dejaba un 404 en caché.** `lib/data.ts` ahora lanza el error en vez de devolver `null` o `[]`. Si la regeneración falla, el CDN sigue sirviendo la última versión buena.
+- `next` subió a `^15.5.28`, la versión mínima que pide OpenNext 1.20.
+- Archivos nuevos: `open-next.config.ts` (caché incremental en R2 y tag cache en D1, sin cola porque no hay revalidación por tiempo), `wrangler.jsonc`, `public/_headers` (caché permanente para `/_next/static/*`) y `.dev.vars.example`.
+- Scripts: `npm run preview -w @munych/public` (build con OpenNext y servidor local en `:8787`, sin cuenta) y `npm run deploy -w @munych/public`.
+- Verificado en local con mocks: primera visita `MISS`, siguientes `HIT`; webhook firmado → `200` y la siguiente visita es `MISS`, después `HIT` (evento, portal y comité); firma mala → `401`.
+
+**Panel (`apps/panel`)**, como static assets de Workers, sin código de servidor: `wrangler.jsonc`, `public/_headers` (caché permanente para `/assets/*`, `noindex` y cabeceras de seguridad) y los scripts `cf:preview` y `deploy`.
+
+**Para el primer deploy** (lo hace quien tenga la cuenta de Cloudflare de Munych):
+
+1. `npx wrangler login`.
+2. `npx wrangler r2 bucket create munych-public-cache`.
+3. `npx wrangler d1 create munych-public-tags` y copiar el `database_id` en `apps/public/wrangler.jsonc`.
+4. `npx wrangler secret put REVALIDATE_SECRET` (en `apps/public`), con el mismo valor que en el backend.
+5. Hacer el build con las variables `NEXT_PUBLIC_*` de producción. Se incrustan al compilar, así que hay que volver a desplegar si cambian.
+6. Backend: `PUBLIC_SITE_URL` con la URL del worker público y `CORS_ORIGINS` con la URL del panel.
+
+⚠️ **OpenNext incrusta los `.env*` en el worker** (`.open-next/cloudflare/next-env.mjs`, solo del lado del servidor; se comprobó que no llegan a los assets públicos). Para producción, haz el build sin `REVALIDATE_SECRET` en `.env.local`, por ejemplo en CI, y deja que lo ponga `wrangler secret`. OpenNext recomienda compilar en Linux o WSL, porque en Windows avisa que puede fallar.
+
+---
+
 ## Entrega final
 
 ### Pantallas conectadas

@@ -1,0 +1,9 @@
+# Cloudflare static assets. Vite pone un hash en los nombres de /assets: caché permanente.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# El panel maneja sesiones y datos de menores: que ningún buscador lo indexe.
+/*
+  X-Robots-Tag: noindex
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

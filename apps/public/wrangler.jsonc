@@ -1,0 +1,33 @@
+// Worker de la página pública de resultados (Next.js con OpenNext).
+// Antes del primer deploy hay que crear los recursos en la cuenta de Cloudflare de Munych:
+//   npx wrangler r2 bucket create munych-public-cache
+//   npx wrangler d1 create munych-public-tags      → copia el database_id aquí abajo
+//   npx wrangler secret put REVALIDATE_SECRET       → el mismo valor que en el backend
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "munych-public",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "munych-public-cache"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "munych-public-tags",
+      // TODO: sustituir por el id que devuelve `wrangler d1 create munych-public-tags`.
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

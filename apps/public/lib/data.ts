@@ -5,6 +5,12 @@ import type { PublicResultsDocument } from './types';
 /** Por defecto lee public.public_results en Supabase; con NEXT_PUBLIC_USE_MOCKS=true usa mockPublicData.ts. */
 const useMocks = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
+/*
+ * Un error de lectura se lanza en vez de devolver vacío o null: así la regeneración ISR
+ * falla y el CDN sigue sirviendo la última versión buena. Devolver null produciría un 404
+ * que quedaría cacheado hasta la siguiente revalidación (p. ej. en plena clausura).
+ */
+
 /** Documentos de todos los eventos publicados (el portal muestra premios del más reciente). */
 export async function getPublishedDocuments(): Promise<PublicResultsDocument[]> {
   if (useMocks) {
@@ -12,9 +18,7 @@ export async function getPublishedDocuments(): Promise<PublicResultsDocument[]> 
   }
   const { data, error } = await supabasePublic.from('public_results').select('data').eq('published', true);
   if (error) {
-    // eslint-disable-next-line no-console
-    console.error('No se pudieron leer los eventos publicados:', error.message);
-    return [];
+    throw new Error(`No se pudieron leer los eventos publicados: ${error.message}`);
   }
   if (!data) return [];
   return (data as { data: PublicResultsDocument }[]).map((row) => row.data);
@@ -31,9 +35,7 @@ export async function getEventDocument(eventSlug: string): Promise<PublicResults
     .eq('published', true)
     .maybeSingle();
   if (error) {
-    // eslint-disable-next-line no-console
-    console.error(`No se pudo leer el evento "${eventSlug}":`, error.message);
-    return null;
+    throw new Error(`No se pudo leer el evento "${eventSlug}": ${error.message}`);
   }
   if (!data) return null;
   return (data as { data: PublicResultsDocument }).data;

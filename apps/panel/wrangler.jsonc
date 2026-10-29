@@ -1,0 +1,13 @@
+// Panel de admin y jueces: SPA estática servida como static assets de Workers (sin código
+// de servidor). Las variables VITE_* se incrustan en `npm run build`, no aquí.
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "munych-panel",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // El panel usa HashRouter, así que el servidor solo recibe "/". Esto es una red de
+    // seguridad por si algún día se pasa a rutas con historial: sirve index.html.
+    "not_found_handling": "single-page-application"
+  }
+}

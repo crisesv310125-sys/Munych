@@ -10,7 +10,13 @@ import { CommitteeAwards } from '../../../../components/CommitteeAwards';
 import { RankingTable } from '../../../../components/RankingTable';
 import styles from '../../../../components/public.module.css';
 
-export const revalidate = 3600;
+// Solo se regenera cuando el backend llama a /api/revalidate al publicar o despublicar.
+export const revalidate = false;
+
+// Sin rutas en el build: cada página se genera en su primera visita y queda cacheada (ISR).
+export function generateStaticParams() {
+  return [];
+}
 
 interface PageProps {
   params: Promise<{ locale: string; eventSlug: string; committeeSlug: string }>;

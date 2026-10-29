@@ -15,6 +15,11 @@ next-env.d.ts
 *.tsbuildinfo
 *.local
 
+# Cloudflare (OpenNext / wrangler)
+.open-next
+.wrangler
+.dev.vars
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -34,10 +34,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ revalidated: false, error: 'Falta event_slug' }, { status: 400 });
   }
 
-  // Revalida la lista de eventos y todas las rutas del evento (locale 'es' por ahora, sección 10).
+  // Revalida la lista de eventos y la página del evento (locale 'es' por ahora, sección 10).
   revalidatePath('/es');
   revalidatePath(`/es/${eventSlug}`);
-  revalidatePath(`/es/${eventSlug}/[committeeSlug]`, 'page');
+  // Los comités se revalidan por el patrón de la ruta: no se puede mezclar un segmento
+  // concreto con uno dinámico ('/es/x/[committeeSlug]' no coincide con ninguna página).
+  // Esto incluye los comités de otros eventos, que se regeneran en su siguiente visita.
+  revalidatePath('/[locale]/[eventSlug]/[committeeSlug]', 'page');
 
   return NextResponse.json({ revalidated: true });
 }

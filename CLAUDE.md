@@ -23,7 +23,11 @@ npm run lint -w @munych/panel
 npm run build -w @munych/panel
 npm run dev -w @munych/public
 npm run build -w @munych/public
+npm run preview -w @munych/public   # build con OpenNext + worker local en :8787
+npm run cf:preview -w @munych/panel # build + static assets en wrangler local
 ```
+
+Despliegue: ambas apps van a Cloudflare Workers (`wrangler.jsonc` en cada app). La página pública usa OpenNext con ISR solo bajo demanda (`revalidate = false` + `generateStaticParams()` que devuelve `[]`): **no** uses `cookies()`, `headers()` ni middleware en sus páginas, porque la vuelven dinámica y deja de cachearse. Detalle en `docs/CAMBIOS-FRONTEND.md` (hito 9).
 
 ## Datos y mocks
 

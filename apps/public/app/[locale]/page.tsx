@@ -4,7 +4,14 @@ import { EventsPortal, type PortalEvent } from '../../components/EventsPortal';
 import { PortalTopbar } from '../../components/SiteHeader';
 import styles from '../../components/public.module.css';
 
-export const revalidate = 3600;
+// Solo se regenera cuando el backend llama a /api/revalidate al publicar o despublicar.
+export const revalidate = false;
+
+// Sin rutas en el build: cada página se genera en su primera visita y queda cacheada (ISR).
+// Sin esta función, Next la trataría como dinámica y consultaría Supabase en cada visita.
+export function generateStaticParams() {
+  return [];
+}
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

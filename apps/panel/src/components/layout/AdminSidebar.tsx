@@ -2,7 +2,6 @@ import { ArrowLeft, CalendarDays, CalendarClock, Download, Flag, LayoutDashboard
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useAppState } from '../../state/AppStateContext';
 import { useEvent } from '../../data-access/hooks';
-import { eventStatusLabel } from '../../lib/statusLabels';
 import styles from './AdminSidebar.module.css';
 
 function eventNav(eventId: string) {
@@ -68,11 +67,6 @@ export function AdminSidebar({ open, onNavigate }: { open?: boolean; onNavigate?
               );
             })}
           </nav>
-          <div className={styles.event}>
-            <span className={styles.eventLabel}>Evento activo</span>
-            <span className={styles.eventName}>{event.name}</span>
-            <span className={styles.eventLabel}>{eventStatusLabel(event.status)}</span>
-          </div>
         </>
       ) : (
         <nav className={styles.nav}>

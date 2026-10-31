@@ -6,9 +6,9 @@ import type { PublicResultsDocument } from './types';
 const useMocks = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 /*
- * Un error de lectura se lanza en vez de devolver vacío o null: así la regeneración ISR
- * falla y el CDN sigue sirviendo la última versión buena. Devolver null produciría un 404
- * que quedaría cacheado hasta la siguiente revalidación (p. ej. en plena clausura).
+ * Un error de lectura se lanza en vez de devolver vacío o null: así el build falla y no se
+ * despliega un sitio sin eventos o con 404 (p. ej. en plena clausura). Cloudflare Pages sigue
+ * sirviendo el último despliegue bueno.
  */
 
 /** Documentos de todos los eventos publicados (el portal muestra premios del más reciente). */

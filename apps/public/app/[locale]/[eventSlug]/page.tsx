@@ -1,30 +1,29 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getEventDocument } from '../../../lib/data';
+import { getEventDocument, getPublishedDocuments } from '../../../lib/data';
+import { getDictionary, type Locale } from '../../../lib/i18n';
 import { committeeView, delegationCount, eventView } from '../../../lib/view';
 import { SiteHeader } from '../../../components/SiteHeader';
 import { ShareActions } from '../../../components/ShareActions';
 import { EventCommittees } from '../../../components/EventCommittees';
 import styles from '../../../components/public.module.css';
 
-// Solo se regenera cuando el backend llama a /api/revalidate al publicar o despublicar.
-export const revalidate = false;
-
-// Sin rutas en el build: cada página se genera en su primera visita y queda cacheada (ISR).
-export function generateStaticParams() {
-  return [];
+// Export estático: una página por evento publicado en el momento del build (por cada idioma del layout).
+export async function generateStaticParams() {
+  const docs = await getPublishedDocuments();
+  return docs.map((d) => ({ eventSlug: d.event.slug }));
 }
 
 interface PageProps {
-  params: Promise<{ locale: string; eventSlug: string }>;
+  params: Promise<{ locale: Locale; eventSlug: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { eventSlug } = await params;
+  const { locale, eventSlug } = await params;
   const doc = await getEventDocument(eventSlug);
   if (!doc) return {};
   return {
-    title: `${doc.event.name} · Resultados`,
+    title: `${doc.event.name} · ${getDictionary(locale).meta.results}`,
     robots: doc.settings.indexable ? undefined : { index: false, follow: false },
   };
 }
@@ -34,19 +33,23 @@ export default async function EventPage({ params }: PageProps) {
   const doc = await getEventDocument(eventSlug);
   if (!doc) notFound();
 
-  const event = eventView(doc);
+  const t = getDictionary(locale);
+  const event = eventView(doc, locale);
   // Los comités pendientes van al final, conservando el orden del documento.
-  const committees = doc.committees.map(committeeView).sort((a, b) => Number(a.pending) - Number(b.pending));
+  const committees = doc.committees
+    .map((c) => committeeView(c, locale))
+    .sort((a, b) => Number(a.pending) - Number(b.pending));
   const delegations = delegationCount(committees);
 
   return (
     <main className={styles.page}>
       <SiteHeader
+        locale={locale}
         className={styles.eventHeader}
         logoUrl={event.logoUrl}
         homeHref={`/${locale}`}
-        crumbs={[{ label: 'Eventos', href: `/${locale}` }, { label: event.name }]}
-        actions={<ShareActions title={`${event.name} · Resultados`} pdf />}
+        crumbs={[{ label: t.header.events, href: `/${locale}` }, { label: event.name }]}
+        actions={<ShareActions locale={locale} title={`${event.name} · ${t.meta.results}`} pdf />}
       >
         <div className={styles.titleRow}>
           <div>
@@ -60,19 +63,24 @@ export default async function EventPage({ params }: PageProps) {
           <div className={styles.stats}>
             <div className={styles.stat}>
               <div className={styles.statValue}>{committees.length}</div>
-              <div className={styles.statLabel}>COMITÉS</div>
+              <div className={styles.statLabel}>{t.event.committees}</div>
             </div>
             {delegations !== null && (
               <div className={styles.stat}>
                 <div className={styles.statValue}>{delegations}</div>
-                <div className={styles.statLabel}>DELEGACIONES</div>
+                <div className={styles.statLabel}>{t.event.delegations}</div>
               </div>
             )}
           </div>
         </div>
       </SiteHeader>
       <div className={`${styles.eventBody} ${styles.gutter}`}>
-        <EventCommittees committees={committees} eventHref={`/${locale}/${eventSlug}`} publishedLabel={event.publishedNumeric} />
+        <EventCommittees
+          locale={locale}
+          committees={committees}
+          eventHref={`/${locale}/${eventSlug}`}
+          publishedLabel={event.publishedNumeric}
+        />
       </div>
     </main>
   );

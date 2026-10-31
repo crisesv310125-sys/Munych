@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { normalizeSearch } from '../lib/format';
+import { getDictionary, type Dictionary, type Locale } from '../lib/i18n';
 import type { EventView } from '../lib/view';
 import styles from './public.module.css';
 
@@ -17,16 +18,16 @@ const HIGHLIGHTS = 3;
 
 type Order = 'desc' | 'asc';
 
-function Featured({ event, href }: { event: PortalEvent; href: string }) {
+function Featured({ event, href, t }: { event: PortalEvent; href: string; t: Dictionary['portal'] }) {
   const shown = event.highlights.slice(0, HIGHLIGHTS);
   const rest = event.committeeCount - shown.length;
   return (
     <>
-      <div className={styles.featuredEyebrow}>MÁS RECIENTE</div>
+      <div className={styles.featuredEyebrow}>{t.latest}</div>
       <div className={styles.featured}>
         <div className={styles.featuredMain}>
           <div className={styles.featuredStatus}>
-            <span className={styles.pillPublished}>RESULTADOS PUBLICADOS</span>
+            <span className={styles.pillPublished}>{t.published}</span>
             <span className={styles.monoMeta}>{event.publishedShort}</span>
           </div>
           <h2 className={styles.featuredName} style={{ margin: 0 }}>
@@ -37,12 +38,12 @@ function Featured({ event, href }: { event: PortalEvent; href: string }) {
             <span>{event.dateRange}</span>
           </div>
           <Link href={href} className={styles.goldButton}>
-            Ver resultados →
+            {t.viewResults}
           </Link>
         </div>
         <div className={styles.featuredSide}>
-          <div className={styles.sideEyebrow}>MEJOR DELEGACIÓN POR COMITÉ</div>
-          {shown.length === 0 && <div className={styles.pendingText}>Los premios de este evento aún no se publican.</div>}
+          <div className={styles.sideEyebrow}>{t.bestByCommittee}</div>
+          {shown.length === 0 && <div className={styles.pendingText}>{t.awardsPending}</div>}
           {shown.map((h) => (
             <div key={h.committee} className={styles.sideRow}>
               <span>{h.committee}</span>
@@ -51,7 +52,7 @@ function Featured({ event, href }: { event: PortalEvent; href: string }) {
           ))}
           {rest > 0 && (
             <Link href={href} className={styles.sideMore}>
-              + {rest} {rest === 1 ? 'comité' : 'comités'}
+              {t.moreCommittees(rest)}
             </Link>
           )}
         </div>
@@ -60,7 +61,8 @@ function Featured({ event, href }: { event: PortalEvent; href: string }) {
   );
 }
 
-export function EventsPortal({ events, locale }: { events: PortalEvent[]; locale: string }) {
+export function EventsPortal({ events, locale }: { events: PortalEvent[]; locale: Locale }) {
+  const t = getDictionary(locale).portal;
   const [query, setQuery] = useState('');
   const [order, setOrder] = useState<Order>('desc');
   const [visible, setVisible] = useState(PAGE_SIZE);
@@ -89,35 +91,35 @@ export function EventsPortal({ events, locale }: { events: PortalEvent[]; locale
   const eventHref = (e: EventView) => `/${locale}/${e.slug}`;
 
   if (!featured) {
-    return <div className={`${styles.listCard} ${styles.empty}`}>Todavía no hay eventos con resultados publicados.</div>;
+    return <div className={`${styles.listCard} ${styles.empty}`}>{t.noEvents}</div>;
   }
 
   return (
     <>
-      <Featured event={featured} href={eventHref(featured)} />
+      <Featured event={featured} href={eventHref(featured)} t={t} />
       <section aria-labelledby="all-events">
         <div className={styles.listHead}>
           <div className={styles.listTitle}>
             <h2 id="all-events" className={styles.listTitleText} style={{ margin: 0 }}>
-              Todos los eventos
+              {t.allEvents}
             </h2>
             <span className={styles.monoMeta}>
-              {events.length} {events.length === 1 ? 'PUBLICADO' : 'PUBLICADOS'}
+              {t.publishedCount(events.length)}
             </span>
           </div>
           <div className={styles.listTools}>
             <input
               type="search"
               className={`${styles.search} ${styles.listSearch}`}
-              placeholder="Buscar evento…"
-              aria-label="Buscar evento"
+              placeholder={t.searchPlaceholder}
+              aria-label={t.searchLabel}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
                 setVisible(PAGE_SIZE);
               }}
             />
-            <div className={styles.segmented} role="group" aria-label="Orden">
+            <div className={styles.segmented} role="group" aria-label={t.order}>
               {(['desc', 'asc'] as const).map((o) => (
                 <button
                   key={o}
@@ -126,7 +128,7 @@ export function EventsPortal({ events, locale }: { events: PortalEvent[]; locale
                   className={`${styles.segment} ${order === o ? styles.segmentActive : ''}`}
                   onClick={() => setOrder(o)}
                 >
-                  {o === 'desc' ? 'Más recientes' : 'Más antiguos'}
+                  {o === 'desc' ? t.newest : t.oldest}
                 </button>
               ))}
             </div>
@@ -141,19 +143,19 @@ export function EventsPortal({ events, locale }: { events: PortalEvent[]; locale
                   <span className={styles.eventRowName}>{e.name}</span>
                   <span className={styles.eventRowVenue}>{e.venue ?? '—'}</span>
                   <span className={styles.eventRowDate}>{e.dateRangeCompact}</span>
-                  <span className={styles.eventRowGo}>Ver →</span>
+                  <span className={styles.eventRowGo}>{t.view}</span>
                 </Link>
               ))}
             </div>
           ))}
           {list.length === 0 && (
             <div className={styles.empty}>
-              {q ? `Ningún evento coincide con «${query.trim()}».` : 'Por ahora este es el único evento publicado.'}
+              {q ? t.noMatch(query.trim()) : t.onlyOne}
             </div>
           )}
           {list.length > visible && (
             <button type="button" className={styles.moreButton} onClick={() => setVisible((v) => v + PAGE_SIZE)}>
-              Cargar más eventos ▾
+              {t.loadMore}
             </button>
           )}
         </div>

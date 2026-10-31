@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getDictionary, type Locale } from '../lib/i18n';
 import styles from './public.module.css';
 
 /** "Compartir" (hoja nativa del móvil o copiar enlace) y "Descargar PDF" (impresión del navegador). */
-export function ShareActions({ title, pdf = false }: { title: string; pdf?: boolean }) {
+export function ShareActions({ locale, title, pdf = false }: { locale: Locale; title: string; pdf?: boolean }) {
+  const t = getDictionary(locale).share;
   const [toast, setToast] = useState('');
 
   useEffect(() => {
@@ -25,23 +27,23 @@ export function ShareActions({ title, pdf = false }: { title: string; pdf?: bool
     }
     try {
       await navigator.clipboard.writeText(url);
-      setToast('Enlace copiado');
+      setToast(t.copied);
     } catch {
-      setToast('No se pudo copiar el enlace');
+      setToast(t.copyFailed);
     }
   }
 
   return (
     <div className={styles.actions}>
       <button type="button" className={styles.ghostButton} onClick={share}>
-        Compartir
+        {t.share}
       </button>
       {pdf && (
         <button type="button" className={styles.ghostButton} onClick={() => window.print()}>
-          Descargar PDF
+          {t.pdf}
         </button>
       )}
-      <button type="button" className={styles.iconButton} onClick={share} aria-label="Compartir">
+      <button type="button" className={styles.iconButton} onClick={share} aria-label={t.share}>
         ↗
       </button>
       {toast && (

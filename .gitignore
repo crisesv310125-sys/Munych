@@ -15,7 +15,10 @@ next-env.d.ts
 *.tsbuildinfo
 *.local
 
-# Cloudflare (OpenNext / wrangler)
+# Next export estático (apps/public)
+apps/public/out
+
+# Cloudflare (wrangler)
 .open-next
 .wrangler
 .dev.vars

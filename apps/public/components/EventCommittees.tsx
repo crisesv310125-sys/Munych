@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { normalizeSearch } from '../lib/format';
+import { getDictionary, type Dictionary, type Locale } from '../lib/i18n';
 import type { CommitteeView } from '../lib/view';
 import { PositionMedal } from './PositionMedal';
 import styles from './public.module.css';
@@ -11,7 +12,7 @@ const PAGE_SIZE = 6;
 
 const joinDelegates = (delegates: string[]) => delegates.join(' · ');
 
-function CommitteeCard({ committee, href }: { committee: CommitteeView; href: string }) {
+function CommitteeCard({ committee, href, t }: { committee: CommitteeView; href: string; t: Dictionary['event'] }) {
   if (committee.pending) {
     return (
       <article className={`${styles.committeeCard} ${styles.committeeCardPending}`}>
@@ -19,9 +20,9 @@ function CommitteeCard({ committee, href }: { committee: CommitteeView; href: st
           <h2 className={styles.cardName} style={{ margin: 0 }}>
             {committee.name}
           </h2>
-          <span className={styles.pillPending}>PENDIENTE</span>
+          <span className={styles.pillPending}>{t.pending}</span>
         </div>
-        <div className={styles.pendingText}>Los resultados de este comité aún no se publican.</div>
+        <div className={styles.pendingText}>{t.committeePending}</div>
       </article>
     );
   }
@@ -34,10 +35,10 @@ function CommitteeCard({ committee, href }: { committee: CommitteeView; href: st
           <h2 className={styles.cardName} style={{ margin: 0 }}>
             {committee.name}
           </h2>
-          {committee.ranking && <span className={styles.monoMeta}>{committee.ranking.length} DELEG.</span>}
+          {committee.ranking && <span className={styles.monoMeta}>{t.delegationsShort(committee.ranking.length)}</span>}
         </div>
         <Link href={href} className={styles.cardLink}>
-          {committee.ranking ? 'Ver ranking completo →' : 'Ver premios →'}
+          {committee.ranking ? t.fullRanking : t.viewAwards}
         </Link>
       </div>
       <div className={styles.topAward}>
@@ -57,20 +58,23 @@ function CommitteeCard({ committee, href }: { committee: CommitteeView; href: st
           <span className={styles.minorAwardDelegates}>{joinDelegates(award.delegates)}</span>
         </div>
       ))}
-      {rest.length === 0 && <div className={styles.singleAwardNote}>Este comité solo otorgó un premio.</div>}
+      {rest.length === 0 && <div className={styles.singleAwardNote}>{t.singleAward}</div>}
     </article>
   );
 }
 
 export function EventCommittees({
+  locale,
   committees,
   eventHref,
   publishedLabel,
 }: {
+  locale: Locale;
   committees: CommitteeView[];
   eventHref: string;
   publishedLabel: string;
 }) {
+  const t = getDictionary(locale).event;
   const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
   const q = normalizeSearch(query);
@@ -92,27 +96,27 @@ export function EventCommittees({
         <input
           type="search"
           className={`${styles.search} ${styles.eventSearch}`}
-          placeholder="Buscar comité, país o delegado…"
-          aria-label="Buscar comité, país o delegado"
+          placeholder={t.searchPlaceholder}
+          aria-label={t.searchLabel}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <span className={styles.monoMeta}>PUBLICADO {publishedLabel}</span>
+        <span className={styles.monoMeta}>{t.publishedAt(publishedLabel)}</span>
       </div>
       {committees.length === 0 ? (
-        <div className={`${styles.listCard} ${styles.empty}`}>Este evento todavía no tiene comités publicados.</div>
+        <div className={`${styles.listCard} ${styles.empty}`}>{t.noCommittees}</div>
       ) : matches.length === 0 ? (
-        <div className={`${styles.listCard} ${styles.empty}`}>Ningún comité coincide con «{query.trim()}».</div>
+        <div className={`${styles.listCard} ${styles.empty}`}>{t.noMatch(query.trim())}</div>
       ) : (
         <div className={styles.committeeGrid}>
           {shown.map((c) => (
-            <CommitteeCard key={c.slug} committee={c} href={`${eventHref}/${c.slug}`} />
+            <CommitteeCard key={c.slug} committee={c} href={`${eventHref}/${c.slug}`} t={t} />
           ))}
         </div>
       )}
       {hidden > 0 && (
         <button type="button" className={styles.moreButton} onClick={() => setShowAll(true)}>
-          Ver {hidden} {hidden === 1 ? 'comité más' : 'comités más'} ▾
+          {t.showMore(hidden)}
         </button>
       )}
     </>

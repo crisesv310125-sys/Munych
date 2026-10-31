@@ -1,3 +1,0 @@
-# Variables de servidor para `npm run preview` (wrangler local). Copia a .dev.vars.
-# En producción se configuran con `npx wrangler secret put REVALIDATE_SECRET`.
-REVALIDATE_SECRET=

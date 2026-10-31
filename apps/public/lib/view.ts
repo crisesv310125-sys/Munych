@@ -10,6 +10,7 @@ import {
   normalizeSearch,
   sortAwards,
 } from './format';
+import type { Locale } from './i18n';
 import type { PublicCommittee, PublicDelegation, PublicResultsDocument } from './types';
 
 /**
@@ -65,11 +66,11 @@ export interface EventView {
   showScores: boolean;
 }
 
-function delegationView(d: PublicDelegation): DelegationView {
-  return { name: delegationLabel(d), code: d.character_name ? null : d.country_code, institution: d.institution };
+function delegationView(d: PublicDelegation, locale: Locale): DelegationView {
+  return { name: delegationLabel(d, locale), code: d.character_name ? null : d.country_code, institution: d.institution };
 }
 
-export function eventView(doc: PublicResultsDocument): EventView {
+export function eventView(doc: PublicResultsDocument, locale: Locale): EventView {
   const { event } = doc;
   return {
     slug: event.slug,
@@ -78,24 +79,24 @@ export function eventView(doc: PublicResultsDocument): EventView {
     logoUrl: event.logo_url,
     startsOn: event.starts_on,
     year: eventYear(event.starts_on),
-    dateRange: formatEventDateRange(event.starts_on, event.ends_on),
-    dateRangeShort: formatEventDateRangeShort(event.starts_on, event.ends_on),
-    dateRangeCompact: formatEventDateRangeCompact(event.starts_on, event.ends_on),
-    publishedShort: formatPublishedShort(doc.published_at, event.timezone),
-    publishedNumeric: formatPublishedNumeric(doc.published_at, event.timezone),
+    dateRange: formatEventDateRange(event.starts_on, event.ends_on, locale),
+    dateRangeShort: formatEventDateRangeShort(event.starts_on, event.ends_on, locale),
+    dateRangeCompact: formatEventDateRangeCompact(event.starts_on, event.ends_on, locale),
+    publishedShort: formatPublishedShort(doc.published_at, event.timezone, locale),
+    publishedNumeric: formatPublishedNumeric(doc.published_at, event.timezone, locale),
     showScores: doc.settings.show_scores,
   };
 }
 
-export function committeeView(committee: PublicCommittee): CommitteeView {
+export function committeeView(committee: PublicCommittee, locale: Locale): CommitteeView {
   const awards = sortAwards(committee.awards).map((a) => ({
-    label: awardLabel(a.award_type),
-    delegation: delegationView(a.delegation),
+    label: awardLabel(a.award_type, locale),
+    delegation: delegationView(a.delegation, locale),
     delegates: a.delegates,
   }));
   const ranking =
     committee.ranking?.map((r) => {
-      const delegation = delegationView(r.delegation);
+      const delegation = delegationView(r.delegation, locale);
       return {
         position: r.position,
         delegation,

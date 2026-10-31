@@ -215,8 +215,8 @@ Total: **49 operaciones**.
 - **`GET /publication/preview`**: devuelve el documento exacto que se publicaría, sin guardarlo.
 - **`POST /publish`**: solo con el evento `closed` (`EVENT_NOT_CLOSED`).
   - Hace upsert en `public.public_results` con `version + 1`.
-  - Llama al webhook `POST {PUBLIC_SITE_URL}/api/revalidate` con la cabecera `X-Signature: sha256=<HMAC>`. Si el webhook falla, la publicación queda hecha igualmente y la respuesta lleva `revalidated: false`.
-- **`POST /unpublish`**: pone `published = false` y avisa al sitio. Es idempotente.
+  - El cambio deja agendado un build del sitio estático en Cloudflare Pages: la BD llama al deploy hook 45 s después del último cambio (máx. 5 min). `revalidated: false` significa que el hook no está configurado; la publicación queda hecha igualmente.
+- **`POST /unpublish`**: pone `published = false` y agenda el build igual que `publish`. Es idempotente.
 
 ---
 

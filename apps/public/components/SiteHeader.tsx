@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { getDictionary, type Locale } from '../lib/i18n';
+import { LanguageSwitch } from './LanguageSwitch';
 import styles from './public.module.css';
 
 const MUNYCH_LOGO = '/brand/munych-logo.png';
@@ -18,27 +20,32 @@ function Logo({ src }: { src: string | null }) {
   );
 }
 
-/** Barra superior del portal: marca MUNYCH + enlace al sitio. */
-export function PortalTopbar() {
+/** Barra superior del portal: marca MUNYCH + idioma + enlace al sitio. */
+export function PortalTopbar({ locale }: { locale: Locale }) {
+  const t = getDictionary(locale);
   return (
     <div className={`${styles.topbar} ${styles.gutter}`}>
       <div className={styles.brand}>
         <Logo src={MUNYCH_LOGO} />
         <div>
           <div className={styles.brandName}>MUNYCH</div>
-          <div className={styles.brandTag}>RESULTADOS OFICIALES</div>
-          <span className={`${styles.brandMobileTag} ${styles.mobileOnly}`}>MUNYCH · RESULTADOS</span>
+          <div className={styles.brandTag}>{t.header.officialResults}</div>
+          <span className={`${styles.brandMobileTag} ${styles.mobileOnly}`}>{t.header.mobileTag}</span>
         </div>
       </div>
-      <a className={styles.siteLink} href="https://munych.org" target="_blank" rel="noreferrer">
-        munych.org
-      </a>
+      <div className={styles.actions} style={{ alignItems: 'center' }}>
+        <LanguageSwitch locale={locale} />
+        <a className={styles.siteLink} href="https://munych.org" target="_blank" rel="noreferrer">
+          munych.org
+        </a>
+      </div>
     </div>
   );
 }
 
-/** Cabecera navy de evento y comité: logo + migas (en móvil, solo "MUNYCH") + acciones. */
+/** Cabecera navy de evento y comité: logo + migas (en móvil, solo "MUNYCH") + idioma + acciones. */
 export function SiteHeader({
+  locale,
   logoUrl,
   homeHref,
   crumbs,
@@ -46,6 +53,7 @@ export function SiteHeader({
   className,
   children,
 }: {
+  locale: Locale;
   logoUrl: string | null;
   homeHref: string;
   crumbs: Crumb[];
@@ -53,15 +61,16 @@ export function SiteHeader({
   className?: string;
   children?: ReactNode;
 }) {
+  const t = getDictionary(locale);
   return (
     <header className={`${styles.header} ${styles.gutter} ${className ?? ''}`}>
       <div className={`${styles.topbar} ${styles.topbarRule}`}>
         <div className={styles.brand}>
-          <Link href={homeHref} className={styles.logoLink} aria-label="Todos los eventos">
+          <Link href={homeHref} className={styles.logoLink} aria-label={t.header.allEvents}>
             <Logo src={logoUrl} />
           </Link>
           <span className={`${styles.brandMobileTag} ${styles.mobileOnly}`}>MUNYCH</span>
-          <nav aria-label="Ruta" className={`${styles.crumbs} ${styles.desktopOnly}`}>
+          <nav aria-label={t.header.breadcrumb} className={`${styles.crumbs} ${styles.desktopOnly}`}>
             {crumbs.map((crumb, i) => (
               <span key={crumb.label + i}>
                 {i > 0 && <span className={styles.crumbSep}>/</span>}
@@ -78,7 +87,10 @@ export function SiteHeader({
             ))}
           </nav>
         </div>
-        {actions}
+        <div className={styles.actions}>
+          <LanguageSwitch locale={locale} />
+          {actions}
+        </div>
       </div>
       {children}
     </header>

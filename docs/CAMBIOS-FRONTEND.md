@@ -210,6 +210,32 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 
 ⚠️ **OpenNext incrusta los `.env*` en el worker** (`.open-next/cloudflare/next-env.mjs`, solo del lado del servidor; se comprobó que no llegan a los assets públicos). Para producción, haz el build sin `REVALIDATE_SECRET` en `.env.local`, por ejemplo en CI, y deja que lo ponga `wrangler secret`. OpenNext recomienda compilar en Linux o WSL, porque en Windows avisa que puede fallar.
 
+> **Sustituido por el hito 10** en lo que toca a la página pública: ya no usa OpenNext, ISR ni el webhook.
+
+---
+
+## Hito 10 — Página pública estática en Cloudflare Pages, en español e inglés
+
+**Export estático** (sustituye a OpenNext/ISR del hito 9):
+
+- `next.config.ts` con `output: 'export'` e `images.unoptimized`. El build deja el sitio en `apps/public/out` (ignorado en git).
+- Eliminados `app/api/revalidate/`, `open-next.config.ts`, `wrangler.jsonc`, `.dev.vars.example`, `REVALIDATE_SECRET` de `.env.example`, los scripts `cf:build`/`deploy` y la dependencia `@opennextjs/cloudflare`. `npm run preview -w @munych/public` ahora hace el build y lo sirve con `wrangler pages dev out`.
+- `generateStaticParams()` genera todas las rutas en el build: los idiomas en `app/[locale]/layout.tsx`, un evento por documento publicado y un comité por cada comité.
+- `public/_redirects`: `/` → `/es/` (302). `app/page.tsx` sigue redirigiendo para `next dev`.
+- `lib/data.ts` sigue lanzando el error de Supabase: el build falla y Pages mantiene el último despliegue bueno.
+- **Actualización tras publicar**: cada cambio necesita un build nuevo. El backend (migración `site_rebuild`, ver su README) agrupa los cambios y llama al deploy hook de Pages 45 s después de la última publicación (máx. 5 min), así que la clausura no lanza un build por comité. Al publicar o despublicar, `ResultsPage` avisa que la página se actualizará en unos 2–3 minutos, o en rojo que falta configurar el hook si `revalidated` es `false`. Solo cambia el texto (mismo `span` que el error, en `var(--muted)`).
+
+**Idiomas (`es`, `en`)**:
+
+- `lib/i18n.ts`: `LOCALES`, `getDictionary(locale)` con todos los textos de la interfaz, y `localizedPath()`. Los componentes reciben `locale` y toman sus textos del diccionario.
+- `lib/format.ts` y `lib/view.ts` reciben el idioma: meses y orden de las fechas ("November 11 – 15, 2026"), fecha de publicación (`2026-10-28 · 10:57` en inglés, para evitar la ambigüedad día/mes), nombres de país (`Intl.DisplayNames`) y nombres de premios.
+- Los nombres de eventos, comités, sedes y delegaciones de personaje vienen del documento publicado y **no** se traducen.
+- `<html lang>` correcto por idioma: el `<html>` pasa de `app/layout.tsx` (que ahora solo devuelve los hijos) a `app/[locale]/layout.tsx`. Título y descripción del sitio por idioma con `generateMetadata`.
+- **Decisión de diseño**: selector de idioma (`components/LanguageSwitch.tsx`) en la barra superior del portal y en las cabeceras de evento y comité. Lleva a la misma página en el otro idioma. Reutiliza `ghostButton` (texto "English"/"Español", escritorio) e `iconButton` ("EN"/"ES", móvil), igual que "Compartir"; no hay estilos nuevos.
+- **Decisión de diseño**: el 404 es un único `404.html` para todo el sitio y no sabe el idioma, así que muestra el texto en ambos idiomas y un botón a cada portal (`Button` de `@munych/ui`).
+
+**Verificación** (mocks): `next build` genera 30 páginas (2 idiomas × portal, 4 eventos y 8 comités). Con `wrangler pages dev out`: `/` redirige a `/es`, el selector cambia de `/es/sd-mun-2026/cs` a `/en/sd-mun-2026/cs` y la página en inglés muestra textos, países ("United Kingdom"), premios ("Best delegate") y fechas en inglés con `<html lang="en">`. La vista móvil no se comprobó en el navegador.
+
 ---
 
 ## Entrega final
@@ -222,7 +248,7 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 
 **Autenticación**: Login (contraseña admin + enlace mágico jueces), guards por rol, logout (admin y jueces).
 
-**Página pública** (`apps/public/`): Inicio (eventos publicados), Evento (premios por comité), Comité (premios + ranking si está habilitado), 404, `noindex`, webhook de revalidación.
+**Página pública** (`apps/public/`): Inicio (eventos publicados), Evento (premios por comité), Comité (premios + ranking si está habilitado), 404, `noindex`, en español e inglés (export estático, hito 10).
 
 ### Decisiones de diseño (pantallas o controles nuevos, siempre con componentes ya existentes)
 
@@ -247,7 +273,7 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 
 ### Cómo ejecutar el proyecto
 
-**Con backend y Supabase reales** (por defecto): backend en `http://127.0.0.1:8000`, y `.env.local` de cada app a partir de su `.env.example` (`VITE_API_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` / `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `REVALIDATE_SECRET`).
+**Con backend y Supabase reales** (por defecto): backend en `http://127.0.0.1:8000`, y `.env.local` de cada app a partir de su `.env.example` (`VITE_API_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` / `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
 ```
 npm install
 npm run dev -w @munych/panel   # http://localhost:5173

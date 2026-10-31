@@ -5,7 +5,7 @@ Sistema de calificaciones para conferencias Modelo de Naciones Unidas (MUNYCH As
 ## Estructura
 
 - `apps/panel/` — panel de administración y jueces (Vite + React 19 + react-router-dom, CSS Modules). `npm run dev -w @munych/panel`.
-- `apps/public/` — página pública de resultados (Next.js App Router, generación estática + revalidación bajo demanda). Lee `public.public_results` con Supabase (clave `anon`); con `NEXT_PUBLIC_USE_MOCKS=true` usa `apps/public/lib/mockPublicData.ts`. `npm run dev -w @munych/public`.
+- `apps/public/` — página pública de resultados (Next.js App Router, export estático `output: 'export'`, en español e inglés). Lee `public.public_results` con Supabase (clave `anon`); con `NEXT_PUBLIC_USE_MOCKS=true` usa `apps/public/lib/mockPublicData.ts`. `npm run dev -w @munych/public`.
 - `packages/ui/` — componentes visuales y tokens de estilo compartidos (`@munych/ui`). Se importan como `@munych/ui/components/<Nombre>` y `@munych/ui/styles/<archivo>.css`. Lo consumen ambas apps.
 
 ## Regla de oro: el diseño no se toca
@@ -23,18 +23,20 @@ npm run lint -w @munych/panel
 npm run build -w @munych/panel
 npm run dev -w @munych/public
 npm run build -w @munych/public
-npm run preview -w @munych/public   # build con OpenNext + worker local en :8787
+npm run preview -w @munych/public   # build estático + wrangler pages dev (aplica _redirects/_headers)
 npm run cf:preview -w @munych/panel # build + static assets en wrangler local
 ```
 
-Despliegue: ambas apps van a Cloudflare Workers (`wrangler.jsonc` en cada app). La página pública usa OpenNext con ISR solo bajo demanda (`revalidate = false` + `generateStaticParams()` que devuelve `[]`): **no** uses `cookies()`, `headers()` ni middleware en sus páginas, porque la vuelven dinámica y deja de cachearse. Detalle en `docs/CAMBIOS-FRONTEND.md` (hito 9).
+Despliegue: el panel va a Cloudflare Workers como static assets (`apps/panel/wrangler.jsonc`). La página pública es un export estático para Cloudflare Pages (directorio de salida `apps/public/out`): cada ruta necesita `generateStaticParams()` y **no** se pueden usar `cookies()`, `headers()`, middleware, route handlers ni `revalidate`. Los datos quedan fijos al hacer el build; al publicar, el backend agrupa los cambios y llama al deploy hook de Pages (migración `site_rebuild` del backend). Detalle en `docs/CAMBIOS-FRONTEND.md` (hito 10).
+
+Idiomas de la página pública: `es` y `en` (`apps/public/lib/i18n.ts`). Todo texto de la interfaz va en ese diccionario, nunca escrito en el componente; fechas, países y premios se formatean por idioma en `lib/format.ts`. Para añadir un idioma: agregarlo a `LOCALES` y a los diccionarios y meses.
 
 ## Datos y mocks
 
 Ambas apps hablan con el backend real por defecto. Rutas y modelos: `routes.md` (raíz); en local el backend corre en `http://127.0.0.1:8000/api/v1` (Swagger en `/api/v1/docs`). Configuración en `.env.local` de cada app (ver su `.env.example`).
 
 - `apps/panel`: API real en `VITE_API_URL` y autenticación con Supabase (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`). Con `VITE_USE_MOCKS=true` (solo en dev), MSW (`src/mocks/`) intercepta `/api/v1/*` y `data-access/authService.ts` simula la sesión (`src/mocks/authMock.ts`).
-- `apps/public`: lee `public.public_results` de Supabase con la clave `anon`. Con `NEXT_PUBLIC_USE_MOCKS=true` usa `lib/mockPublicData.ts`. `REVALIDATE_SECRET` debe ser igual al del backend.
+- `apps/public`: lee `public.public_results` de Supabase con la clave `anon`. Con `NEXT_PUBLIC_USE_MOCKS=true` usa `lib/mockPublicData.ts`. Lee Supabase solo durante el build.
 
 La capa de datos del panel (`apps/panel/src/data-access/`) está escrita a mano y verificada contra `/api/v1/openapi.json`; si cambia el contrato, actualizar `apiTypes.ts` o sustituirla por un cliente generado con Orval (`// TODO` en `apiClient.ts`).
 

@@ -1,15 +1,17 @@
+import { getDictionary, type Locale } from '../lib/i18n';
 import type { AwardView } from '../lib/view';
 import { PositionMedal } from './PositionMedal';
 import styles from './public.module.css';
 
 /** Tarjetas de premios: la primera destacada (navy en escritorio, borde dorado en móvil). */
-export function CommitteeAwards({ awards }: { awards: AwardView[] }) {
+export function CommitteeAwards({ locale, awards }: { locale: Locale; awards: AwardView[] }) {
   if (awards.length === 0) {
+    const t = getDictionary(locale).event;
     return (
       <div className={`${styles.committeeCard} ${styles.committeeCardPending}`}>
         <div className={styles.cardHead}>
-          <span className={styles.pendingText}>Los resultados de este comité aún no se publican.</span>
-          <span className={styles.pillPending}>PENDIENTE</span>
+          <span className={styles.pendingText}>{t.committeePending}</span>
+          <span className={styles.pillPending}>{t.pending}</span>
         </div>
       </div>
     );

@@ -1,28 +1,23 @@
 import { getPublishedDocuments } from '../../lib/data';
+import { getDictionary, type Locale } from '../../lib/i18n';
 import { committeeView, eventView } from '../../lib/view';
 import { EventsPortal, type PortalEvent } from '../../components/EventsPortal';
 import { PortalTopbar } from '../../components/SiteHeader';
 import styles from '../../components/public.module.css';
 
-// Solo se regenera cuando el backend llama a /api/revalidate al publicar o despublicar.
-export const revalidate = false;
+// Los idiomas los genera app/[locale]/layout.tsx (generateStaticParams).
 
-// Sin rutas en el build: cada página se genera en su primera visita y queda cacheada (ISR).
-// Sin esta función, Next la trataría como dinámica y consultaría Supabase en cada visita.
-export function generateStaticParams() {
-  return [];
-}
-
-export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function HomePage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
+  const t = getDictionary(locale).portal;
   const docs = await getPublishedDocuments();
 
   // Ordenados por fecha de inicio, del más reciente al más antiguo.
   const events: PortalEvent[] = docs
     .map((doc) => {
-      const committees = doc.committees.map(committeeView);
+      const committees = doc.committees.map((c) => committeeView(c, locale));
       return {
-        ...eventView(doc),
+        ...eventView(doc, locale),
         committeeCount: committees.length,
         highlights: committees
           .filter((c) => !c.pending)
@@ -34,10 +29,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <PortalTopbar />
+        <PortalTopbar locale={locale} />
         <div className={`${styles.hero} ${styles.gutter}`}>
-          <div className={styles.heroEyebrow}>EVENTOS PUBLICADOS</div>
-          <h1 className={styles.heroTitle}>Consulta los reconocimientos de cada comité.</h1>
+          <div className={styles.heroEyebrow}>{t.eyebrow}</div>
+          <h1 className={styles.heroTitle}>{t.title}</h1>
         </div>
       </header>
       <div className={`${styles.portalBody} ${styles.gutter}`}>

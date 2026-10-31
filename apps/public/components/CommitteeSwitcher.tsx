@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { getDictionary, type Locale } from '../lib/i18n';
 import styles from './public.module.css';
 
 export interface CommitteeLink {
@@ -12,7 +13,18 @@ export interface CommitteeLink {
 }
 
 /** "Cambiar comité ▾" (escritorio). En móvil se usan las pastillas de CommitteeChips. */
-export function CommitteeSwitcher({ committees, current, eventHref }: { committees: CommitteeLink[]; current: string; eventHref: string }) {
+export function CommitteeSwitcher({
+  locale,
+  committees,
+  current,
+  eventHref,
+}: {
+  locale: Locale;
+  committees: CommitteeLink[];
+  current: string;
+  eventHref: string;
+}) {
+  const t = getDictionary(locale);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,7 +49,7 @@ export function CommitteeSwitcher({ committees, current, eventHref }: { committe
   return (
     <div className={styles.switcher} ref={ref}>
       <button type="button" className={styles.switcherButton} aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)}>
-        Cambiar comité <span className={styles.switcherCaret}>▾</span>
+        {t.committee.switch} <span className={styles.switcherCaret}>▾</span>
       </button>
       {open && (
         <div className={styles.switcherMenu}>
@@ -50,7 +62,7 @@ export function CommitteeSwitcher({ committees, current, eventHref }: { committe
               onClick={() => setOpen(false)}
             >
               <span>{c.name}</span>
-              {c.pending && <span className={styles.pillPending}>PENDIENTE</span>}
+              {c.pending && <span className={styles.pillPending}>{t.event.pending}</span>}
             </Link>
           ))}
         </div>
@@ -60,7 +72,17 @@ export function CommitteeSwitcher({ committees, current, eventHref }: { committe
 }
 
 /** Pastillas horizontales de comités (móvil, pantalla 2c). */
-export function CommitteeChips({ committees, current, eventHref }: { committees: CommitteeLink[]; current: string; eventHref: string }) {
+export function CommitteeChips({
+  locale,
+  committees,
+  current,
+  eventHref,
+}: {
+  locale: Locale;
+  committees: CommitteeLink[];
+  current: string;
+  eventHref: string;
+}) {
   const activeRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
@@ -70,7 +92,7 @@ export function CommitteeChips({ committees, current, eventHref }: { committees:
   if (committees.length < 2) return null;
 
   return (
-    <nav aria-label="Comités" className={styles.chips}>
+    <nav aria-label={getDictionary(locale).committee.chips} className={styles.chips}>
       {committees.map((c) => {
         const active = c.slug === current;
         return (

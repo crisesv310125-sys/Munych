@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { normalizeSearch } from '../lib/format';
+import { getDictionary, type Locale } from '../lib/i18n';
 import type { RankingRowView } from '../lib/view';
 import { PositionMedal } from './PositionMedal';
 import styles from './public.module.css';
@@ -9,7 +10,8 @@ import styles from './public.module.css';
 const PAGE_SIZE = 10;
 
 /** Ranking del comité (2e). Sin `showScores` se oculta la columna de puntaje. */
-export function RankingTable({ ranking, showScores }: { ranking: RankingRowView[]; showScores: boolean }) {
+export function RankingTable({ locale, ranking, showScores }: { locale: Locale; ranking: RankingRowView[]; showScores: boolean }) {
+  const t = getDictionary(locale).ranking;
   const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
   const q = normalizeSearch(query);
@@ -31,27 +33,27 @@ export function RankingTable({ ranking, showScores }: { ranking: RankingRowView[
       <div className={styles.rankingHead}>
         <h2 id="ranking-title" className={styles.eyebrow} style={{ margin: 0 }}>
           <span className={styles.desktopOnly}>
-            Ranking · {count} {count === 1 ? 'delegación' : 'delegaciones'}
+            {t.title(count)}
           </span>
-          <span className={styles.mobileOnly}>Clasificación · {count} deleg.</span>
+          <span className={styles.mobileOnly}>{t.titleShort(count)}</span>
         </h2>
         <input
           type="search"
           className={`${styles.search} ${styles.rankingSearch}`}
-          placeholder="Buscar país o delegado…"
-          aria-label="Buscar país o delegado"
+          placeholder={t.searchPlaceholder}
+          aria-label={t.searchLabel}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
       <div className={`${styles.table} ${showScores ? '' : styles.tableNoScores}`} role="table" aria-labelledby="ranking-title">
         <div className={`${styles.tableRow} ${styles.tableHeadRow}`} role="row">
-          <span role="columnheader">POS.</span>
-          <span role="columnheader">DELEGACIÓN</span>
-          <span role="columnheader">DELEGADO(S)</span>
+          <span role="columnheader">{t.position}</span>
+          <span role="columnheader">{t.delegation}</span>
+          <span role="columnheader">{t.delegates}</span>
           {showScores && (
             <span role="columnheader" className={styles.right}>
-              PUNTAJE
+              {t.score}
             </span>
           )}
         </div>
@@ -91,14 +93,14 @@ export function RankingTable({ ranking, showScores }: { ranking: RankingRowView[
             </div>
           );
         })}
-        {matches.length === 0 && <div className={styles.empty}>Ninguna delegación coincide con «{query.trim()}».</div>}
+        {matches.length === 0 && <div className={styles.empty}>{t.noMatch(query.trim())}</div>}
         {(missingScores || hidden > 0) && (
           <div className={styles.tableFoot}>
-            {missingScores && <span className={styles.tableFootNote}>— Puntaje no disponible (sin calificaciones completas)</span>}
+            {missingScores && <span className={styles.tableFootNote}>{t.missingScore}</span>}
             {hidden > 0 && (
               <button type="button" className={styles.moreButton} onClick={() => setShowAll(true)}>
-                <span className={styles.desktopOnly}>Ver las {matches.length} ▾</span>
-                <span className={styles.mobileOnly}>Ver todas ▾</span>
+                <span className={styles.desktopOnly}>{t.showAllCount(matches.length)}</span>
+                <span className={styles.mobileOnly}>{t.showAll}</span>
               </button>
             )}
           </div>

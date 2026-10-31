@@ -127,10 +127,12 @@ export function ResultsPage() {
   const { data: preview, refetch: refetchPreview } = usePublicationPreview(eventId);
   const [showPreview, setShowPreview] = useState(false);
   const [pubError, setPubError] = useState('');
+  const [pubNotice, setPubNotice] = useState('');
 
   async function patchSettings(patch: Partial<PublicationSettings>) {
     if (!settings) return;
     setPubError('');
+    setPubNotice('');
     try {
       await updateSettings.mutateAsync({ ...settings, ...patch });
     } catch (err) {
@@ -138,11 +140,19 @@ export function ResultsPage() {
     }
   }
 
+  // La página pública es estática: el backend agrupa los cambios y pide un build a Cloudflare
+  // Pages ~45 s después de la última publicación, y el build tarda 1–2 min.
+  function siteUpdateMessage(done: string, revalidated: boolean) {
+    if (revalidated) setPubNotice(`${done} La página pública se actualizará en unos 2–3 minutos.`);
+    else setPubError(`${done} La página pública no se actualizará sola: falta configurar el deploy hook en el backend.`);
+  }
+
   async function handlePublish() {
     setPubError('');
+    setPubNotice('');
     try {
       const res = await publishEvent.mutateAsync();
-      if (!res.revalidated) setPubError('Se publicó, pero la página pública no se revalidó automáticamente.');
+      siteUpdateMessage('Resultados publicados.', res.revalidated);
     } catch (err) {
       setPubError(errorMessage(err));
     }
@@ -150,8 +160,10 @@ export function ResultsPage() {
 
   async function handleUnpublish() {
     setPubError('');
+    setPubNotice('');
     try {
-      await unpublishEvent.mutateAsync();
+      const res = await unpublishEvent.mutateAsync();
+      siteUpdateMessage('Resultados despublicados.', res.revalidated);
     } catch (err) {
       setPubError(errorMessage(err));
     }
@@ -329,6 +341,7 @@ export function ResultsPage() {
               ))}
             </div>
             {pubError && <span style={{ color: '#C0392B', fontSize: 12 }}>{pubError}</span>}
+            {pubNotice && <span style={{ color: 'var(--muted)', fontSize: 12 }}>{pubNotice}</span>}
             <div style={{ display: 'flex', gap: 10 }}>
               <Button variant="secondary" onClick={() => { setShowPreview(true); refetchPreview(); }}>
                 Actualizar vista previa

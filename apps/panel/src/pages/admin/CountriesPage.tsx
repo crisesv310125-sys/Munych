@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '@munych/ui/components/Button';
 import { Input, Select } from '@munych/ui/components/FormControls';
@@ -9,7 +9,6 @@ import {
   useDelegations,
   useDeleteDelegate,
   useDeleteDelegation,
-  useImportDelegations,
   useUpdateDelegation,
 } from '../../data-access/hooks';
 import { errorMessage } from '../../data-access/errors';
@@ -58,14 +57,10 @@ export function CountriesPage() {
   const updateDelegation = useUpdateDelegation(activeCommitteeId);
   const deleteDelegation = useDeleteDelegation(activeCommitteeId);
   const deleteDelegate = useDeleteDelegate(activeCommitteeId);
-  const importDelegations = useImportDelegations(activeCommitteeId);
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [draft, setDraft] = useState<Draft | null>(null);
   const [draftError, setDraftError] = useState('');
-  const [importResult, setImportResult] = useState<{ created: number; skipped: number; errors: { row: number; message: string }[] } | null>(null);
-  const [importError, setImportError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const list = delegations ?? [];
 
@@ -145,29 +140,6 @@ export function CountriesPage() {
       await deleteDelegation.mutateAsync(id);
     }
     setSelected(new Set());
-  }
-
-  function downloadTemplate() {
-    const blob = new Blob(['country_code,character_name,institution,delegate_1,delegate_2\n'], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'plantilla_delegaciones.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  async function handleFile(file: File) {
-    setImportError('');
-    setImportResult(null);
-    try {
-      const result = await importDelegations.mutateAsync(file);
-      setImportResult(result);
-    } catch (err) {
-      setImportError(errorMessage(err));
-    } finally {
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
   }
 
   return (
@@ -251,7 +223,7 @@ export function CountriesPage() {
             <div style={{ padding: 26, fontSize: 13, color: 'var(--muted)' }}>Este comité aún no tiene delegaciones registradas.</div>
           )}
         </div>
-        {draft ? (
+        {draft && (
           <div className={`${styles.sidePanel} ${styles.sidePanelNarrow}`}>
             <div className={styles.modalCard}>
               <div className={styles.modalHeader}>
@@ -335,75 +307,6 @@ export function CountriesPage() {
                 </Button>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className={`${styles.sidePanel} ${styles.sidePanelNarrow}`}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: 'var(--navy)' }}>Carga masiva</span>
-              <span style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
-                Sube un CSV con las columnas{' '}
-                <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: 11 }}>
-                  country_code, character_name, institution, delegate_1, delegate_2
-                </span>
-                .
-              </span>
-            </div>
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                const file = e.dataTransfer.files[0];
-                if (file) handleFile(file);
-              }}
-              style={{
-                border: '1px dashed var(--border-input)',
-                borderRadius: 10,
-                background: 'var(--white)',
-                padding: '28px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 8,
-                textAlign: 'center',
-                cursor: 'pointer',
-              }}
-            >
-              <div style={{ width: 38, height: 38, borderRadius: 8, background: 'var(--chip-neutral-bg)', border: '1px solid var(--border)' }} />
-              <span style={{ fontSize: 13, color: 'var(--ink)', fontWeight: 600 }}>Arrastra el archivo aquí</span>
-              <span style={{ fontSize: 12, color: 'var(--muted)' }}>
-                o <span style={{ color: 'var(--un-blue)', fontWeight: 600 }}>selecciona un archivo</span>
-              </span>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv"
-                hidden
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFile(file);
-                }}
-              />
-            </div>
-            {importResult && (
-              <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: 10, padding: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
-                  {importResult.created} creadas · {importResult.skipped} omitidas
-                </span>
-                {importResult.errors.map((e, i) => (
-                  <span key={i} style={{ fontSize: 11, color: '#C0392B' }}>
-                    Fila {e.row}: {e.message}
-                  </span>
-                ))}
-              </div>
-            )}
-            {importError && <span style={{ color: '#C0392B', fontSize: 12 }}>{importError}</span>}
-            <a href="#" onClick={(e) => { e.preventDefault(); downloadTemplate(); }} style={{ fontSize: 12, fontWeight: 600 }}>
-              Descargar plantilla CSV
-            </a>
-            <Button style={{ marginTop: 'auto' }} disabled={importDelegations.isPending} onClick={() => fileInputRef.current?.click()}>
-              {importDelegations.isPending ? 'Importando…' : 'Elegir archivo CSV'}
-            </Button>
           </div>
         )}
       </div>

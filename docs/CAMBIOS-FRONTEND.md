@@ -216,7 +216,7 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 
 ### Pantallas conectadas
 
-**Administración** (`apps/panel/src/pages/admin/`): Eventos (CRUD), Panel general (KPIs + progreso por comité + cierre de evento), Comités (CRUD + sesiones), Delegaciones (CRUD + importación CSV), Jueces (invitar + asignar por comité), Criterios (rúbrica: escala, pesos, descriptores por nivel), Resultados (ranking + premios + publicación + vista previa pública), Exportar (descarga real del XLSX).
+**Administración** (`apps/panel/src/pages/admin/`): Eventos (CRUD), Panel general (KPIs + progreso por comité + cierre de evento), Comités (CRUD + sesiones), Delegaciones (CRUD; se retiró la carga masiva por CSV del panel), Jueces (invitar + asignar por comité), Criterios (rúbrica: escala, pesos, descriptores por nivel), Resultados (ranking + premios + publicación + vista previa pública), Exportar (descarga real del XLSX).
 
 **Jueces** (`apps/panel/src/pages/judge/`): Mis comités, Comité (lista de delegados + calificación por sesión con guardado por lotes), Mi progreso (ranking parcial), Mi perfil.
 
@@ -230,6 +230,7 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 - Botón "Cerrar sesión" en `AdminSidebar` (no existía ningún control de logout en el panel de admin).
 - Gestión de **sesiones** (abrir/cerrar) dentro de `CommitteesPage` — no existía ninguna pantalla de sesiones.
 - Página **Sesiones** (`SessionsPage`, `#/admin/eventos/:id/sesiones`): todas las sesiones del evento por comité, con estado, avance (calificaciones hechas/esperadas, se refresca cada 15 s), último cambio y abrir/cerrar; además, abrir o cerrar la sesión N en todos los comités a la vez. Solo usa componentes y estilos existentes (`AdminShared`, `Table`, `StatusBadge`, `ProgressBar`, `ConfirmDialog`).
+- Se retiró el panel de **Carga masiva** (CSV) de Delegaciones a petición del cliente; el endpoint `POST .../delegations/import` y el hook `useImportDelegations` siguen disponibles.
 - Gestión de **premios** y **publicación** (ajustes, vista previa, publicar/despublicar) dentro de `ResultsPage` — ninguna de las dos existía.
 - Botón **Cerrar evento** en el Panel general — no existía.
 - `CriterionSlider` (`@munych/ui`) reparametrizado a la escala de la rúbrica con descriptor de nivel, en vez de crear un componente nuevo.

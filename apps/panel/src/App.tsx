@@ -16,6 +16,7 @@ const loaders = {
   EventsPage: () => import('./pages/admin/EventsPage').then((m) => m.EventsPage),
   AdminDashboardPage: () => import('./pages/admin/AdminDashboardPage').then((m) => m.AdminDashboardPage),
   CommitteesPage: () => import('./pages/admin/CommitteesPage').then((m) => m.CommitteesPage),
+  SessionsPage: () => import('./pages/admin/SessionsPage').then((m) => m.SessionsPage),
   CountriesPage: () => import('./pages/admin/CountriesPage').then((m) => m.CountriesPage),
   JudgesPage: () => import('./pages/admin/JudgesPage').then((m) => m.JudgesPage),
   CriteriaPage: () => import('./pages/admin/CriteriaPage').then((m) => m.CriteriaPage),
@@ -47,6 +48,7 @@ const router = createHashRouter(
         <Route path="eventos/:eventId" lazy={lazy('EventScopeLayout')}>
           <Route index lazy={lazy('AdminDashboardPage')} />
           <Route path="comites" lazy={lazy('CommitteesPage')} />
+          <Route path="sesiones" lazy={lazy('SessionsPage')} />
           <Route path="paises" lazy={lazy('CountriesPage')} />
           <Route path="jueces" lazy={lazy('JudgesPage')} />
           <Route path="criterios" lazy={lazy('CriteriaPage')} />

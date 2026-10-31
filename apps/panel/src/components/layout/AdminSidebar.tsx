@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarDays, Download, Flag, LayoutDashboard, Landmark, LogOut, SlidersHorizontal, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CalendarClock, Download, Flag, LayoutDashboard, Landmark, LogOut, SlidersHorizontal, Trophy, Users } from 'lucide-react';
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useAppState } from '../../state/AppStateContext';
 import { useEvent } from '../../data-access/hooks';
@@ -10,6 +10,7 @@ function eventNav(eventId: string) {
   return [
     { path: base, label: 'Dashboard', Icon: LayoutDashboard },
     { path: `${base}/comites`, label: 'Comités', Icon: Landmark },
+    { path: `${base}/sesiones`, label: 'Sesiones', Icon: CalendarClock },
     { path: `${base}/paises`, label: 'Países', Icon: Flag },
     { path: `${base}/jueces`, label: 'Jueces', Icon: Users },
     { path: `${base}/criterios`, label: 'Criterios', Icon: SlidersHorizontal },

@@ -229,6 +229,7 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 - Toggle de enlace mágico en Login (reutilizando/limpiando un botón duplicado que ya existía sin función).
 - Botón "Cerrar sesión" en `AdminSidebar` (no existía ningún control de logout en el panel de admin).
 - Gestión de **sesiones** (abrir/cerrar) dentro de `CommitteesPage` — no existía ninguna pantalla de sesiones.
+- Página **Sesiones** (`SessionsPage`, `#/admin/eventos/:id/sesiones`): todas las sesiones del evento por comité, con estado, avance (calificaciones hechas/esperadas, se refresca cada 15 s), último cambio y abrir/cerrar; además, abrir o cerrar la sesión N en todos los comités a la vez. Solo usa componentes y estilos existentes (`AdminShared`, `Table`, `StatusBadge`, `ProgressBar`, `ConfirmDialog`).
 - Gestión de **premios** y **publicación** (ajustes, vista previa, publicar/despublicar) dentro de `ResultsPage` — ninguna de las dos existía.
 - Botón **Cerrar evento** en el Panel general — no existía.
 - `CriterionSlider` (`@munych/ui`) reparametrizado a la escala de la rúbrica con descriptor de nivel, en vez de crear un componente nuevo.

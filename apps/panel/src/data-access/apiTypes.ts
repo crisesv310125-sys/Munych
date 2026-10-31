@@ -45,8 +45,8 @@ export interface ApiJudgeInvitation {
 export interface JudgeInvite {
   email: string;
   full_name: string;
-  /** Vincula al juez con ese evento (si ya existía en la organización, solo se vincula). */
   event_id?: string | null;
+  
 }
 
 /** (JudgeUpdate) */

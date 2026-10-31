@@ -24,10 +24,6 @@ export function resendJudgeInvitation(judgeId: string): Promise<ApiJudgeInvitati
   return apiFetch<ApiJudgeInvitation>(`/judges/${judgeId}/invitation`, { method: 'POST' });
 }
 
-/**
- * Envía la invitación de Supabase por correo. Si el correo ya existe en Auth, reutiliza ese usuario
- * (y, si aún no aceptó una invitación anterior, se la reenvía).
- */
 export function inviteJudge(invite: JudgeInvite): Promise<ApiJudge> {
   return apiFetch<ApiJudge>('/judges', { method: 'POST', body: invite });
 }

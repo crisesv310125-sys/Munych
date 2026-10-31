@@ -42,7 +42,7 @@ function newCommitteeDraft(): CommitteeDraft {
     slug: `nuevo-comite-${Date.now().toString(36)}`,
     type: 'general_assembly',
     delegation_mode: 'single',
-    sessions_count: 3,
+    sessions_count: 5,
     rubric_id: null,
   };
 }

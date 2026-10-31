@@ -68,11 +68,7 @@ export function AdminSidebar({ open, onNavigate }: { open?: boolean; onNavigate?
               );
             })}
           </nav>
-          <div className={styles.event}>
-            <span className={styles.eventLabel}>Evento activo</span>
-            <span className={styles.eventName}>{event.name}</span>
-            <span className={styles.eventLabel}>{eventStatusLabel(event.status)}</span>
-          </div>
+      
         </>
       ) : (
         <nav className={styles.nav}>

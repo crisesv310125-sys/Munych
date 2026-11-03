@@ -238,6 +238,16 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 
 ---
 
+## Hito 11 — Tipos de evento (2026-11-03)
+
+Primer paso del spec «Tipos de evento y votación de delegados»: solo el **tipo** del evento. Votación de delegados/staff, accesos por token y cálculo combinado quedan para después.
+
+- Backend (migración `20261103000100_event_types`): `app.events.event_type` = `judges_only` (por defecto; los eventos existentes no cambian) | `voting`. Qué roles votan y su peso está en `EVENT_TYPES` (`catalog.py`), no programado por tipo. El tipo solo se puede cambiar con el evento en borrador (409 `CONFLICT`).
+- Panel: `EventType` en `apiTypes.ts` (`EventDraft.event_type?`, `ApiEvent.event_type`), etiquetas en `lib/statusLabels.ts` (`EVENT_TYPE_LABELS`), mocks (SD-MUN 2026 es `voting`) y la misma regla de borrador en el `PATCH` de MSW.
+- **Decisión de diseño**: select "Tipo de evento" en el modal "Nuevo evento" (`EventsPage`), con el `Select` de `@munych/ui` ya usado para "Marca"; sin estilos nuevos.
+
+---
+
 ## Entrega final
 
 ### Pantallas conectadas
@@ -259,6 +269,7 @@ Objetivo: que las más de 1000 visitas de la clausura de SD-MUN-2026 se sirvan d
 - Se retiró el panel de **Carga masiva** (CSV) de Delegaciones a petición del cliente; el endpoint `POST .../delegations/import` y el hook `useImportDelegations` siguen disponibles.
 - Gestión de **premios** y **publicación** (ajustes, vista previa, publicar/despublicar) dentro de `ResultsPage` — ninguna de las dos existía.
 - Botón **Cerrar evento** en el Panel general — no existía.
+- Select **Tipo de evento** en el modal "Nuevo evento" (hito 11), con el mismo `Select` que "Marca".
 - `CriterionSlider` (`@munych/ui`) reparametrizado a la escala de la rúbrica con descriptor de nivel, en vez de crear un componente nuevo.
 - Se retiró "+ Nuevo set de rúbrica" en Criterios (el contrato no tiene endpoint para crear rúbricas adicionales) y "Marcar como completo" en la calificación del juez (el contrato no tiene un flag de completado independiente de tener todos los criterios calificados).
 

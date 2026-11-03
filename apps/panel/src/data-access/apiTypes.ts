@@ -76,12 +76,19 @@ export interface CommitteeJudgeAssignmentOut {
 
 export type EventBrand = 'munych' | 'grand_international';
 export type EventStatus = 'draft' | 'active' | 'closed';
+/**
+ * judges_only: solo califican los jueces (flujo original).
+ * voting: votan delegados, staff y jueces. Solo se puede cambiar con el evento en borrador.
+ */
+export type EventType = 'judges_only' | 'voting';
 
 /** (EventCreate) */
 export interface EventDraft {
   slug: string;
   name: string;
   brand: EventBrand;
+  /** Por defecto `judges_only`. */
+  event_type?: EventType;
   venue?: string | null;
   country_code?: string | null;
   timezone: string;
@@ -101,6 +108,7 @@ export interface ApiEvent {
   slug: string;
   name: string;
   brand: EventBrand;
+  event_type: EventType;
   logo_url: string | null;
   venue: string | null;
   country_code: string | null;

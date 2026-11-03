@@ -397,6 +397,7 @@ export const handlers = [
       slug: draft.slug,
       name: draft.name,
       brand: draft.brand,
+      event_type: draft.event_type ?? 'judges_only',
       logo_url: null,
       venue: draft.venue ?? null,
       country_code: draft.country_code ?? null,
@@ -422,6 +423,9 @@ export const handlers = [
     const patch = (await request.json()) as EventUpdate;
     if (patch.status && patch.status !== 'draft' && patch.status !== 'active') {
       return problem(422, 'VALIDATION_ERROR', 'status solo admite draft o active.');
+    }
+    if (patch.event_type !== undefined && patch.event_type !== event.event_type && event.status !== 'draft') {
+      return problem(409, 'CONFLICT', 'El tipo de evento solo se puede cambiar mientras el evento está en borrador');
     }
     Object.assign(event, patch, { updated_at: now() });
     return HttpResponse.json(event);

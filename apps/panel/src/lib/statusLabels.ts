@@ -1,4 +1,4 @@
-import type { EventStatus, SessionStatus } from '../data-access/apiTypes';
+import type { EventStatus, EventType, SessionStatus } from '../data-access/apiTypes';
 
 /**
  * Traducciones de los enums de estado del contrato (routes.md) a las etiquetas y tonos que
@@ -12,6 +12,16 @@ export function eventStatusLabel(status: EventStatus): string {
   if (status === 'closed') return 'Cerrado';
   if (status === 'active') return 'Activo';
   return 'Borrador';
+}
+
+/** Etiquetas de `event_type`, en el orden en que se ofrecen al crear un evento. */
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  judges_only: 'Solo jueces',
+  voting: 'Votación (delegados, staff y jueces)',
+};
+
+export function eventTypeLabel(type: EventType): string {
+  return EVENT_TYPE_LABELS[type];
 }
 
 export function eventStatusTone(status: EventStatus): BadgeTone {

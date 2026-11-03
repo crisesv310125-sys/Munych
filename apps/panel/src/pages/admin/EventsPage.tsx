@@ -7,9 +7,9 @@ import { Card } from '@munych/ui/components/Card';
 import { StatusBadge } from '@munych/ui/components/StatusBadge';
 import { useCommittees, useCreateEvent, useEvents } from '../../data-access/hooks';
 import { errorMessage } from '../../data-access/errors';
-import { eventStatusLabel, eventStatusTone } from '../../lib/statusLabels';
+import { EVENT_TYPE_LABELS, eventStatusLabel, eventStatusTone } from '../../lib/statusLabels';
 import { slugify } from '../../lib/slugify';
-import type { ApiEvent, EventBrand } from '../../data-access/apiTypes';
+import type { ApiEvent, EventBrand, EventType } from '../../data-access/apiTypes';
 import styles from './EventsPage.module.css';
 import shared from './AdminShared.module.css';
 
@@ -29,6 +29,7 @@ const EMPTY_DRAFT = {
   name: '',
   slug: '',
   brand: 'munych' as EventBrand,
+  eventType: 'judges_only' as EventType,
   venue: '',
   country: 'MX',
   timezone: 'America/Mexico_City',
@@ -102,6 +103,7 @@ export function EventsPage() {
         name: draft.name.trim(),
         slug: draft.slug.trim() || slugify(draft.name),
         brand: draft.brand,
+        event_type: draft.eventType,
         venue: draft.venue.trim() || null,
         country_code: draft.country.trim() || null,
         timezone: draft.timezone,
@@ -205,6 +207,17 @@ export function EventsPage() {
                   <option value="grand_international">GRAND International</option>
                 </Select>
               </div>
+              <Select
+                label="Tipo de evento"
+                value={draft.eventType}
+                onChange={(e) => setDraft({ ...draft, eventType: e.target.value as EventType })}
+              >
+                {(Object.keys(EVENT_TYPE_LABELS) as EventType[]).map((type) => (
+                  <option key={type} value={type}>
+                    {EVENT_TYPE_LABELS[type]}
+                  </option>
+                ))}
+              </Select>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <Input
                   label="Fecha de inicio"

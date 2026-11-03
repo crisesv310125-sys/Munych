@@ -255,23 +255,25 @@ type AssignmentOut = {
 ```ts
 type Brand       = "munych" | "grand_international"
 type EventStatus = "draft" | "active" | "closed"
+type EventType   = "judges_only" | "voting"   // solo jueces | delegados + staff + jueces
 
 type EventCreate = {
   slug: string          // ^[a-z0-9]+(-[a-z0-9]+)*$, máx. 80
   name: string          // 1–200
   brand: Brand
+  event_type?: EventType         // por defecto "judges_only"
   venue?: string | null
   country_code?: string | null   // ISO-3166 alfa-2
   timezone: string               // IANA, p. ej. "America/Santo_Domingo"
   starts_on: date
   ends_on: date                  // >= starts_on
 }
-type EventUpdate = Partial<EventCreate> & {
+type EventUpdate = Partial<EventCreate> & {   // event_type: solo en borrador; si no, 409 CONFLICT
   default_rubric_id?: uuid | null
   status?: "draft" | "active" | null   // para cerrar: POST /events/{id}/close
 }
 type EventOut = {
-  id: uuid; slug: string; name: string; brand: Brand
+  id: uuid; slug: string; name: string; brand: Brand; event_type: EventType
   logo_url: string | null; venue: string | null; country_code: string | null
   timezone: string; starts_on: date; ends_on: date
   status: EventStatus; default_rubric_id: uuid | null
@@ -550,6 +552,7 @@ El auth hook lee esta tabla para añadir el claim `app_role` al JWT.
 | `timezone` | text | IANA |
 | `starts_on`, `ends_on` | date | `ends_on >= starts_on` |
 | `status` | text | `draft` (por defecto) \| `active` \| `closed` |
+| `event_type` | text | `judges_only` (por defecto) \| `voting` · roles que votan y su peso: `EVENT_TYPES` en `catalog.py` del backend |
 | `default_rubric_id` | uuid \| null → `rubrics` | `on delete set null` |
 | `publication_settings` | jsonb | `{"name_format":"first_name_initial","show_institution":true,"show_ranking":false,"show_scores":false,"indexable":false}` |
 

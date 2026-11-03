@@ -14,14 +14,14 @@ export function eventStatusLabel(status: EventStatus): string {
   return 'Borrador';
 }
 
-/** Etiquetas de `event_type`, en el orden en que se ofrecen al crear un evento. */
-export const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  judges_only: 'Solo jueces',
-  voting: 'Votación (delegados, staff y jueces)',
-};
+/** Opciones de `event_type`, en el orden en que se ofrecen al crear un evento. */
+export const EVENT_TYPE_OPTIONS: { value: EventType; label: string; description: string }[] = [
+  { value: 'judges_only', label: 'Puntuación', description: 'Solo jueces califican' },
+  { value: 'voting', label: 'Votación', description: 'Delegados, staff y jueces' },
+];
 
 export function eventTypeLabel(type: EventType): string {
-  return EVENT_TYPE_LABELS[type];
+  return EVENT_TYPE_OPTIONS.find((o) => o.value === type)?.label ?? type;
 }
 
 export function eventStatusTone(status: EventStatus): BadgeTone {

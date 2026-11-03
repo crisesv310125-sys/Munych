@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@munych/ui/components/Button';
-import { Input, Select } from '@munych/ui/components/FormControls';
 import { Card } from '@munych/ui/components/Card';
 import { StatusBadge } from '@munych/ui/components/StatusBadge';
-import { useCommittees, useCreateEvent, useEvents } from '../../data-access/hooks';
+import { useCommittees, useEvents } from '../../data-access/hooks';
 import { errorMessage } from '../../data-access/errors';
-import { EVENT_TYPE_LABELS, eventStatusLabel, eventStatusTone } from '../../lib/statusLabels';
-import { slugify } from '../../lib/slugify';
-import type { ApiEvent, EventBrand, EventType } from '../../data-access/apiTypes';
+import { eventStatusLabel, eventStatusTone } from '../../lib/statusLabels';
+import type { ApiEvent } from '../../data-access/apiTypes';
+import { CreateEventDialog } from './CreateEventDialog';
 import styles from './EventsPage.module.css';
 import shared from './AdminShared.module.css';
 
@@ -24,18 +23,6 @@ function formatDateRange(startDate: string, endDate: string): string {
   const endLabel = end.toLocaleDateString('es-MX', opts);
   return startDate === endDate ? startLabel : `${startLabel} – ${endLabel}`;
 }
-
-const EMPTY_DRAFT = {
-  name: '',
-  slug: '',
-  brand: 'munych' as EventBrand,
-  eventType: 'judges_only' as EventType,
-  venue: '',
-  country: 'MX',
-  timezone: 'America/Mexico_City',
-  startDate: '',
-  endDate: '',
-};
 
 function EventCard({ event, index, onClick }: { event: ApiEvent; index: number; onClick: () => void }) {
   const { data: committees } = useCommittees(event.id);
@@ -77,45 +64,15 @@ function EventCard({ event, index, onClick }: { event: ApiEvent; index: number; 
 
 export function EventsPage() {
   const { data: events, isLoading, isError, error, refetch } = useEvents();
-  const createEvent = useCreateEvent();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
-  const [draft, setDraft] = useState(EMPTY_DRAFT);
-  const [slugTouched, setSlugTouched] = useState(false);
-  const [createError, setCreateError] = useState('');
 
   const eventList: ApiEvent[] = events ?? [];
   const filtered = eventList.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()));
 
-  function openCreate() {
-    setDraft(EMPTY_DRAFT);
-    setSlugTouched(false);
-    setCreateError('');
-    setCreating(true);
-  }
-
-  async function handleCreate() {
-    if (!draft.name.trim() || !draft.startDate || !draft.endDate) return;
-    setCreateError('');
-    try {
-      const created = await createEvent.mutateAsync({
-        name: draft.name.trim(),
-        slug: draft.slug.trim() || slugify(draft.name),
-        brand: draft.brand,
-        event_type: draft.eventType,
-        venue: draft.venue.trim() || null,
-        country_code: draft.country.trim() || null,
-        timezone: draft.timezone,
-        starts_on: draft.startDate,
-        ends_on: draft.endDate,
-      });
-      setCreating(false);
-      navigate(`/admin/eventos/${created.id}`);
-    } catch (err) {
-      setCreateError(errorMessage(err));
-    }
-  }
+  const openCreate = () => setCreating(true);
+  const closeCreate = useCallback(() => setCreating(false), []);
 
   return (
     <div className={shared.page}>
@@ -164,110 +121,13 @@ export function EventsPage() {
       </div>
 
       {creating && (
-        <div className={styles.overlay} onClick={() => setCreating(false)}>
-          <div className={`${shared.modalCard} ${styles.dialog}`} onClick={(e) => e.stopPropagation()}>
-            <div className={shared.modalHeader}>
-              <span style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: 'var(--navy)' }}>
-                Nuevo evento
-              </span>
-              <button
-                onClick={() => setCreating(false)}
-                style={{ background: 'none', border: 'none', color: 'var(--state-none-dot)', fontSize: 16, cursor: 'pointer' }}
-                aria-label="Cerrar"
-              >
-                ✕
-              </button>
-            </div>
-            <div className={shared.modalBody}>
-              <Input
-                label="Nombre del evento"
-                placeholder="p. ej. MUNYCH 2027"
-                value={draft.name}
-                onChange={(e) => {
-                  const name = e.target.value;
-                  setDraft((d) => ({ ...d, name, slug: slugTouched ? d.slug : slugify(name) }));
-                }}
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <Input
-                  label="Slug"
-                  placeholder="munych-2027"
-                  value={draft.slug}
-                  onChange={(e) => {
-                    setSlugTouched(true);
-                    setDraft({ ...draft, slug: slugify(e.target.value) });
-                  }}
-                />
-                <Select
-                  label="Marca"
-                  value={draft.brand}
-                  onChange={(e) => setDraft({ ...draft, brand: e.target.value as EventBrand })}
-                >
-                  <option value="munych">MUNYCH</option>
-                  <option value="grand_international">GRAND International</option>
-                </Select>
-              </div>
-              <Select
-                label="Tipo de evento"
-                value={draft.eventType}
-                onChange={(e) => setDraft({ ...draft, eventType: e.target.value as EventType })}
-              >
-                {(Object.keys(EVENT_TYPE_LABELS) as EventType[]).map((type) => (
-                  <option key={type} value={type}>
-                    {EVENT_TYPE_LABELS[type]}
-                  </option>
-                ))}
-              </Select>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <Input
-                  label="Fecha de inicio"
-                  type="date"
-                  value={draft.startDate}
-                  onChange={(e) => setDraft({ ...draft, startDate: e.target.value })}
-                />
-                <Input
-                  label="Fecha de fin"
-                  type="date"
-                  value={draft.endDate}
-                  onChange={(e) => setDraft({ ...draft, endDate: e.target.value })}
-                />
-              </div>
-              <Input
-                label="Sede"
-                placeholder="Campus Central, Ciudad de México"
-                value={draft.venue}
-                onChange={(e) => setDraft({ ...draft, venue: e.target.value })}
-              />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <Input
-                  label="País (ISO)"
-                  placeholder="MX"
-                  maxLength={2}
-                  value={draft.country}
-                  onChange={(e) => setDraft({ ...draft, country: e.target.value.toUpperCase() })}
-                />
-                <Input
-                  label="Zona horaria (IANA)"
-                  placeholder="America/Mexico_City"
-                  value={draft.timezone}
-                  onChange={(e) => setDraft({ ...draft, timezone: e.target.value })}
-                />
-              </div>
-              {createError && <span style={{ color: '#C0392B', fontSize: 13 }}>{createError}</span>}
-            </div>
-            <div className={shared.modalFooter}>
-              <Button variant="secondary" onClick={() => setCreating(false)} disabled={createEvent.isPending}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleCreate}
-                disabled={createEvent.isPending || !draft.name.trim() || !draft.startDate || !draft.endDate}
-              >
-                {createEvent.isPending ? 'Creando…' : 'Crear evento'}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <CreateEventDialog
+          onClose={closeCreate}
+          onCreated={(created) => {
+            setCreating(false);
+            navigate(`/admin/eventos/${created.id}`);
+          }}
+        />
       )}
     </div>
   );

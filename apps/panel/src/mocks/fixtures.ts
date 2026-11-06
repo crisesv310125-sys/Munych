@@ -76,7 +76,7 @@ export const events: ApiEvent[] = [
     slug: 'sd-mun-2026',
     name: 'SD-MUN 2026',
     brand: 'grand_international',
-    event_type: 'voting',
+    event_type: 'mun_regular',
     logo_url: '/brand/munych-logo.png',
     venue: 'Santo Domingo',
     country_code: 'DO',

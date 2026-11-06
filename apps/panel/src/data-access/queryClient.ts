@@ -30,6 +30,8 @@ export const queryKeys = {
   awards: (committeeId: string) => ['awards', committeeId] as const,
   publicationSettings: (eventId: string) => ['publication-settings', eventId] as const,
   publicationPreview: (eventId: string) => ['publication-preview', eventId] as const,
+  voterTokens: (eventId: string) => ['voter-tokens', eventId] as const,
+  ballot: (token: string) => ['ballot', token] as const,
   me: ['me'] as const,
   judgeCommittees: ['judge', 'committees'] as const,
   judgeCommittee: (committeeId: string) => ['judge', 'committee', committeeId] as const,

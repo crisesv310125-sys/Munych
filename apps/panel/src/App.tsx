@@ -22,6 +22,8 @@ const loaders = {
   CriteriaPage: () => import('./pages/admin/CriteriaPage').then((m) => m.CriteriaPage),
   ResultsPage: () => import('./pages/admin/ResultsPage').then((m) => m.ResultsPage),
   ExportPage: () => import('./pages/admin/ExportPage').then((m) => m.ExportPage),
+  VotingAccessPage: () => import('./pages/admin/VotingAccessPage').then((m) => m.VotingAccessPage),
+  VotePage: () => import('./pages/vote/VotePage').then((m) => m.VotePage),
 } satisfies Record<string, () => Promise<ComponentType>>;
 
 const lazy = (name: keyof typeof loaders) => async () => ({ Component: await loaders[name]() });
@@ -34,6 +36,9 @@ const router = createHashRouter(
       <Route path="/login" element={<LoginPage />} />
       {/* Destino de los enlaces de invitación y recuperación (ver supabaseClient.ts). */}
       <Route path="/crear-contrasena" element={<SetPasswordPage />} />
+      {/* Boleta pública del delegado: entra con su token, sin cuenta (ADR-005). */}
+      <Route path="/votar" lazy={lazy('VotePage')} />
+      <Route path="/votar/:token" lazy={lazy('VotePage')} />
 
       <Route path="/juez" lazy={lazy('JudgeLayout')}>
         <Route index lazy={lazy('DashboardPage')} />
@@ -54,6 +59,7 @@ const router = createHashRouter(
           <Route path="criterios" lazy={lazy('CriteriaPage')} />
           <Route path="resultados" lazy={lazy('ResultsPage')} />
           <Route path="exportar" lazy={lazy('ExportPage')} />
+          <Route path="votacion" lazy={lazy('VotingAccessPage')} />
         </Route>
       </Route>
 

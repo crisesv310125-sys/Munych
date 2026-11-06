@@ -55,7 +55,11 @@ export interface JudgeUpdate {
   active?: boolean | null;
 }
 
-export type JudgeCommitteeRole = 'chair' | 'moderator' | 'judge';
+/** Rol de una cuenta en un comité. `chair` y `moderator` cuentan como Mesa Directiva. */
+export type JudgeCommitteeRole = 'chair' | 'moderator' | 'judge' | 'staff';
+
+/** Grupo que vota en el resultado ponderado. `chair` = Mesa Directiva. */
+export type VoterRole = 'judge' | 'chair' | 'staff' | 'delegate';
 
 /** (AssignmentIn) */
 export interface CommitteeJudgeAssignment {
@@ -78,9 +82,11 @@ export type EventBrand = 'munych' | 'grand_international';
 export type EventStatus = 'draft' | 'active' | 'closed';
 /**
  * judges_only: solo califican los jueces (flujo original).
- * voting: votan delegados, staff y jueces. Solo se puede cambiar con el evento en borrador.
+ * mun_regular: mesa 30 %, delegados 50 %, staff 20 % (sin jueces).
+ * national_championship: jueces 50 %, mesa 15 %, delegados 25 %, staff 10 %.
+ * Solo se puede cambiar con el evento en borrador.
  */
-export type EventType = 'judges_only' | 'voting';
+export type EventType = 'judges_only' | 'mun_regular' | 'national_championship';
 
 /** (EventCreate) */
 export interface EventDraft {
@@ -427,12 +433,87 @@ export interface RankingEntry {
   score: number | null; // 0–100, null = sin notas (va al final)
   criteria_averages: Record<string, number | null>; // clave = criterion_id
   incomplete_flags: IncompleteFlag[];
+  /** Nota 0–100 por rol que vota; null = nadie de ese rol calificó (su peso se reparte). */
+  role_scores: Partial<Record<VoterRole, number | null>>;
 }
 
 /** (RankingOut) */
 export interface RankingResponse {
   items: RankingEntry[];
   quota_warnings: string[];
+  event_type: EventType;
+  /** Peso (%) de cada rol según el tipo de evento. */
+  role_weights: Partial<Record<VoterRole, number>>;
+}
+
+// ---- Votación de delegados (ADR-005) ----
+
+export type VoterTokenStatus = 'none' | 'active' | 'revoked' | 'expired';
+
+/** (VoterAccessOut) — nunca incluye el token. */
+export interface VoterAccess {
+  delegate_id: string;
+  full_name: string;
+  delegation_id: string;
+  country_code: string | null;
+  character_name: string | null;
+  committee_id: string;
+  committee_name: string;
+  committee_acronym: string;
+  status: VoterTokenStatus;
+  issued_at: string | null;
+  last_used_at: string | null;
+  votes_count: number;
+}
+
+/** (GenerateTokensIn) */
+export interface GenerateVoterTokensIn {
+  /** Prefijo del enlace; el token se añade al final. */
+  link_base: string;
+  /** Sin lista: todos los que no tienen acceso vigente. Con lista: regenera esos. */
+  delegate_ids?: string[] | null;
+}
+
+/** (GeneratedTokenOut) — el token solo llega aquí, una vez. */
+export interface GeneratedVoterToken {
+  delegate_id: string;
+  full_name: string;
+  country_code: string | null;
+  character_name: string | null;
+  committee_name: string;
+  committee_acronym: string;
+  token: string;
+  url: string;
+  qr_svg: string;
+  expires_at: string;
+}
+
+export interface BallotDelegation {
+  delegation_id: string;
+  country_code: string | null;
+  character_name: string | null;
+}
+
+export interface BallotVote {
+  delegation_id: string;
+  criterion_id: string;
+  value: number;
+}
+
+/** (BallotOut) */
+export interface Ballot {
+  voter_name: string;
+  own_delegation: BallotDelegation;
+  event_name: string;
+  event_status: EventStatus;
+  committee_name: string;
+  committee_acronym: string;
+  /** null: no hay sesión abierta (la página muestra "esperando la siguiente sesión"). */
+  open_session: { session_id: string; number: number; opened_at: string | null } | null;
+  rubric: { scale_min: number; scale_max: number; criteria: ApiCriterion[] } | null;
+  /** Todas las delegaciones del comité menos la propia. */
+  delegations: BallotDelegation[];
+  votes: BallotVote[];
 }
 
 /** (AwardIn / AwardOut) */

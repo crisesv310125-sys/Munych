@@ -116,8 +116,14 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | GET | `/judge/committees/{committee_id}` | judge | `get_judge_committee` | — | `JudgeCommitteeDetailOut` |
 | GET | `/judge/sessions/{session_id}/scores` | judge | `list_my_session_scores` | — | `ScoreOut[]` |
 | POST | `/judge/scores/batch` | judge | `submit_scores_batch` | `ScoresBatchIn` | `ScoresBatchOut` |
+| **Votación de delegados** | | | | | |
+| GET | `/events/{event_id}/voter-tokens` | admin | `list_voter_tokens` | — | `VoterAccessOut[]` |
+| POST | `/events/{event_id}/voter-tokens` | admin | `generate_voter_tokens` | `GenerateTokensIn` | `GeneratedTokenOut[]` (201) |
+| POST | `/events/{event_id}/voter-tokens/revoke` | admin | `revoke_voter_tokens` | `RevokeTokensIn` | `{ revoked: number }` |
+| GET | `/vote/ballot` | token de delegado | `get_ballot` | — | `BallotOut` |
+| PUT | `/vote/ballot` | token de delegado | `submit_votes` | `VotesIn` | `BallotOut` |
 
-Total: **49 operaciones**.
+Total: **54 operaciones**.
 
 ---
 
@@ -174,6 +180,7 @@ Total: **49 operaciones**.
 ### 3.5 Asignaciones (`judging`)
 
 - **`PUT /committees/{committee_id}/judges`**: el cuerpo es un **array JSON**, `[{ "judge_id": "...", "role": "chair" }]`, que reemplaza todas las asignaciones del comité. `role` vale `judge` por defecto.
+- **Roles y tipo de evento** (2026-11-05): `chair` y `moderator` cuentan como **Mesa Directiva**; `staff` es el staff del evento. En `judges_only` todos califican como un solo grupo. En `mun_regular` un `judge` no califica (sus ítems se rechazan con `FORBIDDEN`); en `national_championship` califican los tres.
 
 ### 3.6 Calificación (`scoring`)
 
@@ -207,6 +214,14 @@ Total: **49 operaciones**.
   - **Nota de la delegación**: media de sus delegados.
   - **Desempate**: por la media del criterio de mayor peso. Si el empate persiste, las delegaciones comparten posición con `tied: true`.
   - Las delegaciones sin notas llevan `score: null` y van al final.
+  - **Votación por roles** (`mun_regular`, `national_championship`): la nota anterior se calcula **por rol** (`role_scores`), y la de la delegación es `Σ peso × nota_rol / Σ peso` de los roles **con nota** (un rol sin votos no cuenta como 0). Los delegados votan por delegación. Pesos en `role_weights`: MUN regular = mesa 30, delegados 50, staff 20; Campeonato = jueces 50, mesa 15, delegados 25, staff 10.
+
+### 3.7 bis Votación de delegados (`voting`)
+
+- Los delegados **no tienen cuenta**: el admin genera un token por delegado (`POST /events/{id}/voter-tokens` con `link_base`, p. ej. `https://<panel>/#/votar/`) y lo reparte como enlace o QR. El token, el enlace y el QR (SVG) **solo** vienen en esa respuesta; en la BD queda su SHA-256. Sin `delegate_ids` genera para quien no tenga acceso vigente; con `delegate_ids` los regenera y revoca los anteriores. `409 CONFLICT` si en el tipo de evento no votan delegados.
+- **`GET /vote/ballot`** (`Authorization: Bearer <token>`): nombre, delegación propia, rúbrica, delegaciones por las que puede votar (todas menos la suya), la sesión abierta del comité (`null` si no hay, o si el evento no está `active`) y sus votos en esa sesión. El panel la consulta cada 20 s.
+- **`PUT /vote/ballot`** `{ items: [{ delegation_id, criterion_id, value }] }`: el servidor decide la sesión (la abierta). Errores: `401 UNAUTHORIZED` (token inválido, revocado o vencido), `403 FORBIDDEN` (su propia delegación), `409 SESSION_CLOSED`, `404 NOT_FOUND`, `422 VALUE_OUT_OF_RANGE`. Reenviar corrige el voto.
+- Límite por token (no por IP, porque comparten el wifi): 20 GET/min y 30 PUT/min.
 - **`PUT /committees/{committee_id}/awards`**: array JSON `[{ award_type, delegation_id, position }]` (`position` vale 1 por defecto) que reemplaza los premios. Superar un cupo **no bloquea**: solo añade avisos a `quota_warnings`.
 - **`GET /events/{event_id}/export.xlsx`**: libro de Excel con una hoja **Resumen**, una hoja de ranking por comité y una hoja **Detalle** (delegado × sesión × juez × criterio). Las fechas van en la zona horaria del evento.
 
@@ -242,7 +257,7 @@ type JudgeInvite = { email: email; full_name: string /* 1–200 */; event_id?: u
 type JudgeUpdate = { full_name?: string | null; active?: boolean | null }
 type JudgeOut    = { judge_id: uuid; email: string | null; full_name: string; active: boolean }
 
-type CommitteeJudgeRole = "chair" | "moderator" | "judge"
+type CommitteeJudgeRole = "chair" | "moderator" | "judge" | "staff"   // chair y moderator = Mesa
 type AssignmentIn  = { judge_id: uuid; role?: CommitteeJudgeRole /* = "judge" */ }
 type AssignmentOut = {
   judge_id: uuid; role: CommitteeJudgeRole
@@ -255,7 +270,8 @@ type AssignmentOut = {
 ```ts
 type Brand       = "munych" | "grand_international"
 type EventStatus = "draft" | "active" | "closed"
-type EventType   = "judges_only" | "voting"   // solo jueces | delegados + staff + jueces
+type EventType   = "judges_only" | "mun_regular" | "national_championship"
+// solo jueces | mesa 30 · delegados 50 · staff 20 | jueces 50 · mesa 15 · delegados 25 · staff 10
 
 type EventCreate = {
   slug: string          // ^[a-z0-9]+(-[a-z0-9]+)*$, máx. 80
@@ -427,8 +443,39 @@ type RankingEntry = {
     kind: "incomplete" | "session_without_scores" | "delegate_without_scores"
     delegate_id: uuid; session_number: number | null; judge_id: uuid | null
   }[]
+  role_scores: Partial<Record<VoterRole, number | null>>   // 0–100; null = rol sin votos
 }
-type RankingOut = { items: RankingEntry[]; quota_warnings: string[] }
+type VoterRole  = "judge" | "chair" | "staff" | "delegate"
+type RankingOut = {
+  items: RankingEntry[]; quota_warnings: string[]
+  event_type: EventType; role_weights: Partial<Record<VoterRole, number>>  // %
+}
+
+// ---- Votación de delegados ----
+type VoterAccessOut = {
+  delegate_id: uuid; full_name: string; delegation_id: uuid
+  country_code: string | null; character_name: string | null
+  committee_id: uuid; committee_name: string; committee_acronym: string
+  status: "none" | "active" | "revoked" | "expired"
+  issued_at: datetime | null; last_used_at: datetime | null; votes_count: number
+}
+type GenerateTokensIn  = { link_base: string /* https://… */; delegate_ids?: uuid[] | null }
+type GeneratedTokenOut = {
+  delegate_id: uuid; full_name: string; country_code: string | null; character_name: string | null
+  committee_name: string; committee_acronym: string
+  token: string; url: string; qr_svg: string; expires_at: datetime
+}
+type RevokeTokensIn = { delegate_ids: uuid[] }
+type BallotOut = {
+  voter_name: string; own_delegation: BallotDelegation
+  event_name: string; event_status: EventStatus; committee_name: string; committee_acronym: string
+  open_session: { session_id: uuid; number: number; opened_at: datetime | null } | null
+  rubric: { scale_min: number; scale_max: number; criteria: CriterionOut[] } | null
+  delegations: BallotDelegation[]   // todas menos la propia
+  votes: { delegation_id: uuid; criterion_id: uuid; value: number }[]
+}
+type BallotDelegation = { delegation_id: uuid; country_code: string | null; character_name: string | null }
+type VotesIn = { items: { delegation_id: uuid; criterion_id: uuid; value: number }[] /* 1–2000 */ }
 
 type AwardIn   = { award_type: AwardType; delegation_id: uuid; position?: number /* ≥ 1, = 1 */ }
 type AwardOut  = { award_type: AwardType; delegation_id: uuid; position: number }
@@ -552,7 +599,7 @@ El auth hook lee esta tabla para añadir el claim `app_role` al JWT.
 | `timezone` | text | IANA |
 | `starts_on`, `ends_on` | date | `ends_on >= starts_on` |
 | `status` | text | `draft` (por defecto) \| `active` \| `closed` |
-| `event_type` | text | `judges_only` (por defecto) \| `voting` · roles que votan y su peso: `EVENT_TYPES` en `catalog.py` del backend |
+| `event_type` | text | `judges_only` (por defecto) \| `mun_regular` \| `national_championship` · roles que votan y su peso: `EVENT_TYPES` en `catalog.py` del backend |
 | `default_rubric_id` | uuid \| null → `rubrics` | `on delete set null` |
 | `publication_settings` | jsonb | `{"name_format":"first_name_initial","show_institution":true,"show_ranking":false,"show_scores":false,"indexable":false}` |
 
@@ -611,7 +658,7 @@ Por minimización de datos (hay menores), no se guarda correo, teléfono, fecha 
 |---|---|---|
 | `committee_id` | uuid → `committees` | PK (con `judge_id`) |
 | `judge_id` | uuid → `judges.user_id` | PK |
-| `role` | text | `chair` \| `moderator` \| `judge` (por defecto) |
+| `role` | text | `chair` \| `moderator` \| `judge` (por defecto) \| `staff` |
 
 #### `app.scoring_sessions`
 | Columna | Tipo | Notas |
@@ -635,6 +682,30 @@ Por minimización de datos (hay menores), no se guarda correo, teléfono, fecha 
 | `comment` | text \| null | privado: nunca se publica |
 | `client_updated_at` | timestamptz | gana la última escritura |
 | | | `unique(judge_id, delegate_id, session_id, criterion_id)` |
+
+#### `app.voter_tokens`
+Accesos de los delegados (sin cuenta). El token en claro nunca se guarda.
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` | uuid PK | |
+| `delegate_id` | uuid → `delegates` | `on delete cascade` · un solo token vigente (`revoked_at is null`) por delegado |
+| `event_id` | uuid → `events` | |
+| `token_hash` | text | SHA-256 en hexadecimal, **único** |
+| `expires_at` | timestamptz | `ends_on` + 2 días |
+| `revoked_at`, `last_used_at` | timestamptz \| null | |
+| `created_by` | uuid \| null → `auth.users` | |
+
+#### `app.delegate_votes`
+Un trigger (`app.check_delegate_vote`) rechaza el voto por la propia delegación o fuera del comité del votante.
+| Columna | Tipo | Notas |
+|---|---|---|
+| `id` | uuid PK | |
+| `voter_delegate_id` | uuid → `delegates` | quien vota |
+| `delegation_id` | uuid → `delegations` | por quién vota |
+| `session_id` | uuid → `scoring_sessions` | la sesión abierta al votar |
+| `criterion_id` | uuid → `criteria` | |
+| `value` | smallint | dentro de la escala de la rúbrica |
+| | | `unique(voter_delegate_id, delegation_id, session_id, criterion_id)` |
 
 #### `app.awards`
 | Columna | Tipo | Notas |
@@ -692,6 +763,8 @@ RLS: `anon` y `authenticated` solo pueden leer las filas con `published = true`.
 | `awards` | `(committee_id)` |
 | `result_snapshots` | `(event_id, created_at desc)` |
 | `audit_log` | `(entity, entity_id)` |
+| `voter_tokens` | `(delegate_id) where revoked_at is null` (único), `(event_id)` |
+| `delegate_votes` | `(session_id, delegation_id)` |
 
 ### Otros objetos
 

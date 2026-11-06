@@ -14,9 +14,16 @@ import type {
   CommitteeJudgeAssignmentOut,
   DelegationDraft,
   DelegationImportResult,
+  Ballot,
   EventDraft,
+  EventType,
   EventUpdate,
+  GeneratedVoterToken,
+  GenerateVoterTokensIn,
   IncompleteFlag,
+  JudgeCommitteeRole,
+  VoterAccess,
+  VoterRole,
   JudgeCommitteeDetail,
   JudgeCommitteeSummary,
   JudgeScore,
@@ -135,6 +142,35 @@ function assignmentsOut(committeeId: string): CommitteeJudgeAssignmentOut[] {
   });
 }
 
+// ---- Tipos de evento y votación de delegados (ADR-005) ----
+
+/** Igual que EVENT_TYPES del backend (shared/kernel/catalog.py). */
+const ROLE_WEIGHTS: Record<EventType, Partial<Record<VoterRole, number>>> = {
+  judges_only: { judge: 100 },
+  mun_regular: { chair: 30, delegate: 50, staff: 20 },
+  national_championship: { judge: 50, chair: 15, delegate: 25, staff: 10 },
+};
+
+function accountVoterRole(weights: Partial<Record<VoterRole, number>>, role: JudgeCommitteeRole | undefined): VoterRole | null {
+  let voter: VoterRole = 'judge';
+  if (Object.keys(weights).length > 1) {
+    if (role === 'chair' || role === 'moderator') voter = 'chair';
+    else if (role === 'staff') voter = 'staff';
+  }
+  return voter in weights ? voter : null;
+}
+
+interface MockVoterToken {
+  delegate_id: string;
+  event_id: string;
+  issued_at: string;
+  revoked_at: string | null;
+  last_used_at: string | null;
+}
+/** token en claro → acceso (en el backend solo se guarda el hash). */
+const voterTokens = new Map<string, MockVoterToken>();
+const delegateVotes: Array<{ voter_delegate_id: string; delegation_id: string; session_id: string; criterion_id: string; value: number }> = [];
+
 // ---- Motor de ranking (routes.md 3.7) ----
 
 function computeRanking(committeeId: string): RankingEntry[] {
@@ -144,8 +180,52 @@ function computeRanking(committeeId: string): RankingEntry[] {
   const sessions = sessionsByCommittee[committeeId] ?? [];
   const topCriterion = [...rubric.criteria].sort((a, b) => b.weight - a.weight)[0];
 
+  const weights = ROLE_WEIGHTS[eventOfCommittee(committee).event_type];
+  const assignedRole = new Map((committeeJudges[committeeId] ?? []).map((a) => [a.judge_id, a.role]));
+  const roleOf = (judgeId: string) => accountVoterRole(weights, assignedRole.get(judgeId));
+  /** Nota 0-100 de un evaluador sobre una rúbrica completa; null si le falta algún criterio. */
+  const weighted = (values: Array<{ criterion_id: string; value: number }>) =>
+    values.length < rubric.criteria.length
+      ? null
+      : rubric.criteria.reduce((sum, c) => sum + ((values.find((s) => s.criterion_id === c.id)?.value ?? 0) / rubric.scale_max) * c.weight, 0);
+  /** Media de evaluadores por sesión → media de sesiones (mismo método para cada rol). */
+  const roleScore = (votes: Array<{ voter: string; session_id: string; criterion_id: string; value: number }>) => {
+    const perSession = sessions.map((session) => {
+      const inSession = votes.filter((v) => v.session_id === session.id);
+      return avg(
+        [...new Set(inSession.map((v) => v.voter))]
+          .map((voter) => weighted(inSession.filter((v) => v.voter === voter)))
+          .filter((x): x is number => x !== null),
+      );
+    });
+    return avg(perSession.filter((x): x is number => x !== null));
+  };
+  const combine = (byRole: Partial<Record<VoterRole, number | null>>) => {
+    const present = (Object.entries(byRole) as Array<[VoterRole, number | null]>).filter((e): e is [VoterRole, number] => e[1] !== null);
+    const total = present.reduce((s, [role]) => s + (weights[role] ?? 0), 0);
+    return present.length === 0 || total === 0 ? null : present.reduce((s, [role, v]) => s + (weights[role] ?? 0) * v, 0) / total;
+  };
+
   const entries = committeeDelegations(committeeId).map((delegation) => {
     const flags: IncompleteFlag[] = [];
+    const roleScores: Partial<Record<VoterRole, number | null>> = {};
+    for (const role of Object.keys(weights) as VoterRole[]) {
+      if (role === 'delegate') {
+        roleScores[role] = roleScore(
+          delegateVotes.filter((v) => v.delegation_id === delegation.id).map((v) => ({ ...v, voter: v.voter_delegate_id })),
+        );
+      } else {
+        const perDelegate = delegation.delegates.map((delegate) =>
+          roleScore(
+            judgeScores
+              .filter((s) => s.delegate_id === delegate.id && roleOf(s.judge_id) === role)
+              .map((s) => ({ ...s, voter: s.judge_id })),
+          ),
+        );
+        roleScores[role] = avg(perDelegate.filter((x): x is number => x !== null));
+      }
+      if (roleScores[role] !== null && roleScores[role] !== undefined) roleScores[role] = round2(roleScores[role]!);
+    }
     const delegateScores = delegation.delegates.map((delegate) => {
       const mine = judgeScores.filter((s) => s.delegate_id === delegate.id);
       if (mine.length === 0) flags.push({ kind: 'delegate_without_scores', delegate_id: delegate.id, session_number: null, judge_id: null });
@@ -180,12 +260,14 @@ function computeRanking(committeeId: string): RankingEntry[] {
       const value = avg(allScores.filter((s) => s.criterion_id === c.id).map((s) => s.value));
       criteriaAverages[c.id] = value === null ? null : round2(value);
     }
-    const score = avg(finals);
+    // Solo jueces: la media de siempre. Con varios roles: suma ponderada por rol.
+    const score = Object.keys(weights).length > 1 ? combine(roleScores) : avg(finals);
     return {
       delegation,
       score: score === null ? null : round2(score),
       tiebreak: topCriterion ? (criteriaAverages[topCriterion.id] ?? -1) : -1,
       criteriaAverages,
+      roleScores,
       flags,
       delegates: delegateScores.map((d) => ({ delegate_id: d.delegate.id, full_name: d.delegate.full_name, final_score: d.final })),
     };
@@ -211,6 +293,7 @@ function computeRanking(committeeId: string): RankingEntry[] {
       score: entry.score,
       criteria_averages: entry.criteriaAverages,
       incomplete_flags: entry.flags,
+      role_scores: Object.keys(weights).length > 1 ? entry.roleScores : { judge: entry.score },
     });
   });
   return result;
@@ -685,7 +768,13 @@ export const handlers = [
   http.get(`${BASE}/committees/:committeeId/ranking`, ({ params }) => {
     const committeeId = String(params.committeeId);
     if (!findCommittee(committeeId)) return notFound();
-    return HttpResponse.json({ items: computeRanking(committeeId), quota_warnings: awardsOut(committeeId).quota_warnings });
+    const eventType = eventOfCommittee(findCommittee(committeeId)!).event_type;
+    return HttpResponse.json({
+      items: computeRanking(committeeId),
+      quota_warnings: awardsOut(committeeId).quota_warnings,
+      event_type: eventType,
+      role_weights: ROLE_WEIGHTS[eventType],
+    });
   }),
   http.get(`${BASE}/committees/:committeeId/awards`, ({ params }) => {
     if (!findCommittee(params.committeeId)) return notFound();
@@ -816,8 +905,13 @@ export const handlers = [
         reject(item.client_id, 'NOT_FOUND', 'La sesión o el delegado no existen.');
         continue;
       }
-      if (!(committeeJudges[committee.id] ?? []).some((a) => a.judge_id === judgeId)) {
+      const assignment = (committeeJudges[committee.id] ?? []).find((a) => a.judge_id === judgeId);
+      if (!assignment) {
         reject(item.client_id, 'JUDGE_NOT_ASSIGNED', 'No estás asignado a este comité.');
+        continue;
+      }
+      if (!accountVoterRole(ROLE_WEIGHTS[eventOfCommittee(committee).event_type], assignment.role)) {
+        reject(item.client_id, 'FORBIDDEN', `Tu rol en este comité (${assignment.role}) no califica en este tipo de evento`);
         continue;
       }
       if (isEventClosed(committee.event_id)) {
@@ -862,4 +956,137 @@ export const handlers = [
     }
     return HttpResponse.json(response);
   }),
+
+  // ---- Votación de delegados (ADR-005) ----
+  http.get(`${BASE}/events/:eventId/voter-tokens`, ({ params }) => {
+    const eventId = String(params.eventId);
+    if (!findEvent(eventId)) return notFound();
+    const latest = new Map<string, MockVoterToken>();
+    voterTokens.forEach((t) => {
+      if (t.event_id === eventId && (!latest.get(t.delegate_id) || latest.get(t.delegate_id)!.issued_at <= t.issued_at)) latest.set(t.delegate_id, t);
+    });
+    const items: VoterAccess[] = committees
+      .filter((c) => c.event_id === eventId)
+      .flatMap((c) =>
+        committeeDelegations(c.id).flatMap((d) =>
+          d.delegates.map((p) => {
+            const token = latest.get(p.id);
+            return {
+              delegate_id: p.id,
+              full_name: p.full_name,
+              delegation_id: d.id,
+              country_code: d.country_code,
+              character_name: d.character_name,
+              committee_id: c.id,
+              committee_name: c.name,
+              committee_acronym: c.acronym,
+              status: !token ? 'none' : token.revoked_at ? 'revoked' : 'active',
+              issued_at: token?.issued_at ?? null,
+              last_used_at: token?.last_used_at ?? null,
+              votes_count: delegateVotes.filter((v) => v.voter_delegate_id === p.id).length,
+            } satisfies VoterAccess;
+          }),
+        ),
+      );
+    return HttpResponse.json(items);
+  }),
+  http.post(`${BASE}/events/:eventId/voter-tokens`, async ({ params, request }) => {
+    const event = findEvent(params.eventId);
+    if (!event) return notFound();
+    if (!('delegate' in ROLE_WEIGHTS[event.event_type])) return problem(409, 'CONFLICT', 'En este tipo de evento los delegados no votan');
+    if (event.status === 'closed') return problem(409, 'EVENT_CLOSED', 'El evento está cerrado');
+    const body = (await request.json()) as GenerateVoterTokensIn;
+    const active = (delegateId: string) => [...voterTokens.values()].some((t) => t.delegate_id === delegateId && !t.revoked_at);
+    const all = committees
+      .filter((c) => c.event_id === event.id)
+      .flatMap((c) => committeeDelegations(c.id).flatMap((d) => d.delegates.map((p) => ({ c, d, p }))));
+    const targets = body.delegate_ids ? all.filter((x) => body.delegate_ids!.includes(x.p.id)) : all.filter((x) => !active(x.p.id));
+    const issued = now();
+    const out: GeneratedVoterToken[] = targets.map(({ c, d, p }) => {
+      voterTokens.forEach((t) => {
+        if (t.delegate_id === p.id && !t.revoked_at) t.revoked_at = issued;
+      });
+      const token = crypto.randomUUID().replace(/-/g, '');
+      voterTokens.set(token, { delegate_id: p.id, event_id: event.id, issued_at: issued, revoked_at: null, last_used_at: null });
+      const url = `${body.link_base}${token}`;
+      return {
+        delegate_id: p.id,
+        full_name: p.full_name,
+        country_code: d.country_code,
+        character_name: d.character_name,
+        committee_name: c.name,
+        committee_acronym: c.acronym,
+        token,
+        url,
+        // En los mocks no se genera un QR real: un recuadro con el texto basta para la vista previa.
+        qr_svg: `<svg xmlns="http://www.w3.org/2000/svg" width="116" height="116"><rect width="116" height="116" fill="#fff" stroke="#000"/><text x="58" y="62" font-size="10" text-anchor="middle">QR (mock)</text></svg>`,
+        expires_at: `${event.ends_on}T00:00:00Z`,
+      };
+    });
+    return HttpResponse.json(out, { status: 201 });
+  }),
+  http.post(`${BASE}/events/:eventId/voter-tokens/revoke`, async ({ params, request }) => {
+    if (!findEvent(params.eventId)) return notFound();
+    const { delegate_ids } = (await request.json()) as { delegate_ids: string[] };
+    let revoked = 0;
+    voterTokens.forEach((t) => {
+      if (t.event_id === params.eventId && delegate_ids.includes(t.delegate_id) && !t.revoked_at) {
+        t.revoked_at = now();
+        revoked += 1;
+      }
+    });
+    return HttpResponse.json({ revoked });
+  }),
+  ...(['get', 'put'] as const).map((method) =>
+    http[method](`${BASE}/vote/ballot`, async ({ request }) => {
+      const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
+      const access = voterTokens.get(token);
+      if (!access || access.revoked_at) return problem(401, 'UNAUTHORIZED', 'Tu acceso no es válido o ya venció. Pide uno nuevo al staff del evento');
+      access.last_used_at = now();
+      const found = findDelegate(access.delegate_id);
+      const committee = found && findCommittee(found.delegation.committee_id);
+      if (!found || !committee) return problem(401, 'UNAUTHORIZED', 'Tu acceso no es válido o ya venció.');
+      const event = eventOfCommittee(committee);
+      const rubric = rubricForCommittee(committee);
+      const session = event.status === 'active' ? (sessionsByCommittee[committee.id] ?? []).filter((s) => s.status === 'open').sort((a, b) => b.number - a.number)[0] : undefined;
+
+      if (method === 'put') {
+        if (!session) return problem(409, 'SESSION_CLOSED', 'No hay una sesión abierta; espera a la siguiente');
+        const { items } = (await request.json()) as { items: Array<{ delegation_id: string; criterion_id: string; value: number }> };
+        for (const item of items) {
+          if (item.delegation_id === found.delegation.id) return problem(403, 'FORBIDDEN', 'No puedes votar por tu propia delegación');
+          if (!committeeDelegations(committee.id).some((d) => d.id === item.delegation_id)) return problem(404, 'NOT_FOUND', 'La delegación no pertenece a tu comité');
+          if (!rubric?.criteria.some((c) => c.id === item.criterion_id)) return problem(404, 'NOT_FOUND', 'El criterio no pertenece a la rúbrica del comité');
+          if (item.value < rubric.scale_min || item.value > rubric.scale_max) return problem(422, 'VALUE_OUT_OF_RANGE', `El valor ${item.value} está fuera de la escala`);
+        }
+        for (const item of items) {
+          const existing = delegateVotes.find(
+            (v) => v.voter_delegate_id === access.delegate_id && v.delegation_id === item.delegation_id && v.session_id === session.id && v.criterion_id === item.criterion_id,
+          );
+          if (existing) existing.value = item.value;
+          else delegateVotes.push({ voter_delegate_id: access.delegate_id, session_id: session.id, ...item });
+        }
+      }
+
+      const ballot: Ballot = {
+        voter_name: found.delegate.full_name,
+        own_delegation: { delegation_id: found.delegation.id, country_code: found.delegation.country_code, character_name: found.delegation.character_name },
+        event_name: event.name,
+        event_status: event.status,
+        committee_name: committee.name,
+        committee_acronym: committee.acronym,
+        open_session: session ? { session_id: session.id, number: session.number, opened_at: session.opened_at } : null,
+        rubric: rubric ? { scale_min: rubric.scale_min, scale_max: rubric.scale_max, criteria: rubric.criteria } : null,
+        delegations: committeeDelegations(committee.id)
+          .filter((d) => d.id !== found.delegation.id)
+          .map((d) => ({ delegation_id: d.id, country_code: d.country_code, character_name: d.character_name })),
+        votes: session
+          ? delegateVotes
+              .filter((v) => v.voter_delegate_id === access.delegate_id && v.session_id === session.id)
+              .map(({ delegation_id, criterion_id, value }) => ({ delegation_id, criterion_id, value }))
+          : [],
+      };
+      return HttpResponse.json(ballot);
+    }),
+  ),
 ];

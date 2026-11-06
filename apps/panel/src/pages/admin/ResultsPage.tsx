@@ -21,7 +21,8 @@ import {
   useUpdatePublicationSettings,
 } from '../../data-access/hooks';
 import { errorMessage } from '../../data-access/errors';
-import type { Award, AwardType, IncompleteFlag, PublicationSettings, PublicNameFormat, RankingEntry } from '../../data-access/apiTypes';
+import { VOTER_ROLE_LABELS } from '../../lib/statusLabels';
+import type { Award, AwardType, IncompleteFlag, PublicationSettings, PublicNameFormat, RankingEntry, VoterRole } from '../../data-access/apiTypes';
 import styles from './AdminShared.module.css';
 
 const AWARD_TYPES: Array<{ id: AwardType; label: string }> = [
@@ -76,6 +77,8 @@ export function ResultsPage() {
 
   const { data: rankingResponse } = useRanking(committeeId);
   const results = rankingResponse?.items ?? [];
+  // Con votación por roles, el total es la suma ponderada de cada rol (se desglosa al expandir).
+  const roleWeights = Object.entries(rankingResponse?.role_weights ?? {}) as Array<[VoterRole, number]>;
 
   const scoredResults = results.filter((r) => r.score !== null);
   const overallAvg = scoredResults.length === 0 ? 0 : scoredResults.reduce((s, r) => s + (r.score ?? 0), 0) / scoredResults.length;
@@ -264,6 +267,29 @@ export function ResultsPage() {
                     );
                   })}
                 </div>
+                {roleWeights.length > 1 && (
+                  <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <span style={{ fontSize: 11, letterSpacing: '.1em', color: 'var(--muted)', fontWeight: 600 }}>DESGLOSE POR ROL</span>
+                    {roleWeights.map(([role, weight]) => {
+                      const value = r.role_scores?.[role] ?? null;
+                      return (
+                        <div key={role} style={{ display: 'grid', gridTemplateColumns: '1.4fr 46px 1.4fr 52px', gap: 14, alignItems: 'center' }}>
+                          <span style={{ fontSize: 13, color: 'var(--ink)' }}>{VOTER_ROLE_LABELS[role]}</span>
+                          <span style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 600 }}>{weight}%</span>
+                          <ProgressBar percent={value ?? 0} color="var(--gold)" />
+                          <span style={{ fontSize: 13, fontWeight: 600, color: value === null ? 'var(--state-none-dot)' : 'var(--navy)', textAlign: 'right' }}>
+                            {formatScore(value)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                    {roleWeights.some(([role]) => (r.role_scores?.[role] ?? null) === null) && (
+                      <span style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5 }}>
+                        Un rol sin votos («—») no cuenta como 0: su peso se reparte entre los demás roles.
+                      </span>
+                    )}
+                  </div>
+                )}
                 {r.incomplete_flags.length > 0 && (
                   <div style={{ flex: '1 1 240px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                     <span style={{ fontSize: 11, letterSpacing: '.1em', color: 'var(--muted)', fontWeight: 600 }}>AVISOS</span>

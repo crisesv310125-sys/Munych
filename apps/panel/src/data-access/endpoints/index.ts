@@ -7,4 +7,5 @@ export * from './rubrics';
 export * from './sessions';
 export * from './results';
 export * from './publication';
+export * from './voting';
 export * as judgeApi from './judgeApi';

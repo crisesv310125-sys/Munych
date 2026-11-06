@@ -248,6 +248,24 @@ Primer paso del spec «Tipos de evento y votación de delegados»: solo el **tip
 
 ---
 
+## Hito 12 — Votación por roles y accesos de delegados (2026-11-05)
+
+Resto del spec «Tipos de evento y votación de delegados». Backend: migración `20261105000100_voting`, módulo `voting`, `scoring_engine/roles.py` (ver ADR 0001 del backend, «Tipos de evento y votación», y ADR-005 de la bóveda).
+
+- **Tipos de evento**: `EventType` pasa a `judges_only | mun_regular | national_championship` (el provisional `voting` se migra a `mun_regular`). `EVENT_TYPE_OPTIONS` muestra los pesos de cada tipo en el modal "Nuevo evento" (la tercera opción cae en una segunda fila de la misma rejilla). Mocks: SD-MUN 2026 es `mun_regular`.
+- **Roles**: `JudgeCommitteeRole` admite `staff`; `chair`/`moderator` = Mesa. Nuevo `VoterRole` y etiquetas en `lib/statusLabels.ts` (`VOTER_ROLE_LABELS`, `committeeRoleOptions`, `delegatesVote`).
+- **Ranking**: `RankingEntry.role_scores` y `RankingResponse.event_type`/`role_weights`. El mock de MSW calcula igual que el backend (por rol, suma ponderada, un rol sin votos reparte su peso).
+- **Capa de datos**: `endpoints/voting.ts` (`listVoterTokens`, `generateVoterTokens`, `revokeVoterTokens`, `getBallot`, `submitVotes`; la boleta usa su propio `fetch` con el token del delegado, no la sesión de Supabase), hooks `useVoterTokens`/`useGenerateVoterTokens`/`useRevokeVoterTokens` y claves `voterTokens`/`ballot`.
+- **Decisión de diseño**: pantalla nueva **Votación** (`VotingAccessPage`, `#/admin/eventos/:id/votacion`), solo en eventos con votación: lista de delegados con estado del acceso, último uso y votos; generar los faltantes, regenerar o revocar uno; descargar los recién generados como **CSV** y como **hoja HTML con QR** para imprimir (`lib/voterSheets.ts`; los tokens solo llegan una vez). Componentes existentes: `AdminShared`, `Table`, `StatusBadge`, `Button`, `Select`, `ConfirmDialog`.
+- **Decisión de diseño**: enlace **Votación** (icono `QrCode` de lucide, ya instalado) en `AdminSidebar` para eventos con votación, y "Jueces" se rotula **Evaluadores** en esos eventos.
+- **Decisión de diseño**: en **Jueces**, select "Rol en sus comités" (Juez / Mesa Directiva / Staff según el tipo de evento) con el `Select` existente; la columna "Comités" muestra el rol. En `judges_only` no aparece y las asignaciones no se reescriben.
+- **Decisión de diseño**: en **Resultados**, al expandir una delegación, bloque "Desglose por rol" (peso, barra y nota de cada rol) con la misma rejilla y `ProgressBar` del desglose por criterio. Solo aparece con más de un rol.
+- **Decisión de diseño**: **boleta del delegado** (`pages/vote/VotePage.tsx`, rutas públicas `#/votar/:token` y `#/votar`). El token se guarda en `localStorage` para todo el evento y se quita de la URL; sin token, pide el código. Lista de delegaciones (todas menos la propia) → sliders por criterio (`CriterionSlider`) → "Guardar y seguir". Sin sesión abierta muestra "Esperando la siguiente sesión" y consulta cada 20 s. Reutiliza los estilos móviles del juez (`CommitteePage.module.css`, `ScoringForm.module.css`, `JudgeLayout.module.css`); sin CSS nuevo.
+
+`TODO(cliente)` de este hito (valores por defecto en uso): SD-MUN-2026 es MUN regular; voto por delegado (QR personal), no por delegación; los delegados usan la rúbrica del comité y votan por sesión; un rol sin votos reparte su peso; sin mitigación de sesgo entre pares.
+
+---
+
 ## Entrega final
 
 ### Pantallas conectadas
@@ -270,6 +288,7 @@ Primer paso del spec «Tipos de evento y votación de delegados»: solo el **tip
 - Gestión de **premios** y **publicación** (ajustes, vista previa, publicar/despublicar) dentro de `ResultsPage` — ninguna de las dos existía.
 - Botón **Cerrar evento** en el Panel general — no existía.
 - Select **Tipo de evento** en el modal "Nuevo evento" (hito 11), con el mismo `Select` que "Marca".
+- Pantalla **Votación** (accesos de delegados con QR/CSV), **boleta pública del delegado** (`#/votar`), select de **rol** en Jueces y **desglose por rol** en Resultados (hito 12).
 - `CriterionSlider` (`@munych/ui`) reparametrizado a la escala de la rúbrica con descriptor de nivel, en vez de crear un componente nuevo.
 - Se retiró "+ Nuevo set de rúbrica" en Criterios (el contrato no tiene endpoint para crear rúbricas adicionales) y "Marcar como completo" en la calificación del juez (el contrato no tiene un flag de completado independiente de tener todos los criterios calificados).
 

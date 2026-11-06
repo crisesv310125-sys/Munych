@@ -11,6 +11,7 @@ import type {
   DelegationUpdate,
   EventDraft,
   EventUpdate,
+  GenerateVoterTokensIn,
   JudgeInvite,
   JudgeUpdate,
   PublicationSettings,
@@ -357,6 +358,32 @@ export function useUnpublishEvent(eventId: string) {
   return useMutation({
     mutationFn: () => api.unpublishEvent(eventId),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.publicationPreview(eventId) }),
+  });
+}
+
+// ---- Votación de delegados (ADR-005) ----
+
+export function useVoterTokens(eventId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.voterTokens(eventId ?? ''),
+    queryFn: () => api.listVoterTokens(eventId!),
+    enabled: !!eventId,
+  });
+}
+
+export function useGenerateVoterTokens(eventId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: GenerateVoterTokensIn) => api.generateVoterTokens(eventId, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.voterTokens(eventId) }),
+  });
+}
+
+export function useRevokeVoterTokens(eventId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (delegateIds: string[]) => api.revokeVoterTokens(eventId, delegateIds),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.voterTokens(eventId) }),
   });
 }
 

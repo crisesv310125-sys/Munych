@@ -1,17 +1,23 @@
-import { ArrowLeft, CalendarDays, CalendarClock, Download, Flag, LayoutDashboard, Landmark, LogOut, SlidersHorizontal, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, CalendarDays, CalendarClock, Download, Flag, LayoutDashboard, Landmark, LogOut, QrCode, SlidersHorizontal, Trophy, Users } from 'lucide-react';
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useAppState } from '../../state/AppStateContext';
 import { useEvent } from '../../data-access/hooks';
+import { delegatesVote } from '../../lib/statusLabels';
+import type { EventType } from '../../data-access/apiTypes';
 import styles from './AdminSidebar.module.css';
 
-function eventNav(eventId: string) {
+function eventNav(eventId: string, eventType: EventType) {
   const base = `/admin/eventos/${eventId}`;
+  const voting = delegatesVote(eventType);
   return [
     { path: base, label: 'Dashboard', Icon: LayoutDashboard },
     { path: `${base}/comites`, label: 'Comités', Icon: Landmark },
     { path: `${base}/sesiones`, label: 'Sesiones', Icon: CalendarClock },
     { path: `${base}/paises`, label: 'Países', Icon: Flag },
-    { path: `${base}/jueces`, label: 'Jueces', Icon: Users },
+    // En eventos con votación, aquí también se asignan la mesa y el staff.
+    { path: `${base}/jueces`, label: voting ? 'Evaluadores' : 'Jueces', Icon: Users },
+    // Decisión de diseño (hito 12): accesos de los delegados, solo si votan.
+    ...(voting ? [{ path: `${base}/votacion`, label: 'Votación', Icon: QrCode }] : []),
     { path: `${base}/criterios`, label: 'Criterios', Icon: SlidersHorizontal },
     { path: `${base}/resultados`, label: 'Resultados', Icon: Trophy },
     { path: `${base}/exportar`, label: 'Exportar', Icon: Download },
@@ -53,7 +59,7 @@ export function AdminSidebar({ open, onNavigate }: { open?: boolean; onNavigate?
             Todos los eventos
           </button>
           <nav className={styles.nav}>
-            {eventNav(event.id).map(({ path, label, Icon }) => {
+            {eventNav(event.id, event.event_type).map(({ path, label, Icon }) => {
               const active = path === `/admin/eventos/${event.id}` ? location.pathname === path : location.pathname.startsWith(path);
               return (
                 <button

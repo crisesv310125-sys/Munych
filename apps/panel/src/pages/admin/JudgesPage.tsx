@@ -3,12 +3,13 @@ import { useParams } from 'react-router-dom';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { Avatar } from '@munych/ui/components/Avatar';
 import { Button } from '@munych/ui/components/Button';
-import { Input } from '@munych/ui/components/FormControls';
-import { useCommittees, useInviteJudge, useJudges } from '../../data-access/hooks';
+import { Input, Select } from '@munych/ui/components/FormControls';
+import { useCommittees, useEvent, useInviteJudge, useJudges } from '../../data-access/hooks';
+import { committeeRoleLabel, committeeRoleOptions, delegatesVote } from '../../lib/statusLabels';
 import { errorMessage } from '../../data-access/errors';
 import { getCommitteeJudges, getCommitteeProgress, setCommitteeJudges } from '../../data-access/endpoints';
 import { queryKeys } from '../../data-access/queryClient';
-import type { ApiCommittee, ApiJudge } from '../../data-access/apiTypes';
+import type { ApiCommittee, ApiJudge, JudgeCommitteeRole } from '../../data-access/apiTypes';
 import styles from './AdminShared.module.css';
 import { PendingInvitations } from './PendingInvitations';
 import tableStyles from '@munych/ui/components/Table.module.css';
@@ -36,10 +37,13 @@ function useJudgeAssignments(committees: ApiCommittee[]) {
 
   const committeesByJudge = new Map<string, ApiCommittee[]>();
   const progressByJudge = new Map<string, { scored: number; expected: number }>();
+  /** Rol de cada juez en cada comité, con clave `${judge_id}:${committee_id}`. */
+  const roleByAssignment = new Map<string, JudgeCommitteeRole>();
   committees.forEach((committee, i) => {
     const assignments = assignmentQueries[i]?.data ?? [];
     const progress = progressQueries[i]?.data;
     assignments.forEach((a) => {
+      roleByAssignment.set(`${a.judge_id}:${committee.id}`, a.role);
       committeesByJudge.set(a.judge_id, [...(committeesByJudge.get(a.judge_id) ?? []), committee]);
       const agg = progressByJudge.get(a.judge_id) ?? { scored: 0, expected: 0 };
       progress?.sessions.forEach((s) => {
@@ -53,7 +57,7 @@ function useJudgeAssignments(committees: ApiCommittee[]) {
     });
   });
 
-  return { committeesByJudge, progressByJudge, assignmentQueries };
+  return { committeesByJudge, progressByJudge, roleByAssignment, assignmentQueries };
 }
 
 export function JudgesPage() {
@@ -61,12 +65,17 @@ export function JudgesPage() {
   const qc = useQueryClient();
   const { data: judges } = useJudges(eventId);
   const { data: committees } = useCommittees(eventId);
+  const { data: event } = useEvent(eventId);
   const inviteJudge = useInviteJudge();
   const list = committees ?? [];
-  const { committeesByJudge, progressByJudge } = useJudgeAssignments(list);
+  const { committeesByJudge, progressByJudge, roleByAssignment } = useJudgeAssignments(list);
+  // Con votación por roles, la cuenta se asigna como juez, mesa o staff (ver statusLabels).
+  const roleOptions = committeeRoleOptions(event?.event_type);
+  const showRoles = delegatesVote(event?.event_type);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draftCommittees, setDraftCommittees] = useState<string[]>([]);
+  const [draftRole, setDraftRole] = useState<JudgeCommitteeRole>('judge');
   const [isInviting, setIsInviting] = useState(false);
   const [invite, setInvite] = useState(EMPTY_INVITE);
   const [saveError, setSaveError] = useState('');
@@ -92,7 +101,17 @@ export function JudgesPage() {
     setIsInviting(false);
     setSaveError('');
     setSelectedId(id);
-    setDraftCommittees((committeesByJudge.get(id) ?? []).map((c) => c.id));
+    const assigned = committeesByJudge.get(id) ?? [];
+    setDraftCommittees(assigned.map((c) => c.id));
+    const current = assigned.length > 0 ? roleByAssignment.get(`${id}:${assigned[0].id}`) : undefined;
+    const normalized = current === 'moderator' ? 'chair' : current;
+    setDraftRole(roleOptions.find((o) => o.value === normalized)?.value ?? roleOptions[0].value);
+  }
+
+  function judgeRoleLabel(judgeId: string): string {
+    const first = committeesByJudge.get(judgeId)?.[0];
+    const role = first && roleByAssignment.get(`${judgeId}:${first.id}`);
+    return role ? committeeRoleLabel(role) : '';
   }
 
   function toggleCommittee(id: string) {
@@ -106,13 +125,19 @@ export function JudgesPage() {
     const judgeId = selected.judge_id;
     const before = new Set((committeesByJudge.get(judgeId) ?? []).map((c) => c.id));
     const after = new Set(draftCommittees);
-    const changed = list.filter((c) => before.has(c.id) !== after.has(c.id));
+    const roleChanged = (committeeId: string) => {
+      const current = roleByAssignment.get(`${judgeId}:${committeeId}`);
+      // `moderator` también es mesa: no se reescribe si se eligió «Mesa Directiva».
+      return (current === 'moderator' ? 'chair' : current) !== draftRole;
+    };
+    // En «solo jueces» el rol no cuenta: no se reescriben las asignaciones existentes.
+    const changed = list.filter((c) => before.has(c.id) !== after.has(c.id) || (showRoles && after.has(c.id) && roleChanged(c.id)));
     try {
       for (const committee of changed) {
         // PUT reemplaza todas las asignaciones del comité: se parte de las actuales para no perder a otros jueces.
         const current = await getCommitteeJudges(committee.id);
         const next = after.has(committee.id)
-          ? [...current.filter((a) => a.judge_id !== judgeId), { judge_id: judgeId, role: 'judge' as const }]
+          ? [...current.filter((a) => a.judge_id !== judgeId), { judge_id: judgeId, role: draftRole }]
           : current.filter((a) => a.judge_id !== judgeId);
         await setCommitteeJudges(committee.id, next);
         qc.invalidateQueries({ queryKey: queryKeys.committeeJudges(committee.id) });
@@ -199,6 +224,7 @@ export function JudgesPage() {
                 <span className={tableStyles.mutedCell}>{j.email ?? '—'}</span>
                 <span className={tableStyles.mutedCell} style={committeeAcronyms.length === 0 ? { color: 'var(--state-none-dot)' } : undefined}>
                   {committeeAcronyms.length > 0 ? committeeAcronyms.join(' · ') : 'Sin asignar'}
+                  {showRoles && committeeAcronyms.length > 0 && ` (${judgeRoleLabel(j.judge_id)})`}
                 </span>
                 <span style={{ fontSize: 13, fontWeight: 600, color: committeeAcronyms.length === 0 ? 'var(--state-none-dot)' : 'var(--ink)' }}>
                   {judgeProgressLabel(j.judge_id)}
@@ -255,6 +281,15 @@ export function JudgesPage() {
                 <span style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: 'var(--navy)' }}>{selected.full_name}</span>
               </div>
             </div>
+            {showRoles && (
+              <Select label="Rol en sus comités" value={draftRole} onChange={(e) => setDraftRole(e.target.value as JudgeCommitteeRole)}>
+                {roleOptions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </Select>
+            )}
             <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', letterSpacing: '.06em' }}>ASIGNAR A COMITÉS</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {list.map((c) => {

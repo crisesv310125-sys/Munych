@@ -4,16 +4,32 @@ import { Button } from '@munych/ui/components/Button';
 import { Select } from '@munych/ui/components/FormControls';
 import { StatusBadge } from '@munych/ui/components/StatusBadge';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
-import { useEvent, useGenerateVoterTokens, useRevokeVoterTokens, useVoterTokens } from '../../data-access/hooks';
+import {
+  useClosePeerVote,
+  useEvent,
+  useGenerateVoterTokens,
+  useOpenPeerVote,
+  usePeerVoteWindows,
+  useRevokeVoterTokens,
+  useVoterTokens,
+} from '../../data-access/hooks';
 import { errorMessage } from '../../data-access/errors';
 import { delegatesVote, eventTypeLabel } from '../../lib/statusLabels';
 import { downloadVoterCsv, downloadVoterQrSheet } from '../../lib/voterSheets';
 import type { BadgeTone } from '../../lib/statusLabels';
-import type { GeneratedVoterToken, VoterAccess, VoterTokenStatus } from '../../data-access/apiTypes';
+import type { GeneratedVoterToken, PeerVoteStatus, VoterAccess, VoterTokenStatus } from '../../data-access/apiTypes';
 import styles from './AdminShared.module.css';
 import tableStyles from '@munych/ui/components/Table.module.css';
 
 const COLS = '1.8fr 1.1fr 1fr 1fr 0.7fr 150px';
+const WINDOW_COLS = '1.8fr 1fr 0.9fr 1.4fr 150px';
+
+const WINDOW_STATUS: Record<PeerVoteStatus, { label: string; tone: BadgeTone }> = {
+  not_scheduled: { label: 'SIN ABRIR', tone: 'none' },
+  scheduled: { label: 'PROGRAMADA', tone: 'progress' },
+  open: { label: 'ABIERTA', tone: 'done' },
+  closed: { label: 'CERRADA', tone: 'none' },
+};
 
 const STATUS: Record<VoterTokenStatus, { label: string; tone: BadgeTone }> = {
   none: { label: 'SIN ACCESO', tone: 'none' },
@@ -39,7 +55,8 @@ function formatMoment(iso: string | null): string {
 /**
  * Decisión de diseño (hito 12): pantalla nueva «Votación» para repartir los accesos de los
  * delegados. Solo usa componentes y estilos existentes (AdminShared, Table, StatusBadge,
- * Button, Select, ConfirmDialog).
+ * Button, Select, ConfirmDialog). Desde el 2026-11-06 también abre y cierra el voto entre
+ * pares de cada comité (misma tabla y badges, sin estilos nuevos).
  */
 export function VotingAccessPage() {
   const { eventId = '' } = useParams<{ eventId: string }>();
@@ -47,6 +64,9 @@ export function VotingAccessPage() {
   const { data: accesses } = useVoterTokens(eventId);
   const generate = useGenerateVoterTokens(eventId);
   const revoke = useRevokeVoterTokens(eventId);
+  const { data: windows } = usePeerVoteWindows(eventId);
+  const openWindow = useOpenPeerVote(eventId);
+  const closeWindow = useClosePeerVote(eventId);
 
   const [committeeFilter, setCommitteeFilter] = useState('');
   const [generated, setGenerated] = useState<GeneratedVoterToken[] | null>(null);
@@ -66,6 +86,15 @@ export function VotingAccessPage() {
     try {
       const tokens = await generate.mutateAsync({ link_base: linkBase(), delegate_ids: delegateIds ?? null });
       setGenerated(tokens);
+    } catch (err) {
+      setError(errorMessage(err));
+    }
+  }
+
+  async function handleWindow(action: () => Promise<unknown>) {
+    setError('');
+    try {
+      await action();
     } catch (err) {
       setError(errorMessage(err));
     }
@@ -141,6 +170,69 @@ export function VotingAccessPage() {
 
         <div className={styles.panelCard}>
           <div className={styles.panelHeader}>
+            <span className={styles.panelTitle}>Voto entre pares por comité</span>
+          </div>
+          <div style={{ padding: '12px 20px 0', fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
+            Los delegados eligen Mejor delegado, Delegado distinguido y Mención de honor (3, 2 y 1 puntos), una sola vez y sin
+            votar por su propia delegación. Abre la votación al cerrar la última sesión del comité.
+          </div>
+          <div className={tableStyles.head} style={{ gridTemplateColumns: WINDOW_COLS }}>
+            <span>Comité</span>
+            <span>Estado</span>
+            <span>Ya votaron</span>
+            <span>Abrió / cierra</span>
+            <span style={{ textAlign: 'right' }}>Acción</span>
+          </div>
+          {(windows ?? []).length === 0 && (
+            <div className={tableStyles.row} style={{ gridTemplateColumns: '1fr' }}>
+              <span className={tableStyles.mutedCell}>No hay comités en este evento.</span>
+            </div>
+          )}
+          {(windows ?? []).map((w) => (
+            <div key={w.committee_id} className={tableStyles.row} style={{ gridTemplateColumns: WINDOW_COLS }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>{w.committee_name}</span>
+                <span className={tableStyles.mutedCell} style={{ fontSize: 11 }}>
+                  {w.committee_acronym}
+                </span>
+              </div>
+              <span style={{ justifySelf: 'start' }}>
+                <StatusBadge tone={WINDOW_STATUS[w.status].tone} label={WINDOW_STATUS[w.status].label} />
+              </span>
+              <span className={tableStyles.nameCell}>
+                {w.submitted} de {w.voters}
+              </span>
+              <span className={tableStyles.mutedCell}>
+                {formatMoment(w.opens_at)}
+                {w.closes_at ? ` – ${formatMoment(w.closes_at)}` : ''}
+              </span>
+              <span className={tableStyles.right} style={{ display: 'flex', gap: 12 }}>
+                {enabled && w.status !== 'open' && (
+                  <button
+                    className={tableStyles.linkAction}
+                    onClick={() => handleWindow(() => openWindow.mutateAsync({ committeeId: w.committee_id }))}
+                    disabled={openWindow.isPending}
+                  >
+                    {w.status === 'closed' ? 'Reabrir' : 'Abrir ahora'}
+                  </button>
+                )}
+                {enabled && w.status === 'open' && (
+                  <button
+                    className={tableStyles.linkAction}
+                    style={{ color: '#C0392B' }}
+                    onClick={() => handleWindow(() => closeWindow.mutateAsync(w.committee_id))}
+                    disabled={closeWindow.isPending}
+                  >
+                    Cerrar
+                  </button>
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.panelCard}>
+          <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>Accesos por delegado</span>
             <div style={{ minWidth: 220 }}>
               <Select value={committeeFilter} onChange={(e) => setCommitteeFilter(e.target.value)}>
@@ -158,7 +250,7 @@ export function VotingAccessPage() {
             <span>Delegación</span>
             <span>Estado</span>
             <span>Último uso</span>
-            <span>Votos</span>
+            <span>Votó</span>
             <span style={{ textAlign: 'right' }}>Acción</span>
           </div>
           {visible.length === 0 && (
@@ -180,7 +272,7 @@ export function VotingAccessPage() {
               </span>
               <span className={tableStyles.mutedCell}>{formatMoment(a.last_used_at)}</span>
               <span style={{ fontSize: 13, fontWeight: 600, color: a.votes_count > 0 ? 'var(--ink)' : 'var(--state-none-dot)' }}>
-                {a.votes_count}
+                {a.votes_count > 0 ? 'Sí' : 'No'}
               </span>
               <span className={tableStyles.right} style={{ display: 'flex', gap: 12 }}>
                 {enabled && (
@@ -202,7 +294,7 @@ export function VotingAccessPage() {
       {pendingRevoke && (
         <ConfirmDialog
           title="Revocar acceso"
-          message={`El enlace de ${pendingRevoke.full_name} (${delegationLabel(pendingRevoke)}) dejará de funcionar de inmediato. Sus votos ya emitidos se conservan.`}
+          message={`El enlace de ${pendingRevoke.full_name} (${delegationLabel(pendingRevoke)}) dejará de funcionar de inmediato. Su voto ya enviado se conserva.`}
           onClose={() => setPendingRevoke(null)}
           actions={[
             { label: 'Cancelar', onClick: () => setPendingRevoke(null) },

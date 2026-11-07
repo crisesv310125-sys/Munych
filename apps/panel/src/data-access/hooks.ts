@@ -12,6 +12,7 @@ import type {
   EventDraft,
   EventUpdate,
   GenerateVoterTokensIn,
+  PeerVoteWindowIn,
   JudgeInvite,
   JudgeUpdate,
   PublicationSettings,
@@ -384,6 +385,32 @@ export function useRevokeVoterTokens(eventId: string) {
   return useMutation({
     mutationFn: (delegateIds: string[]) => api.revokeVoterTokens(eventId, delegateIds),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.voterTokens(eventId) }),
+  });
+}
+
+/** Estado del voto entre pares por comité; se refresca para ver quién ya votó. */
+export function usePeerVoteWindows(eventId: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.peerVoteWindows(eventId ?? ''),
+    queryFn: () => api.listPeerVoteWindows(eventId!),
+    enabled: !!eventId,
+    refetchInterval: 30_000,
+  });
+}
+
+export function useOpenPeerVote(eventId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ committeeId, body }: { committeeId: string; body?: PeerVoteWindowIn }) => api.openPeerVote(committeeId, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.peerVoteWindows(eventId) }),
+  });
+}
+
+export function useClosePeerVote(eventId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (committeeId: string) => api.closePeerVote(committeeId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.peerVoteWindows(eventId) }),
   });
 }
 

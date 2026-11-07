@@ -262,7 +262,29 @@ Resto del spec «Tipos de evento y votación de delegados». Backend: migración
 - **Decisión de diseño**: en **Resultados**, al expandir una delegación, bloque "Desglose por rol" (peso, barra y nota de cada rol) con la misma rejilla y `ProgressBar` del desglose por criterio. Solo aparece con más de un rol.
 - **Decisión de diseño**: **boleta del delegado** (`pages/vote/VotePage.tsx`, rutas públicas `#/votar/:token` y `#/votar`). El token se guarda en `localStorage` para todo el evento y se quita de la URL; sin token, pide el código. Lista de delegaciones (todas menos la propia) → sliders por criterio (`CriterionSlider`) → "Guardar y seguir". Sin sesión abierta muestra "Esperando la siguiente sesión" y consulta cada 20 s. Reutiliza los estilos móviles del juez (`CommitteePage.module.css`, `ScoringForm.module.css`, `JudgeLayout.module.css`); sin CSS nuevo.
 
-`TODO(cliente)` de este hito (valores por defecto en uso): SD-MUN-2026 es MUN regular; voto por delegado (QR personal), no por delegación; los delegados usan la rúbrica del comité y votan por sesión; un rol sin votos reparte su peso; sin mitigación de sesgo entre pares.
+`TODO(cliente)` de este hito (valores por defecto en uso): SD-MUN-2026 es MUN regular; voto por delegado (QR personal), no por delegación; los delegados usan la rúbrica del comité y votan por sesión; un rol sin votos reparte su peso; sin mitigación de sesgo entre pares. _(La rúbrica y el voto por sesión de los delegados se reemplazan en el hito 13.)_
+
+---
+
+## Hito 13 — Voto de delegados por premios (2026-11-06)
+
+Los delegados **ya no usan la rúbrica**. Votan **una sola vez por comité, al final**, eligiendo Mejor delegado (3 puntos), Delegado distinguido (2) y Mención de honor (1): tres delegaciones distintas, ninguna la propia (si hay menos de 3 candidatas, solo los primeros N premios). Nota del rol delegados = puntos recibidos ÷ (3 × votantes que enviaron) × 100; sigue pesando 50 % (MUN regular) / 25 % (Campeonato), y sin votantes es `null` (su peso se reparte). El admin abre y cierra la votación por comité. Backend: migración `20261106000100_peer_award_votes` (columnas `peer_vote_opens_at`/`peer_vote_closes_at` en `app.committees`, tabla `app.peer_votes`; **borra** `app.delegate_votes`), `scoring_engine/peer_awards.py` y el módulo `voting` reescrito. Contrato en `routes.md` (3.7 bis y modelos).
+
+- **Capa de datos**: `apiTypes.ts` (`PeerAwardType`, `PeerVoteStatus`, `PeerVoteWindow`, `PeerVoteWindowIn`, `CommitteePeerVote`, `BallotAward`, `BallotPick` y el `Ballot` nuevo; se quitó `BallotVote`). `endpoints/voting.ts`: `submitPeerVote` (`POST /vote/ballot`, sustituye a `submitVotes`), `listPeerVoteWindows`, `openPeerVote`, `closePeerVote`; hooks `usePeerVoteWindows`, `useOpenPeerVote`, `useClosePeerVote` y clave `peerVoteWindows`.
+- **Mocks (MSW)**: `peerVotes` sustituye a `delegateVotes`; ventana por comité en memoria; `GET/POST /vote/ballot`, `GET /events/:id/peer-vote`, `PUT /committees/:id/peer-vote`, `POST /committees/:id/peer-vote/close` con los mismos códigos de error del backend; `computeRanking` calcula el rol `delegate` con 3/2/1.
+- **Decisión de diseño**: en **Votación** (`VotingAccessPage`), sección «Voto entre pares por comité» (abrir/reabrir/cerrar, «X de Y ya votaron») y columna «Votó» Sí/No, con los componentes existentes.
+- **Decisión de diseño**: la **boleta del delegado** (`pages/vote/VotePage.tsx` + `VotePage.module.css`, nuevo) se rehízo según el handoff `handoff-votacion-delegados/` (Apartado 3) y **deja de reutilizar** los estilos del juez. Los tokens de color y tipografía del handoff están definidos como variables locales del CSS Module; `@munych/ui` no se tocó. Se añadieron Source Serif 4 (400/600/700) e IBM Plex Mono 600 al enlace de Google Fonts de `apps/panel/index.html`. Pantallas:
+  - Sin token o token inválido (401) → entrada del código, en el estilo oscuro de 3e.
+  - `not_scheduled`/`scheduled` → **3e** «La votación aún no abre»: cuenta regresiva HH/MIN/SEG si hay `opens_at` (al llegar a cero vuelve a consultar en vez de mostrar tiempo negativo), rango de apertura/cierre y barra segmentada con `sessions_closed` de `sessions_total`.
+  - `open` → **3a** boleta por pasos «VOTO n DE N · premio», un paso por premio: buscador (sin mayúsculas ni acentos, con estado «sin resultados»), lista alfabética con la propia delegación deshabilitada en su posición («Tu delegación») y las ya elegidas en otro premio deshabilitadas con el nombre de ese premio; footer fijo «Seleccionado: X» + «Siguiente» / «Revisar voto» (deshabilitado sin selección); «‹ Anterior» para volver un paso; badge «Cierra HH:MM» si hay `closes_at`.
+  - **3c** bottom sheet: resumen de los premios + Comité/Vota/Peso, aviso «Una vez enviado no se puede cambiar», «Enviar voto» (ink, con «Enviando…» y error con «Reintentar»), «Volver y cambiar»; tocar el fondo o Esc = volver.
+  - Con `picks` → **3d** «Voto registrado» con comprobante (`receipt`, `submitted_at`) y lo que votó. Tiene prioridad sobre «cerrada» (nunca se muestra 3f a quien votó).
+  - `closed` (o evento cerrado) sin voto → **3f** «La votación ya cerró».
+  - Escritorio (≥ 960 px) → **3g**: barra superior, rejilla de 3 columnas («Mostrar las N ▾» a partir de 12) y panel «TUS VOTOS» con los pasos (se puede volver a uno ya hecho) y el CTA.
+  - Se mantiene la lógica del token (`localStorage` `munych.voter-token`, se quita de la URL) y el sondeo cada 20 s.
+- Diferencias con el handoff: no se portan la home de sesiones (3h) ni la boleta de resoluciones (3b): el voto de resoluciones no aplica. El peso que se muestra es el del rol delegados completo, así que el texto dice «El voto de los delegados suma X % al puntaje final» en vez de «Tu voto suma X %». Sin el CTA «Ver resultados públicos» de 3f porque el panel no conoce la URL de la página pública. Los chips de país son el código ISO de 2 letras (iniciales para personajes), sin banderas.
+
+`TODO(cliente)` de este hito: confirmar que no hay votos por rúbrica reales en `app.delegate_votes` antes de aplicar la migración (se borran); URL de la página pública para el CTA de 3f; ¿el delegado debe poder salir (cerrar sesión) en dispositivos compartidos?
 
 ---
 
@@ -289,6 +311,7 @@ Resto del spec «Tipos de evento y votación de delegados». Backend: migración
 - Botón **Cerrar evento** en el Panel general — no existía.
 - Select **Tipo de evento** en el modal "Nuevo evento" (hito 11), con el mismo `Select` que "Marca".
 - Pantalla **Votación** (accesos de delegados con QR/CSV), **boleta pública del delegado** (`#/votar`), select de **rol** en Jueces y **desglose por rol** en Resultados (hito 12).
+- **Boleta del delegado por premios** con estilos propios del handoff de votación (`VotePage.module.css`) y control de apertura/cierre del voto entre pares en Votación (hito 13).
 - `CriterionSlider` (`@munych/ui`) reparametrizado a la escala de la rúbrica con descriptor de nivel, en vez de crear un componente nuevo.
 - Se retiró "+ Nuevo set de rúbrica" en Criterios (el contrato no tiene endpoint para crear rúbricas adicionales) y "Marcar como completo" en la calificación del juez (el contrato no tiene un flag de completado independiente de tener todos los criterios calificados).
 

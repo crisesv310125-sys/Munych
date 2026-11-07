@@ -15,6 +15,8 @@ import type {
   DelegationDraft,
   DelegationImportResult,
   Ballot,
+  BallotPick,
+  CommitteePeerVote,
   EventDraft,
   EventType,
   EventUpdate,
@@ -27,6 +29,10 @@ import type {
   JudgeCommitteeDetail,
   JudgeCommitteeSummary,
   JudgeScore,
+  PeerAwardType,
+  PeerVoteStatus,
+  PeerVoteWindow,
+  PeerVoteWindowIn,
   ProblemJson,
   PublicationSettings,
   PublicResultsDocument,
@@ -169,7 +175,55 @@ interface MockVoterToken {
 }
 /** token en claro → acceso (en el backend solo se guarda el hash). */
 const voterTokens = new Map<string, MockVoterToken>();
-const delegateVotes: Array<{ voter_delegate_id: string; delegation_id: string; session_id: string; criterion_id: string; value: number }> = [];
+
+// Voto entre pares (2026-11-06): una boleta por delegado con Mejor delegado, Delegado
+// distinguido y Mención de honor (3/2/1 puntos). Como app.peer_votes del backend.
+const PEER_AWARDS: Array<{ award_type: PeerAwardType; label: string; points: number }> = [
+  { award_type: 'best_delegate', label: 'Mejor delegado', points: 3 },
+  { award_type: 'outstanding_delegate', label: 'Delegado distinguido', points: 2 },
+  { award_type: 'honorable_mention', label: 'Mención de honor', points: 1 },
+];
+const PEER_MAX_POINTS = 3;
+interface MockPeerVote {
+  id: string;
+  voter_delegate_id: string;
+  committee_id: string;
+  award_type: PeerAwardType;
+  delegation_id: string;
+  created_at: string;
+}
+const peerVotes: MockPeerVote[] = [];
+/** Como committees.peer_vote_opens_at / peer_vote_closes_at. */
+const peerVoteWindows = new Map<string, { opens_at: string | null; closes_at: string | null }>();
+
+function peerWindowOf(committeeId: string, eventStatus: ApiEvent['status']): PeerVoteWindow {
+  const { opens_at, closes_at } = peerVoteWindows.get(committeeId) ?? { opens_at: null, closes_at: null };
+  const t = Date.now();
+  let status: PeerVoteStatus;
+  if (eventStatus === 'closed') status = opens_at ? 'closed' : 'not_scheduled';
+  else if (!opens_at) status = 'not_scheduled';
+  else if (closes_at && t >= Date.parse(closes_at)) status = 'closed';
+  else if (t < Date.parse(opens_at) || eventStatus !== 'active') status = 'scheduled';
+  else status = 'open';
+  return { status, opens_at, closes_at };
+}
+
+/** Nota 0-100 por delegación: puntos recibidos ÷ (3 × votantes que enviaron) × 100. */
+function peerAwardScores(committeeId: string): Map<string, number | null> {
+  const votes = peerVotes.filter((v) => v.committee_id === committeeId);
+  const voters = new Set(votes.map((v) => v.voter_delegate_id)).size;
+  const points = new Map(committeeDelegations(committeeId).map((d) => [d.id, 0]));
+  votes.forEach((v) => {
+    if (points.has(v.delegation_id)) points.set(v.delegation_id, points.get(v.delegation_id)! + (PEER_AWARDS.find((a) => a.award_type === v.award_type)?.points ?? 0));
+  });
+  return new Map([...points].map(([id, p]) => [id, voters === 0 ? null : (p * 100) / (PEER_MAX_POINTS * voters)]));
+}
+
+function peerReceipt(acronym: string, voteId: string): string {
+  const prefix = acronym.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) || 'MUN';
+  const code = voteId.replace(/-/g, '').toUpperCase();
+  return `${prefix}-${code.slice(0, 4)}-${code.slice(4, 6)}`;
+}
 
 // ---- Motor de ranking (routes.md 3.7) ----
 
@@ -206,14 +260,14 @@ function computeRanking(committeeId: string): RankingEntry[] {
     return present.length === 0 || total === 0 ? null : present.reduce((s, [role, v]) => s + (weights[role] ?? 0) * v, 0) / total;
   };
 
+  const peerScores = peerAwardScores(committeeId);
   const entries = committeeDelegations(committeeId).map((delegation) => {
     const flags: IncompleteFlag[] = [];
     const roleScores: Partial<Record<VoterRole, number | null>> = {};
     for (const role of Object.keys(weights) as VoterRole[]) {
       if (role === 'delegate') {
-        roleScores[role] = roleScore(
-          delegateVotes.filter((v) => v.delegation_id === delegation.id).map((v) => ({ ...v, voter: v.voter_delegate_id })),
-        );
+        // Premios entre pares (3/2/1): no usan la rúbrica ni aportan a las medias por criterio.
+        roleScores[role] = peerScores.get(delegation.id) ?? null;
       } else {
         const perDelegate = delegation.delegates.map((delegate) =>
           roleScore(
@@ -983,7 +1037,7 @@ export const handlers = [
               status: !token ? 'none' : token.revoked_at ? 'revoked' : 'active',
               issued_at: token?.issued_at ?? null,
               last_used_at: token?.last_used_at ?? null,
-              votes_count: delegateVotes.filter((v) => v.voter_delegate_id === p.id).length,
+              votes_count: peerVotes.filter((v) => v.voter_delegate_id === p.id).length,
             } satisfies VoterAccess;
           }),
         ),
@@ -1037,7 +1091,53 @@ export const handlers = [
     });
     return HttpResponse.json({ revoked });
   }),
-  ...(['get', 'put'] as const).map((method) =>
+  // ---- Voto entre pares: ventana por comité (admin) ----
+  http.get(`${BASE}/events/:eventId/peer-vote`, ({ params }) => {
+    const event = findEvent(params.eventId);
+    if (!event) return notFound('Evento no encontrado');
+    const items: CommitteePeerVote[] = committees
+      .filter((c) => c.event_id === event.id)
+      .map((c) => {
+        const voters = committeeDelegations(c.id).flatMap((d) => d.delegates.map((p) => p.id));
+        return {
+          committee_id: c.id,
+          committee_name: c.name,
+          committee_acronym: c.acronym,
+          ...peerWindowOf(c.id, event.status),
+          voters: voters.length,
+          submitted: new Set(peerVotes.filter((v) => voters.includes(v.voter_delegate_id)).map((v) => v.voter_delegate_id)).size,
+        };
+      });
+    return HttpResponse.json(items);
+  }),
+  http.put(`${BASE}/committees/:committeeId/peer-vote`, async ({ params, request }) => {
+    const committee = findCommittee(params.committeeId);
+    if (!committee) return notFound('Comité no encontrado');
+    const event = eventOfCommittee(committee);
+    if (!('delegate' in ROLE_WEIGHTS[event.event_type])) return problem(409, 'CONFLICT', 'En este tipo de evento los delegados no votan');
+    if (event.status === 'closed') return problem(409, 'EVENT_CLOSED', 'El evento está cerrado');
+    const body = (await request.json().catch(() => ({}))) as PeerVoteWindowIn;
+    const opensAt = body.opens_at ?? now();
+    const closesAt = body.closes_at ?? null;
+    if (closesAt && Date.parse(closesAt) <= Math.max(Date.parse(opensAt), Date.now())) {
+      return problem(422, 'VALIDATION_ERROR', 'El cierre debe ser posterior a la apertura y a ahora');
+    }
+    peerVoteWindows.set(committee.id, { opens_at: opensAt, closes_at: closesAt });
+    return HttpResponse.json(peerWindowOf(committee.id, event.status));
+  }),
+  http.post(`${BASE}/committees/:committeeId/peer-vote/close`, ({ params }) => {
+    const committee = findCommittee(params.committeeId);
+    if (!committee) return notFound('Comité no encontrado');
+    const event = eventOfCommittee(committee);
+    if (!('delegate' in ROLE_WEIGHTS[event.event_type])) return problem(409, 'CONFLICT', 'En este tipo de evento los delegados no votan');
+    if (event.status === 'closed') return problem(409, 'EVENT_CLOSED', 'El evento está cerrado');
+    const window = peerWindowOf(committee.id, event.status);
+    if (window.status === 'open') peerVoteWindows.set(committee.id, { opens_at: window.opens_at, closes_at: now() });
+    return HttpResponse.json(peerWindowOf(committee.id, event.status));
+  }),
+
+  // ---- Boleta del delegado (voto entre pares) ----
+  ...(['get', 'post'] as const).map((method) =>
     http[method](`${BASE}/vote/ballot`, async ({ request }) => {
       const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
       const access = voterTokens.get(token);
@@ -1047,27 +1147,48 @@ export const handlers = [
       const committee = found && findCommittee(found.delegation.committee_id);
       if (!found || !committee) return problem(401, 'UNAUTHORIZED', 'Tu acceso no es válido o ya venció.');
       const event = eventOfCommittee(committee);
-      const rubric = rubricForCommittee(committee);
-      const session = event.status === 'active' ? (sessionsByCommittee[committee.id] ?? []).filter((s) => s.status === 'open').sort((a, b) => b.number - a.number)[0] : undefined;
+      const window = peerWindowOf(committee.id, event.status);
+      const candidates = committeeDelegations(committee.id).filter((d) => d.id !== found.delegation.id);
+      const awards = PEER_AWARDS.slice(0, Math.min(PEER_AWARDS.length, candidates.length));
+      const mine = () =>
+        peerVotes
+          .filter((v) => v.voter_delegate_id === access.delegate_id)
+          .sort((a, b) => PEER_AWARDS.findIndex((x) => x.award_type === a.award_type) - PEER_AWARDS.findIndex((x) => x.award_type === b.award_type));
 
-      if (method === 'put') {
-        if (!session) return problem(409, 'SESSION_CLOSED', 'No hay una sesión abierta; espera a la siguiente');
-        const { items } = (await request.json()) as { items: Array<{ delegation_id: string; criterion_id: string; value: number }> };
-        for (const item of items) {
-          if (item.delegation_id === found.delegation.id) return problem(403, 'FORBIDDEN', 'No puedes votar por tu propia delegación');
-          if (!committeeDelegations(committee.id).some((d) => d.id === item.delegation_id)) return problem(404, 'NOT_FOUND', 'La delegación no pertenece a tu comité');
-          if (!rubric?.criteria.some((c) => c.id === item.criterion_id)) return problem(404, 'NOT_FOUND', 'El criterio no pertenece a la rúbrica del comité');
-          if (item.value < rubric.scale_min || item.value > rubric.scale_max) return problem(422, 'VALUE_OUT_OF_RANGE', `El valor ${item.value} está fuera de la escala`);
+      if (method === 'post') {
+        if (event.status === 'closed') return problem(409, 'EVENT_CLOSED', 'El evento está cerrado');
+        if (window.status !== 'open') {
+          return problem(409, 'SESSION_CLOSED', window.status === 'closed' ? 'La votación ya cerró' : 'La votación aún no abre');
         }
-        for (const item of items) {
-          const existing = delegateVotes.find(
-            (v) => v.voter_delegate_id === access.delegate_id && v.delegation_id === item.delegation_id && v.session_id === session.id && v.criterion_id === item.criterion_id,
-          );
-          if (existing) existing.value = item.value;
-          else delegateVotes.push({ voter_delegate_id: access.delegate_id, session_id: session.id, ...item });
+        if (mine().length > 0) return problem(409, 'CONFLICT', 'Ya enviaste tu voto; no se puede cambiar');
+        if (awards.length === 0) return problem(409, 'CONFLICT', 'Tu comité no tiene otras delegaciones');
+        const { picks } = (await request.json()) as { picks: BallotPick[] };
+        const sent = [...picks.map((p) => p.award_type)].sort();
+        const required = awards.map((a) => a.award_type).sort();
+        if (sent.join() !== required.join()) {
+          return problem(422, 'VALIDATION_ERROR', `Elige una delegación para: ${awards.map((a) => a.label).join(', ')}`);
         }
+        const chosen = picks.map((p) => p.delegation_id);
+        if (new Set(chosen).size !== chosen.length) return problem(422, 'VALIDATION_ERROR', 'Cada premio debe ir a una delegación distinta');
+        for (const id of chosen) {
+          if (id === found.delegation.id) return problem(403, 'FORBIDDEN', 'No puedes votar por tu propia delegación');
+          if (!candidates.some((d) => d.id === id)) return problem(404, 'NOT_FOUND', 'La delegación no pertenece a tu comité');
+        }
+        const createdAt = now();
+        picks.forEach((p) =>
+          peerVotes.push({
+            id: uuid(),
+            voter_delegate_id: access.delegate_id,
+            committee_id: committee.id,
+            award_type: p.award_type,
+            delegation_id: p.delegation_id,
+            created_at: createdAt,
+          }),
+        );
       }
 
+      const picks = mine();
+      const closedSessions = (sessionsByCommittee[committee.id] ?? []).filter((s) => s.status === 'closed' && s.opened_at).length;
       const ballot: Ballot = {
         voter_name: found.delegate.full_name,
         own_delegation: { delegation_id: found.delegation.id, country_code: found.delegation.country_code, character_name: found.delegation.character_name },
@@ -1075,16 +1196,15 @@ export const handlers = [
         event_status: event.status,
         committee_name: committee.name,
         committee_acronym: committee.acronym,
-        open_session: session ? { session_id: session.id, number: session.number, opened_at: session.opened_at } : null,
-        rubric: rubric ? { scale_min: rubric.scale_min, scale_max: rubric.scale_max, criteria: rubric.criteria } : null,
-        delegations: committeeDelegations(committee.id)
-          .filter((d) => d.id !== found.delegation.id)
-          .map((d) => ({ delegation_id: d.id, country_code: d.country_code, character_name: d.character_name })),
-        votes: session
-          ? delegateVotes
-              .filter((v) => v.voter_delegate_id === access.delegate_id && v.session_id === session.id)
-              .map(({ delegation_id, criterion_id, value }) => ({ delegation_id, criterion_id, value }))
-          : [],
+        sessions_total: committee.sessions_count,
+        sessions_closed: closedSessions,
+        peer_vote: window,
+        weight: ROLE_WEIGHTS[event.event_type].delegate ?? 0,
+        awards,
+        delegations: candidates.map((d) => ({ delegation_id: d.id, country_code: d.country_code, character_name: d.character_name })),
+        picks: picks.map(({ award_type, delegation_id }) => ({ award_type, delegation_id })),
+        submitted_at: picks[0]?.created_at ?? null,
+        receipt: picks[0] ? peerReceipt(committee.acronym, picks[0].id) : null,
       };
       return HttpResponse.json(ballot);
     }),

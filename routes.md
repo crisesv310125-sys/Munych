@@ -120,10 +120,13 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | GET | `/events/{event_id}/voter-tokens` | admin | `list_voter_tokens` | — | `VoterAccessOut[]` |
 | POST | `/events/{event_id}/voter-tokens` | admin | `generate_voter_tokens` | `GenerateTokensIn` | `GeneratedTokenOut[]` (201) |
 | POST | `/events/{event_id}/voter-tokens/revoke` | admin | `revoke_voter_tokens` | `RevokeTokensIn` | `{ revoked: number }` |
+| GET | `/events/{event_id}/peer-vote` | admin | `list_peer_vote_windows` | — | `CommitteePeerVoteOut[]` |
+| PUT | `/committees/{committee_id}/peer-vote` | admin | `open_peer_vote` | `PeerVoteWindowIn` | `PeerVoteWindowOut` |
+| POST | `/committees/{committee_id}/peer-vote/close` | admin | `close_peer_vote` | — | `PeerVoteWindowOut` |
 | GET | `/vote/ballot` | token de delegado | `get_ballot` | — | `BallotOut` |
-| PUT | `/vote/ballot` | token de delegado | `submit_votes` | `VotesIn` | `BallotOut` |
+| POST | `/vote/ballot` | token de delegado | `submit_peer_vote` | `PeerVotesIn` | `BallotOut` |
 
-Total: **54 operaciones**.
+Total: **57 operaciones**.
 
 ---
 
@@ -214,14 +217,16 @@ Total: **54 operaciones**.
   - **Nota de la delegación**: media de sus delegados.
   - **Desempate**: por la media del criterio de mayor peso. Si el empate persiste, las delegaciones comparten posición con `tied: true`.
   - Las delegaciones sin notas llevan `score: null` y van al final.
-  - **Votación por roles** (`mun_regular`, `national_championship`): la nota anterior se calcula **por rol** (`role_scores`), y la de la delegación es `Σ peso × nota_rol / Σ peso` de los roles **con nota** (un rol sin votos no cuenta como 0). Los delegados votan por delegación. Pesos en `role_weights`: MUN regular = mesa 30, delegados 50, staff 20; Campeonato = jueces 50, mesa 15, delegados 25, staff 10.
+  - **Votación por roles** (`mun_regular`, `national_championship`): la nota anterior se calcula **por rol** (`role_scores`), y la de la delegación es `Σ peso × nota_rol / Σ peso` de los roles **con nota** (un rol sin votos no cuenta como 0). Los delegados no usan la rúbrica: su nota es `puntos recibidos ÷ (3 × votantes que enviaron boleta) × 100`, con Mejor delegado = 3, Delegado distinguido = 2 y Mención de honor = 1 (sin votantes en el comité → `null`). No aporta a `criteria_averages`. Pesos en `role_weights`: MUN regular = mesa 30, delegados 50, staff 20; Campeonato = jueces 50, mesa 15, delegados 25, staff 10.
 
 ### 3.7 bis Votación de delegados (`voting`)
 
 - Los delegados **no tienen cuenta**: el admin genera un token por delegado (`POST /events/{id}/voter-tokens` con `link_base`, p. ej. `https://<panel>/#/votar/`) y lo reparte como enlace o QR. El token, el enlace y el QR (SVG) **solo** vienen en esa respuesta; en la BD queda su SHA-256. Sin `delegate_ids` genera para quien no tenga acceso vigente; con `delegate_ids` los regenera y revoca los anteriores. `409 CONFLICT` si en el tipo de evento no votan delegados.
-- **`GET /vote/ballot`** (`Authorization: Bearer <token>`): nombre, delegación propia, rúbrica, delegaciones por las que puede votar (todas menos la suya), la sesión abierta del comité (`null` si no hay, o si el evento no está `active`) y sus votos en esa sesión. El panel la consulta cada 20 s.
-- **`PUT /vote/ballot`** `{ items: [{ delegation_id, criterion_id, value }] }`: el servidor decide la sesión (la abierta). Errores: `401 UNAUTHORIZED` (token inválido, revocado o vencido), `403 FORBIDDEN` (su propia delegación), `409 SESSION_CLOSED`, `404 NOT_FOUND`, `422 VALUE_OUT_OF_RANGE`. Reenviar corrige el voto.
-- Límite por token (no por IP, porque comparten el wifi): 20 GET/min y 30 PUT/min.
+- **Voto entre pares por premios** (desde 2026-11-06): cada delegado vota **una sola vez por comité, al final**, eligiendo Mejor delegado, Delegado distinguido y Mención de honor. Las delegaciones deben ser distintas y ninguna la propia; si el comité tiene menos de 3 candidatas, solo se votan los primeros N premios (`awards`).
+- **Ventana por comité** (admin): `PUT /committees/{id}/peer-vote` `{ opens_at?, closes_at? }` abre (o programa) la votación; `opens_at` null = ahora y `closes_at` null = abierta hasta cerrarla. Reabrir quita el cierre anterior y conserva los votos. `POST /committees/{id}/peer-vote/close` la cierra ya. `GET /events/{id}/peer-vote` da por comité `status`, fechas, `voters` (delegados) y `submitted` (cuántos ya votaron). Estado (`PeerVoteStatus`): `not_scheduled` (sin apertura) · `scheduled` (aún no llega `opens_at`, o el evento no está `active`) · `open` · `closed` (pasó `closes_at` o el evento se cerró). `409 CONFLICT` si en el tipo de evento no votan delegados; `409 EVENT_CLOSED` con el evento cerrado; `422 VALIDATION_ERROR` si el cierre no es posterior a la apertura y a ahora.
+- **`GET /vote/ballot`** (`Authorization: Bearer <token>`): delegación propia, comité, sesiones (`sessions_total`, `sessions_closed`), ventana (`peer_vote`), peso del rol delegados (`weight`, %), premios a votar, delegaciones candidatas (todas menos la suya) y, si ya votó, `picks`, `submitted_at` y `receipt` (comprobante legible `SIGLAS-XXXX-XX`). El panel la consulta cada 20 s.
+- **`POST /vote/ballot`** `{ picks: [{ award_type, delegation_id }] }`: un pick por premio de `awards`. Errores: `401 UNAUTHORIZED` (token inválido, revocado o vencido), `409 SESSION_CLOSED` (la votación aún no abre o ya cerró), `409 EVENT_CLOSED`, `409 CONFLICT` (ya votó: **no se puede cambiar**), `422 VALIDATION_ERROR` (faltan premios o delegación repetida), `403 FORBIDDEN` (su propia delegación), `404 NOT_FOUND` (delegación de otro comité).
+- Límite por token (no por IP, porque comparten el wifi): 20 GET/min y 30 POST/min.
 - **`PUT /committees/{committee_id}/awards`**: array JSON `[{ award_type, delegation_id, position }]` (`position` vale 1 por defecto) que reemplaza los premios. Superar un cupo **no bloquea**: solo añade avisos a `quota_warnings`.
 - **`GET /events/{event_id}/export.xlsx`**: libro de Excel con una hoja **Resumen**, una hoja de ranking por comité y una hoja **Detalle** (delegado × sesión × juez × criterio). Las fechas van en la zona horaria del evento.
 
@@ -466,16 +471,28 @@ type GeneratedTokenOut = {
   token: string; url: string; qr_svg: string; expires_at: datetime
 }
 type RevokeTokensIn = { delegate_ids: uuid[] }
+type PeerAwardType  = "best_delegate" | "outstanding_delegate" | "honorable_mention"  // 3 / 2 / 1 puntos
+type PeerVoteStatus = "not_scheduled" | "scheduled" | "open" | "closed"
+type PeerVoteWindowIn  = { opens_at?: datetime | null /* null = ahora */; closes_at?: datetime | null }
+type PeerVoteWindowOut = { status: PeerVoteStatus; opens_at: datetime | null; closes_at: datetime | null }
+type CommitteePeerVoteOut = PeerVoteWindowOut & {
+  committee_id: uuid; committee_name: string; committee_acronym: string
+  voters: number; submitted: number
+}
 type BallotOut = {
   voter_name: string; own_delegation: BallotDelegation
   event_name: string; event_status: EventStatus; committee_name: string; committee_acronym: string
-  open_session: { session_id: uuid; number: number; opened_at: datetime | null } | null
-  rubric: { scale_min: number; scale_max: number; criteria: CriterionOut[] } | null
-  delegations: BallotDelegation[]   // todas menos la propia
-  votes: { delegation_id: uuid; criterion_id: uuid; value: number }[]
+  sessions_total: number; sessions_closed: number
+  peer_vote: PeerVoteWindowOut
+  weight: number                                   // % del rol delegados en el puntaje final
+  awards: { award_type: PeerAwardType; label: string; points: number }[]  // en orden; < 3 si hay pocas candidatas
+  delegations: BallotDelegation[]                  // todas menos la propia
+  picks: { award_type: PeerAwardType; delegation_id: uuid }[]  // vacío = aún no vota
+  submitted_at: datetime | null
+  receipt: string | null                           // p. ej. "AG-7K2Q-91"
 }
 type BallotDelegation = { delegation_id: uuid; country_code: string | null; character_name: string | null }
-type VotesIn = { items: { delegation_id: uuid; criterion_id: uuid; value: number }[] /* 1–2000 */ }
+type PeerVotesIn = { picks: { award_type: PeerAwardType; delegation_id: uuid }[] /* 1–3 */ }
 
 type AwardIn   = { award_type: AwardType; delegation_id: uuid; position?: number /* ≥ 1, = 1 */ }
 type AwardOut  = { award_type: AwardType; delegation_id: uuid; position: number }
@@ -634,6 +651,8 @@ El auth hook lee esta tabla para añadir el claim `app_role` al JWT.
 | `sessions_count` | integer | entre 1 y 20 |
 | `rubric_id` | uuid \| null → `rubrics` | sobrescribe la rúbrica del evento |
 | `award_quotas` | jsonb | `{"best_delegate":1,"outstanding_delegate":2,...}` |
+| `peer_vote_opens_at` | timestamptz \| null | apertura del voto entre pares; null = sin programar |
+| `peer_vote_closes_at` | timestamptz \| null | cierre; null = abierto hasta que el admin lo cierre · `> peer_vote_opens_at` |
 
 #### `app.delegations`
 | Columna | Tipo | Notas |
@@ -695,17 +714,17 @@ Accesos de los delegados (sin cuenta). El token en claro nunca se guarda.
 | `revoked_at`, `last_used_at` | timestamptz \| null | |
 | `created_by` | uuid \| null → `auth.users` | |
 
-#### `app.delegate_votes`
-Un trigger (`app.check_delegate_vote`) rechaza el voto por la propia delegación o fuera del comité del votante.
+#### `app.peer_votes`
+Voto entre pares por premios (migración `20261106000100_peer_award_votes`, que **elimina** `app.delegate_votes`). Un trigger (`app.check_peer_vote`) rechaza el voto por la propia delegación o fuera del comité del votante; otro impide `UPDATE` (el voto no se cambia). RLS activa, sin acceso para `anon`/`authenticated`.
 | Columna | Tipo | Notas |
 |---|---|---|
 | `id` | uuid PK | |
-| `voter_delegate_id` | uuid → `delegates` | quien vota |
-| `delegation_id` | uuid → `delegations` | por quién vota |
-| `session_id` | uuid → `scoring_sessions` | la sesión abierta al votar |
-| `criterion_id` | uuid → `criteria` | |
-| `value` | smallint | dentro de la escala de la rúbrica |
-| | | `unique(voter_delegate_id, delegation_id, session_id, criterion_id)` |
+| `voter_delegate_id` | uuid → `delegates` | quien vota · `on delete cascade` |
+| `committee_id` | uuid → `committees` | comité del votante |
+| `award_type` | text | `best_delegate` \| `outstanding_delegate` \| `honorable_mention` |
+| `delegation_id` | uuid → `delegations` | a quién premia |
+| `created_at` | timestamptz | |
+| | | `unique(voter_delegate_id, award_type)`, `unique(voter_delegate_id, delegation_id)` |
 
 #### `app.awards`
 | Columna | Tipo | Notas |
@@ -764,7 +783,7 @@ RLS: `anon` y `authenticated` solo pueden leer las filas con `published = true`.
 | `result_snapshots` | `(event_id, created_at desc)` |
 | `audit_log` | `(entity, entity_id)` |
 | `voter_tokens` | `(delegate_id) where revoked_at is null` (único), `(event_id)` |
-| `delegate_votes` | `(session_id, delegation_id)` |
+| `peer_votes` | `(committee_id, delegation_id)` |
 
 ### Otros objetos
 

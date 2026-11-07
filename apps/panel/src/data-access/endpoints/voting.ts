@@ -1,6 +1,16 @@
 import { apiFetch } from '../apiClient';
 import { ApiError } from '../errors';
-import type { Ballot, BallotVote, GeneratedVoterToken, GenerateVoterTokensIn, ProblemJson, VoterAccess } from '../apiTypes';
+import type {
+  Ballot,
+  BallotPick,
+  CommitteePeerVote,
+  GeneratedVoterToken,
+  GenerateVoterTokensIn,
+  PeerVoteWindow,
+  PeerVoteWindowIn,
+  ProblemJson,
+  VoterAccess,
+} from '../apiTypes';
 
 // ---- Accesos de delegados (admin) ----
 
@@ -18,6 +28,21 @@ export function revokeVoterTokens(eventId: string, delegateIds: string[]): Promi
     method: 'POST',
     body: { delegate_ids: delegateIds },
   });
+}
+
+// ---- Voto entre pares: apertura y cierre por comité (admin) ----
+
+export function listPeerVoteWindows(eventId: string): Promise<CommitteePeerVote[]> {
+  return apiFetch<CommitteePeerVote[]>(`/events/${eventId}/peer-vote`);
+}
+
+/** Abre (o programa) el voto entre pares del comité. Sin `opens_at`: ahora mismo. */
+export function openPeerVote(committeeId: string, body: PeerVoteWindowIn = {}): Promise<PeerVoteWindow> {
+  return apiFetch<PeerVoteWindow>(`/committees/${committeeId}/peer-vote`, { method: 'PUT', body });
+}
+
+export function closePeerVote(committeeId: string): Promise<PeerVoteWindow> {
+  return apiFetch<PeerVoteWindow>(`/committees/${committeeId}/peer-vote/close`, { method: 'POST' });
 }
 
 // ---- Boleta del delegado ----
@@ -52,7 +77,7 @@ export function getBallot(token: string): Promise<Ballot> {
   return ballotFetch(token);
 }
 
-/** El servidor decide en qué sesión cae el voto (la abierta); el celular no la manda. */
-export function submitVotes(token: string, items: BallotVote[]): Promise<Ballot> {
-  return ballotFetch(token, { method: 'PUT', body: JSON.stringify({ items }) });
+/** Envía el voto entre pares completo (una delegación por premio). No se puede cambiar. */
+export function submitPeerVote(token: string, picks: BallotPick[]): Promise<Ballot> {
+  return ballotFetch(token, { method: 'POST', body: JSON.stringify({ picks }) });
 }

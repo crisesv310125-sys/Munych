@@ -31,6 +31,7 @@ export const queryKeys = {
   publicationSettings: (eventId: string) => ['publication-settings', eventId] as const,
   publicationPreview: (eventId: string) => ['publication-preview', eventId] as const,
   voterTokens: (eventId: string) => ['voter-tokens', eventId] as const,
+  peerVoteWindows: (eventId: string) => ['peer-vote', eventId] as const,
   ballot: (token: string) => ['ballot', token] as const,
   me: ['me'] as const,
   judgeCommittees: ['judge', 'committees'] as const,

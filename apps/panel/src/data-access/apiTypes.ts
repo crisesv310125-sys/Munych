@@ -463,6 +463,7 @@ export interface VoterAccess {
   status: VoterTokenStatus;
   issued_at: string | null;
   last_used_at: string | null;
+  /** Premios que ha votado (0 si aún no envía su boleta). */
   votes_count: number;
 }
 
@@ -494,13 +495,49 @@ export interface BallotDelegation {
   character_name: string | null;
 }
 
-export interface BallotVote {
-  delegation_id: string;
-  criterion_id: string;
-  value: number;
+/** Premios que votan los delegados entre pares (2026-11-06): no usan la rúbrica. */
+export type PeerAwardType = 'best_delegate' | 'outstanding_delegate' | 'honorable_mention';
+
+/** Estado del voto entre pares de un comité (derivado de sus fechas y del evento). */
+export type PeerVoteStatus = 'not_scheduled' | 'scheduled' | 'open' | 'closed';
+
+/** (PeerVoteWindowOut) */
+export interface PeerVoteWindow {
+  status: PeerVoteStatus;
+  opens_at: string | null;
+  /** null: abierto hasta que el admin lo cierre. */
+  closes_at: string | null;
 }
 
-/** (BallotOut) */
+/** (PeerVoteWindowIn) — opens_at null = ahora (hora del servidor). */
+export interface PeerVoteWindowIn {
+  opens_at?: string | null;
+  closes_at?: string | null;
+}
+
+/** (CommitteePeerVoteOut) */
+export interface CommitteePeerVote extends PeerVoteWindow {
+  committee_id: string;
+  committee_name: string;
+  committee_acronym: string;
+  voters: number;
+  submitted: number;
+}
+
+/** (BallotAwardOut) */
+export interface BallotAward {
+  award_type: PeerAwardType;
+  label: string;
+  points: number;
+}
+
+/** (BallotPickOut) */
+export interface BallotPick {
+  award_type: PeerAwardType;
+  delegation_id: string;
+}
+
+/** (BallotOut) — boleta entre pares: una delegación por premio, una sola vez. */
 export interface Ballot {
   voter_name: string;
   own_delegation: BallotDelegation;
@@ -508,12 +545,19 @@ export interface Ballot {
   event_status: EventStatus;
   committee_name: string;
   committee_acronym: string;
-  /** null: no hay sesión abierta (la página muestra "esperando la siguiente sesión"). */
-  open_session: { session_id: string; number: number; opened_at: string | null } | null;
-  rubric: { scale_min: number; scale_max: number; criteria: ApiCriterion[] } | null;
+  sessions_total: number;
+  sessions_closed: number;
+  peer_vote: PeerVoteWindow;
+  /** Peso (%) del voto de los delegados en el puntaje final. */
+  weight: number;
+  /** Premios a votar, en orden (menos de 3 si el comité tiene pocas delegaciones). */
+  awards: BallotAward[];
   /** Todas las delegaciones del comité menos la propia. */
   delegations: BallotDelegation[];
-  votes: BallotVote[];
+  /** Voto enviado; vacío si aún no vota. */
+  picks: BallotPick[];
+  submitted_at: string | null;
+  receipt: string | null;
 }
 
 /** (AwardIn / AwardOut) */

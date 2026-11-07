@@ -122,6 +122,7 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | **Votación de delegados** | | | | | |
 | GET | `/events/{event_id}/voter-tokens` | admin | `list_voter_tokens` | — | `VoterAccessOut[]` |
 | POST | `/events/{event_id}/voter-tokens` | admin | `generate_voter_tokens` | `GenerateTokensIn` | `GeneratedTokenOut[]` (201) |
+| POST | `/events/{event_id}/voter-tokens/sheet.pdf` | admin | `voter_access_sheet` | `AccessSheetIn` | hoja `.pdf` |
 | POST | `/events/{event_id}/voter-tokens/revoke` | admin | `revoke_voter_tokens` | `RevokeTokensIn` | `{ revoked: number }` |
 | GET | `/events/{event_id}/peer-vote` | admin | `list_peer_vote_windows` | — | `CommitteePeerVoteOut[]` |
 | PUT | `/committees/{committee_id}/peer-vote` | admin | `open_peer_vote` | `PeerVoteWindowIn` | `PeerVoteWindowOut` |
@@ -129,7 +130,7 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | GET | `/vote/ballot` | token de delegado | `get_ballot` | — | `BallotOut` |
 | POST | `/vote/ballot` | token de delegado | `submit_peer_vote` | `PeerVotesIn` | `BallotOut` |
 
-Total: **60 operaciones**.
+Total: **61 operaciones**.
 
 ---
 
@@ -225,6 +226,7 @@ Total: **60 operaciones**.
 ### 3.7 bis Votación de delegados (`voting`)
 
 - Los delegados **no tienen cuenta**: el admin genera un token por delegado (`POST /events/{id}/voter-tokens` con `link_base`, p. ej. `https://<panel>/#/votar/`) y lo reparte como enlace o QR. El token, el enlace y el QR (SVG) **solo** vienen en esa respuesta; en la BD queda su SHA-256. Sin `delegate_ids` genera para quien no tenga acceso vigente; con `delegate_ids` los regenera y revoca los anteriores. `409 CONFLICT` si en el tipo de evento no votan delegados.
+- **Hoja de accesos en PDF** (2026-11-07): `POST /events/{id}/voter-tokens/sheet.pdf` `{ items: [{ delegate_id, token, code, url }] }` con los accesos que acaba de devolver `POST /voter-tokens`. Según la muestra de MUNYCH («Accesos de votación MUNYCH - muestra»): carta, agrupada por comité y ordenada por delegación, 9 tarjetas recortables por hoja con QR vectorial (~3.4 cm), nombre, delegación, «AG · 01/32» y el código de respaldo con la dirección donde escribirlo. Solo imprime accesos **vigentes** (token y código del acceso no revocado ni vencido; si no, `422 VALIDATION_ERROR`); los nombres y comités salen de la base. No guarda nada (`Cache-Control: no-store`).
 - **Código corto de respaldo** (2026-11-07): cada acceso trae además `code` (10 caracteres sin 0/O/1/I/L, p. ej. `K7M2Q-9XH4T`, ~50 bits) para escribirlo a mano si la cámara no lee el QR. Sirve igual que el token en `Authorization: Bearer` (se aceptan minúsculas, espacios y guiones). Como el token, solo llega al generarlo y en la BD queda su hash. Los accesos generados antes no tienen código: hay que regenerarlos.
 - **Voto entre pares por premios** (desde 2026-11-06): cada delegado vota **una sola vez por comité, al final**, eligiendo Mejor delegado, Delegado distinguido y Mención honorífica (los mismos nombres que los premios oficiales). Las delegaciones deben ser distintas y ninguna la propia; si el comité tiene menos de 3 candidatas, solo se votan los primeros N premios (`awards`).
 - **Ventana por comité** (admin): `PUT /committees/{id}/peer-vote` `{ opens_at?, closes_at? }` abre (o programa) la votación; `opens_at` null = ahora y `closes_at` null = abierta hasta cerrarla. Reabrir quita el cierre anterior y conserva los votos. `POST /committees/{id}/peer-vote/close` la cierra ya. **Abrir una sesión** (`POST /committees/{id}/sessions/{n}/open`) también abre el voto entre pares del comité en la misma transacción, salvo que ya esté abierto (se respeta su cierre programado), que el evento esté cerrado o que en el tipo de evento no voten delegados; si estaba programado o cerrado, queda abierto desde ahora y sin cierre. `GET /events/{id}/peer-vote` da por comité `status`, fechas, `voters` (delegados) y `submitted` (cuántos ya votaron). Estado (`PeerVoteStatus`): `not_scheduled` (sin apertura) · `scheduled` (aún no llega `opens_at`, o el evento no está `active`) · `open` · `closed` (pasó `closes_at` o el evento se cerró). `409 CONFLICT` si en el tipo de evento no votan delegados; `409 EVENT_CLOSED` con el evento cerrado; `422 VALIDATION_ERROR` si el cierre no es posterior a la apertura y a ahora.
@@ -485,6 +487,7 @@ type GeneratedTokenOut = {
   token: string; url: string; qr_svg: string; expires_at: datetime
   code: string   // código corto de respaldo, p. ej. "K7M2Q-9XH4T": sirve igual que el token
 }
+type AccessSheetIn = { items: { delegate_id: uuid; token: string; code: string; url: string }[] /* 1–5000 */ }
 type RevokeTokensIn = { delegate_ids: uuid[] }
 type PeerAwardType  = "best_delegate" | "outstanding_delegate" | "honorable_mention"  // 3 / 2 / 1 puntos
 type PeerVoteStatus = "not_scheduled" | "scheduled" | "open" | "closed"

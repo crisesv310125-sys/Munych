@@ -1,4 +1,4 @@
-import { apiFetch } from '../apiClient';
+import { apiFetch, apiFetchBlob } from '../apiClient';
 import { ApiError } from '../errors';
 import type {
   Ballot,
@@ -21,6 +21,18 @@ export function listVoterTokens(eventId: string): Promise<VoterAccess[]> {
 /** Los tokens solo llegan en esta respuesta: hay que descargarlos en el momento. */
 export function generateVoterTokens(eventId: string, body: GenerateVoterTokensIn): Promise<GeneratedVoterToken[]> {
   return apiFetch<GeneratedVoterToken[]>(`/events/${eventId}/voter-tokens`, { method: 'POST', body });
+}
+
+/**
+ * Hoja imprimible (PDF) de los accesos recién generados: 9 tarjetas recortables por hoja,
+ * agrupadas por comité. Hay que pedirla con los accesos que acaba de devolver
+ * `generateVoterTokens`: el backend solo imprime los vigentes (422 si alguno se regeneró).
+ */
+export function downloadVoterAccessSheet(eventId: string, tokens: GeneratedVoterToken[]): Promise<Blob> {
+  return apiFetchBlob(`/events/${eventId}/voter-tokens/sheet.pdf`, {
+    method: 'POST',
+    body: { items: tokens.map(({ delegate_id, token, code, url }) => ({ delegate_id, token, code, url })) },
+  });
 }
 
 export function revokeVoterTokens(eventId: string, delegateIds: string[]): Promise<{ revoked: number }> {

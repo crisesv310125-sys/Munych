@@ -1171,6 +1171,21 @@ export const handlers = [
     });
     return HttpResponse.json(out, { status: 201 });
   }),
+  http.post(`${BASE}/events/:eventId/voter-tokens/sheet.pdf`, async ({ params, request }) => {
+    if (!findEvent(params.eventId)) return notFound();
+    const { items } = (await request.json()) as { items: Array<{ delegate_id: string; token: string }> };
+    // Como el backend: solo se imprimen accesos vigentes.
+    const stale = items.find((i) => {
+      const access = voterTokens.get(i.token);
+      return !access || access.revoked_at || access.delegate_id !== i.delegate_id;
+    });
+    if (stale) return problem(422, 'VALIDATION_ERROR', 'Algún acceso ya no es válido. Genera los accesos de nuevo');
+    // PDF mínimo válido: en los mocks no se dibuja la hoja real.
+    const pdf =
+      '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n' +
+      '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF';
+    return new HttpResponse(new Blob([pdf]), { headers: { 'Content-Type': 'application/pdf' } });
+  }),
   http.post(`${BASE}/events/:eventId/voter-tokens/revoke`, async ({ params, request }) => {
     if (!findEvent(params.eventId)) return notFound();
     const { delegate_ids } = (await request.json()) as { delegate_ids: string[] };

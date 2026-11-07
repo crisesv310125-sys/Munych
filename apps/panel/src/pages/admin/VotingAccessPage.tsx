@@ -15,7 +15,8 @@ import {
 } from '../../data-access/hooks';
 import { errorMessage } from '../../data-access/errors';
 import { delegatesVote, eventTypeLabel } from '../../lib/statusLabels';
-import { downloadVoterCsv, downloadVoterQrSheet } from '../../lib/voterSheets';
+import { downloadVoterAccessSheet } from '../../data-access/endpoints';
+import { downloadBlob, downloadVoterCsv } from '../../lib/voterSheets';
 import type { BadgeTone } from '../../lib/statusLabels';
 import type { GeneratedVoterToken, PeerVoteStatus, VoterAccess, VoterTokenStatus } from '../../data-access/apiTypes';
 import styles from './AdminShared.module.css';
@@ -72,6 +73,21 @@ export function VotingAccessPage() {
   const [generated, setGenerated] = useState<GeneratedVoterToken[] | null>(null);
   const [error, setError] = useState('');
   const [pendingRevoke, setPendingRevoke] = useState<VoterAccess | null>(null);
+  const [sheetLoading, setSheetLoading] = useState(false);
+
+  /** Hoja de QR en PDF (según la muestra de MUNYCH), con los accesos recién generados. */
+  async function handleSheet(tokens: GeneratedVoterToken[]) {
+    setError('');
+    setSheetLoading(true);
+    try {
+      const blob = await downloadVoterAccessSheet(eventId, tokens);
+      downloadBlob(blob, `${event?.slug ?? 'evento'}-accesos-votacion.pdf`);
+    } catch (err) {
+      setError(errorMessage(err));
+    } finally {
+      setSheetLoading(false);
+    }
+  }
 
   const list = accesses ?? [];
   const committees = [...new Map(list.map((a) => [a.committee_id, a.committee_name])).entries()];
@@ -156,8 +172,8 @@ export function VotingAccessPage() {
               </div>
               {generated.length > 0 && (
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                  <Button onClick={() => downloadVoterQrSheet(event?.name ?? '', event?.slug ?? 'evento', generated)}>
-                    Descargar hoja con QR (imprimir)
+                  <Button onClick={() => handleSheet(generated)} disabled={sheetLoading}>
+                    {sheetLoading ? 'Preparando PDF…' : 'Descargar hoja de QR (PDF para imprimir)'}
                   </Button>
                   <Button variant="secondary" onClick={() => downloadVoterCsv(event?.slug ?? 'evento', generated)}>
                     Descargar CSV con enlaces

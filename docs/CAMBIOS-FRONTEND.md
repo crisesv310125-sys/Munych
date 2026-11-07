@@ -305,6 +305,8 @@ Comparación con la bóveda de Obsidian (`Documents\Proyectos`): todo lo program
 
 - **Acta de resultados en PDF** (2026-11-07, a partir de la muestra oficial que entregó MUNYCH): en Exportar, «PDF» descarga `export.pdf` (portada con resumen de premiación + una sección por comité con su ranking). Respeta todas las casillas: comités, puntaje, «Desglose por criterio» (medias por criterio y calificaciones por sesión de cada comité), «Nombre del juez» (si no, «Juez N») y «Comentarios de los jueces»; con estas dos últimas, la portada marca el acta como documento interno. El texto de la tarjeta PDF se actualizó; los diplomas siguen pendientes de diseño.
 
+- **Hoja de QR en PDF** (2026-11-07, a partir de la muestra «Accesos de votación MUNYCH»): en Votación, tras generar los accesos, «Descargar hoja de QR (PDF para imprimir)» pide al backend `voter-tokens/sheet.pdf` con los accesos recién generados (9 tarjetas por hoja, por comité, con QR, nombre, delegación y código de respaldo). Sustituye a la hoja HTML de `lib/voterSheets.ts`; el CSV sigue igual.
+
 `TODO(cliente)` de este hito: diseño de los **diplomas** (el acta ya está); URL definitiva de la página pública para `VITE_PUBLIC_RESULTS_URL` (en `.env.production`); ¿el ranking general debe mezclar comités con rúbricas distintas o solo mostrarse por tipo de comité?
 
 ---

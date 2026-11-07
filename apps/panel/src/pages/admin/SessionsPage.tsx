@@ -143,16 +143,18 @@ export function SessionsPage() {
     })),
   });
 
-  const [bulkNumber, setBulkNumber] = useState(1);
+  /** Comité a mostrar; vacío = todos. */
+  const [committeeFilter, setCommitteeFilter] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [pendingClose, setPendingClose] = useState<PendingClose | null>(null);
 
   const eventClosed = event?.status === 'closed';
   const sessionsOf = (i: number) => sessionQueries[i]?.data ?? [];
-  const allSessions = list.flatMap((_, i) => sessionsOf(i));
-  const openCount = allSessions.filter((s) => s.status === 'open').length;
-  const maxSessions = Math.max(0, ...list.map((c) => c.sessions_count));
+  // Si el comité elegido ya no existe (p. ej. se borró), se vuelve a mostrar todos.
+  const filterId = list.some((c) => c.id === committeeFilter) ? committeeFilter : '';
+  const visible = list.map((c, i) => ({ c, i })).filter(({ c }) => !filterId || c.id === filterId);
+  const openCount = visible.flatMap(({ i }) => sessionsOf(i)).filter((s) => s.status === 'open').length;
 
   /** Aplica la acción a varias sesiones; las que fallen se informan juntas sin frenar al resto. */
   async function run(action: Action, targets: SessionTarget[]) {
@@ -166,6 +168,8 @@ export function SessionsPage() {
       qc.invalidateQueries({ queryKey: queryKeys.sessions(committeeId) });
       qc.invalidateQueries({ queryKey: queryKeys.committeeProgress(committeeId) });
     });
+    // Abrir una sesión también abre el voto entre pares del comité.
+    if (action === 'open') qc.invalidateQueries({ queryKey: ['peer-vote'] });
     const failed = results.flatMap((r, i) => (r.status === 'rejected' ? [{ target: targets[i], reason: r.reason }] : []));
     if (failed.length > 0) {
       const names = failed.map(({ target }) => `${list.find((c) => c.id === target.committeeId)?.acronym ?? 'Comité'} · sesión ${target.number}`);
@@ -187,52 +191,26 @@ export function SessionsPage() {
     }
   }
 
-  /** Sesiones número `bulkNumber` de todos los comités que la tienen y están en el estado indicado. */
-  function bulkTargets(currentlyOpen: boolean): SessionTarget[] {
-    return list.flatMap((c, i) =>
-      sessionsOf(i)
-        .filter((s) => s.number === bulkNumber && (s.status === 'open') === currentlyOpen)
-        .map((s) => ({ committeeId: c.id, number: s.number })),
-    );
-  }
-
-  const toOpen = bulkTargets(false);
-  const toClose = bulkTargets(true);
-
   return (
     <div className={styles.page}>
       <div className={styles.topbar}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <span className={styles.topbarTitle}>Sesiones</span>
           <span className={styles.topbarSub}>
-            {list.length} comités · {openCount === 1 ? '1 sesión abierta' : `${openCount} sesiones abiertas`}
+            {filterId ? visible[0]?.c.name : `${list.length} comités`} ·{' '}
+            {openCount === 1 ? '1 sesión abierta' : `${openCount} sesiones abiertas`}
           </span>
         </div>
-        {!eventClosed && maxSessions > 0 && (
+        {list.length > 1 && (
           <div className={styles.topbarActions}>
-            <Select aria-label="Sesión" value={bulkNumber} onChange={(e) => setBulkNumber(Number(e.target.value))}>
-              {Array.from({ length: maxSessions }, (_, i) => i + 1).map((n) => (
-                <option key={n} value={n}>
-                  Sesión {n}
+            <Select aria-label="Comité" value={filterId} onChange={(e) => setCommitteeFilter(e.target.value)}>
+              <option value="">Todos los comités</option>
+              {list.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </Select>
-            <Button variant="gold" onClick={() => void run('open', toOpen)} disabled={busy || toOpen.length === 0}>
-              Abrir en todos
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={busy || toClose.length === 0}
-              onClick={() =>
-                setPendingClose({
-                  title: `Cerrar la sesión ${bulkNumber} en todos los comités`,
-                  message: `Se cerrará en ${toClose.length === 1 ? '1 comité' : `${toClose.length} comités`}. Los jueces ya no podrán calificarla.`,
-                  targets: toClose,
-                })
-              }
-            >
-              Cerrar en todos
-            </Button>
           </div>
         )}
       </div>
@@ -247,7 +225,7 @@ export function SessionsPage() {
           </div>
         )}
         {list.length === 0 && <span className={styles.topbarSub}>Este evento todavía no tiene comités.</span>}
-        {list.map((c, i) => (
+        {visible.map(({ c, i }) => (
           <CommitteeSessionsCard
             key={c.id}
             committee={c}

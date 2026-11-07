@@ -174,7 +174,8 @@ export function VotingAccessPage() {
           </div>
           <div style={{ padding: '12px 20px 0', fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
             Los delegados eligen Mejor delegado, Delegado distinguido y Mención de honor (3, 2 y 1 puntos), una sola vez y sin
-            votar por su propia delegación. Abre la votación al cerrar la última sesión del comité.
+            votar por su propia delegación. La votación se abre sola al abrir una sesión del comité; también puedes abrirla o
+            cerrarla aquí.
           </div>
           <div className={tableStyles.head} style={{ gridTemplateColumns: WINDOW_COLS }}>
             <span>Comité</span>

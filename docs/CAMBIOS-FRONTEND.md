@@ -284,6 +284,9 @@ Los delegados **ya no usan la rúbrica**. Votan **una sola vez por comité, al f
   - Se mantiene la lógica del token (`localStorage` `munych.voter-token`, se quita de la URL) y el sondeo cada 20 s.
 - Diferencias con el handoff: no se portan la home de sesiones (3h) ni la boleta de resoluciones (3b): el voto de resoluciones no aplica. El peso que se muestra es el del rol delegados completo, así que el texto dice «El voto de los delegados suma X % al puntaje final» en vez de «Tu voto suma X %». Sin el CTA «Ver resultados públicos» de 3f porque el panel no conoce la URL de la página pública. Los chips de país son el código ISO de 2 letras (iniciales para personajes), sin banderas.
 
+- **Abrir una sesión abre el voto entre pares** (petición del cliente, 2026-11-06): lo hace el backend al abrir la sesión (`VotingService.open_with_session`), así que funciona desde Comités y desde Sesiones. El panel refresca la ventana (`['peer-vote']`) tras abrir sesiones; MSW hace lo mismo. Textos de la boleta (3e) y de Votación ajustados.
+- **Sesiones** (petición del cliente, 2026-11-06): el select de arriba filtra por **comité** («Todos los comités» o uno) en vez de elegir el número de sesión; se quitaron «Abrir en todos» / «Cerrar en todos», y cada sesión conserva su Abrir/Cerrar. El subtítulo cuenta las sesiones abiertas de lo que se ve.
+
 `TODO(cliente)` de este hito: confirmar que no hay votos por rúbrica reales en `app.delegate_votes` antes de aplicar la migración (se borran); URL de la página pública para el CTA de 3f; ¿el delegado debe poder salir (cerrar sesión) en dispositivos compartidos?
 
 ---
@@ -305,7 +308,7 @@ Los delegados **ya no usan la rúbrica**. Votan **una sola vez por comité, al f
 - Toggle de enlace mágico en Login (reutilizando/limpiando un botón duplicado que ya existía sin función).
 - Botón "Cerrar sesión" en `AdminSidebar` (no existía ningún control de logout en el panel de admin).
 - Gestión de **sesiones** (abrir/cerrar) dentro de `CommitteesPage` — no existía ninguna pantalla de sesiones.
-- Página **Sesiones** (`SessionsPage`, `#/admin/eventos/:id/sesiones`): todas las sesiones del evento por comité, con estado, avance (calificaciones hechas/esperadas, se refresca cada 15 s), último cambio y abrir/cerrar; además, abrir o cerrar la sesión N en todos los comités a la vez. Solo usa componentes y estilos existentes (`AdminShared`, `Table`, `StatusBadge`, `ProgressBar`, `ConfirmDialog`).
+- Página **Sesiones** (`SessionsPage`, `#/admin/eventos/:id/sesiones`): todas las sesiones del evento por comité, con estado, avance (calificaciones hechas/esperadas, se refresca cada 15 s), último cambio y abrir/cerrar, con un filtro por comité (hasta el hito 13 había, en su lugar, abrir o cerrar la sesión N en todos los comités a la vez). Solo usa componentes y estilos existentes (`AdminShared`, `Table`, `StatusBadge`, `ProgressBar`, `ConfirmDialog`).
 - Se retiró el panel de **Carga masiva** (CSV) de Delegaciones a petición del cliente; el endpoint `POST .../delegations/import` y el hook `useImportDelegations` siguen disponibles.
 - Gestión de **premios** y **publicación** (ajustes, vista previa, publicar/despublicar) dentro de `ResultsPage` — ninguna de las dos existía.
 - Botón **Cerrar evento** en el Panel general — no existía.

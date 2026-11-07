@@ -240,8 +240,8 @@ function NotOpen({ ballot, onElapsed }: { ballot: Ballot; onElapsed: () => void 
   let message: string;
   if (ballot.event_status === 'draft') message = 'El evento aún no inicia. Esta pantalla se actualiza sola.';
   else if (elapsed) message = 'Abriendo la votación… Si tarda, espera a que tu mesa lo indique.';
-  else if (counting) message = 'Abre al terminar la última sesión. Esta pantalla se actualiza sola.';
-  else message = 'Abre cuando tu mesa cierre la última sesión. Esta pantalla se actualiza sola.';
+  else if (counting) message = 'Abre a la hora indicada o al iniciar la sesión. Esta pantalla se actualiza sola.';
+  else message = 'Abre cuando tu mesa inicie la sesión. Esta pantalla se actualiza sola.';
 
   return (
     <Page dark>

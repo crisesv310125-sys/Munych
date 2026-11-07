@@ -283,6 +283,8 @@ export function useOpenSession(committeeId: string) {
     mutationFn: (number: number) => api.openSession(committeeId, number),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.sessions(committeeId) });
+      // Abrir una sesión también abre el voto entre pares del comité.
+      qc.invalidateQueries({ queryKey: ['peer-vote'] });
       qc.invalidateQueries({ queryKey: queryKeys.committeeProgress(committeeId) });
     },
   });

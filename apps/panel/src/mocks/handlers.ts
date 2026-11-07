@@ -795,7 +795,14 @@ export const handlers = [
     if (isEventClosed(committee.event_id)) return problem(409, 'EVENT_CLOSED', 'El evento está cerrado.');
     const session = (sessionsByCommittee[committee.id] ?? []).find((s) => s.number === Number(params.number));
     if (!session) return notFound(`No existe la sesión ${params.number}.`);
-    if (params.action === 'open' && session.status !== 'open') Object.assign(session, { status: 'open', opened_at: now(), closed_at: null });
+    if (params.action === 'open' && session.status !== 'open') {
+      Object.assign(session, { status: 'open', opened_at: now(), closed_at: null });
+      // Como VotingService.open_with_session: abrir una sesión abre el voto entre pares.
+      const event = eventOfCommittee(committee);
+      if ('delegate' in ROLE_WEIGHTS[event.event_type] && peerWindowOf(committee.id, event.status).status !== 'open') {
+        peerVoteWindows.set(committee.id, { opens_at: now(), closes_at: null });
+      }
+    }
     if (params.action === 'close' && session.status !== 'closed') Object.assign(session, { status: 'closed', closed_at: now() });
     return HttpResponse.json(session);
   }),

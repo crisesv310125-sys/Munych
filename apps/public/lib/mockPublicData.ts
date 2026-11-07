@@ -60,9 +60,24 @@ function event(
     event: { slug, name, brand: 'munych', logo_url: '/brand/munych-logo.png', venue, starts_on, ends_on, timezone: 'America/Santo_Domingo' },
     settings: SETTINGS,
     committees,
+    general_ranking: generalRanking(committees),
     published_at,
     version: 1,
   };
+}
+
+/** Igual que el backend (public_view._general_ranking): todas las delegaciones con nota, por nota. */
+function generalRanking(committees: PublicCommittee[]): PublicResultsDocument['general_ranking'] {
+  const rows = committees
+    .flatMap((c) => (c.ranking ?? []).map((r) => ({ c, r })))
+    .filter(({ r }) => r.score !== null)
+    .sort((a, b) => b.r.score! - a.r.score! || a.c.name.localeCompare(b.c.name));
+  const out: NonNullable<PublicResultsDocument['general_ranking']> = [];
+  rows.forEach(({ c, r }, i) => {
+    const tied = i > 0 && rows[i - 1].r.score === r.score;
+    out.push({ ...r, position: tied ? out[i - 1].position : i + 1, committee: { slug: c.slug, name: c.name, acronym: c.acronym } });
+  });
+  return out;
 }
 
 const SD_2026 = event('sd-mun-2026', 'SD MUN 2026', 'Hotel Barceló', '2026-11-11', '2026-11-15', '2026-11-15T22:40:00Z', [

@@ -9,9 +9,24 @@ import styles from './public.module.css';
 
 const PAGE_SIZE = 10;
 
-/** Ranking del comité (2e). Sin `showScores` se oculta la columna de puntaje. */
-export function RankingTable({ locale, ranking, showScores }: { locale: Locale; ranking: RankingRowView[]; showScores: boolean }) {
-  const t = getDictionary(locale).ranking;
+/**
+ * Ranking del comité (2e). Sin `showScores` se oculta la columna de puntaje.
+ * Con `general`, es el ranking general del evento: cada fila indica su comité.
+ */
+export function RankingTable({
+  locale,
+  ranking,
+  showScores,
+  general = false,
+}: {
+  locale: Locale;
+  ranking: RankingRowView[];
+  showScores: boolean;
+  general?: boolean;
+}) {
+  const dictionary = getDictionary(locale);
+  const t = general ? { ...dictionary.ranking, ...dictionary.generalRanking } : dictionary.ranking;
+  const titleId = general ? 'general-ranking-title' : 'ranking-title';
   const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
   const q = normalizeSearch(query);
@@ -29,9 +44,9 @@ export function RankingTable({ locale, ranking, showScores }: { locale: Locale; 
   const count = ranking.length;
 
   return (
-    <section className={styles.section} aria-labelledby="ranking-title">
+    <section className={styles.section} aria-labelledby={titleId}>
       <div className={styles.rankingHead}>
-        <h2 id="ranking-title" className={styles.eyebrow} style={{ margin: 0 }}>
+        <h2 id={titleId} className={styles.eyebrow} style={{ margin: 0 }}>
           <span className={styles.desktopOnly}>
             {t.title(count)}
           </span>
@@ -46,7 +61,7 @@ export function RankingTable({ locale, ranking, showScores }: { locale: Locale; 
           onChange={(e) => setQuery(e.target.value)}
         />
       </div>
-      <div className={`${styles.table} ${showScores ? '' : styles.tableNoScores}`} role="table" aria-labelledby="ranking-title">
+      <div className={`${styles.table} ${showScores ? '' : styles.tableNoScores}`} role="table" aria-labelledby={titleId}>
         <div className={`${styles.tableRow} ${styles.tableHeadRow}`} role="row">
           <span role="columnheader">{t.position}</span>
           <span role="columnheader">{t.delegation}</span>
@@ -61,7 +76,7 @@ export function RankingTable({ locale, ranking, showScores }: { locale: Locale; 
           const top = row.position <= 3;
           return (
             <div
-              key={`${row.position}-${row.delegation.name}`}
+              key={`${row.position}-${row.committee ?? ''}-${row.delegation.name}`}
               role="row"
               className={`${styles.tableRow} ${row.position === 1 ? styles.tableRowFirst : ''}`}
             >
@@ -80,7 +95,8 @@ export function RankingTable({ locale, ranking, showScores }: { locale: Locale; 
                 <span className={`${styles.delegationName} ${top ? styles.delegationNameTop : ''}`}>{row.delegation.name}</span>
               </span>
               <span role="cell" className={styles.delegatesCell}>
-                {row.delegates.join(' · ') || '—'}
+                {row.committee ? `${row.committee} — ` : ''}
+                {row.delegates.join(' · ') || (row.committee ? '' : '—')}
               </span>
               {showScores && (
                 <span

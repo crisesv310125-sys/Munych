@@ -36,6 +36,8 @@ export interface RankingRowView {
   delegation: DelegationView;
   delegates: string[];
   score: string | null;
+  /** Solo en el ranking general: siglas del comité de la delegación. */
+  committee?: string;
   /** Texto normalizado para el buscador. */
   search: string;
 }
@@ -120,6 +122,25 @@ export function committeeView(committee: PublicCommittee, locale: Locale): Commi
     ranking,
     search: normalizeSearch(searchParts.join(' ')),
   };
+}
+
+/** Ranking general del evento; null si no se publica (o el documento es anterior a él). */
+export function generalRankingView(doc: PublicResultsDocument, locale: Locale): RankingRowView[] | null {
+  return (
+    doc.general_ranking?.map((r) => {
+      const delegation = delegationView(r.delegation, locale);
+      return {
+        position: r.position,
+        delegation,
+        delegates: r.delegates,
+        score: r.score !== null ? r.score.toFixed(1) : null,
+        committee: r.committee.acronym,
+        search: normalizeSearch(
+          [delegation.name, delegation.code ?? '', r.committee.name, r.committee.acronym, ...r.delegates].join(' '),
+        ),
+      };
+    }) ?? null
+  );
 }
 
 /** Delegaciones del evento; null si el evento no publica el ranking (no se puede contar). */

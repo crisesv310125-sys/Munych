@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getEventDocument, getPublishedDocuments } from '../../../lib/data';
 import { getDictionary, type Locale } from '../../../lib/i18n';
-import { committeeView, delegationCount, eventView } from '../../../lib/view';
+import { committeeView, delegationCount, eventView, generalRankingView } from '../../../lib/view';
 import { SiteHeader } from '../../../components/SiteHeader';
 import { ShareActions } from '../../../components/ShareActions';
 import { EventCommittees } from '../../../components/EventCommittees';
+import { RankingTable } from '../../../components/RankingTable';
 import styles from '../../../components/public.module.css';
 
 // Export estático: una página por evento publicado en el momento del build (por cada idioma del layout).
@@ -40,6 +41,9 @@ export default async function EventPage({ params }: PageProps) {
     .map((c) => committeeView(c, locale))
     .sort((a, b) => Number(a.pending) - Number(b.pending));
   const delegations = delegationCount(committees);
+  // Decisión de diseño (2026-11-07): ranking general del evento debajo de los comités,
+  // con la misma tabla del ranking por comité. Solo si se publica el ranking.
+  const generalRanking = generalRankingView(doc, locale);
 
   return (
     <main className={styles.page}>
@@ -81,6 +85,9 @@ export default async function EventPage({ params }: PageProps) {
           eventHref={`/${locale}/${eventSlug}`}
           publishedLabel={event.publishedNumeric}
         />
+        {generalRanking && generalRanking.length > 0 && (
+          <RankingTable locale={locale} ranking={generalRanking} showScores={event.showScores} general />
+        )}
       </div>
     </main>
   );

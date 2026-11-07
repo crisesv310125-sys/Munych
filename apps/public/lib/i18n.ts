@@ -85,6 +85,13 @@ const es = {
     showAllCount: (n: number) => `Ver las ${n} ▾`,
     showAll: 'Ver todas ▾',
   },
+  generalRanking: {
+    title: (n: number) => `Ranking general · ${n} ${plural(n, 'delegación', 'delegaciones')}`,
+    titleShort: (n: number) => `Ranking general · ${n} deleg.`,
+    searchPlaceholder: 'Buscar país, comité o delegado…',
+    searchLabel: 'Buscar país, comité o delegado',
+    delegates: 'COMITÉ — DELEGADO(S)',
+  },
   share: {
     share: 'Compartir',
     pdf: 'Descargar PDF',
@@ -93,7 +100,7 @@ const es = {
   },
   awards: {
     best_delegate: 'Mejor delegado',
-    outstanding_delegate: 'Delegado sobresaliente',
+    outstanding_delegate: 'Delegado distinguido',
     honorable_mention: 'Mención honorífica',
     verbal_commendation: 'Mención verbal',
   } as Record<string, string>,
@@ -172,6 +179,13 @@ const en: Dictionary = {
     missingScore: '— Score unavailable (incomplete grading)',
     showAllCount: (n: number) => `Show all ${n} ▾`,
     showAll: 'Show all ▾',
+  },
+  generalRanking: {
+    title: (n: number) => `Overall ranking · ${n} ${plural(n, 'delegation', 'delegations')}`,
+    titleShort: (n: number) => `Overall ranking · ${n} deleg.`,
+    searchPlaceholder: 'Search country, committee or delegate…',
+    searchLabel: 'Search country, committee or delegate',
+    delegates: 'COMMITTEE — DELEGATE(S)',
   },
   share: {
     share: 'Share',

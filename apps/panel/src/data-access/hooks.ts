@@ -307,6 +307,14 @@ export function useRanking(committeeId: string | undefined) {
   return useQuery({ queryKey: queryKeys.ranking(committeeId ?? ''), queryFn: () => api.getRanking(committeeId!), enabled: !!committeeId });
 }
 
+export function useSetTiebreak(committeeId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (delegationIds: string[]) => api.setTiebreak(committeeId, delegationIds),
+    onSuccess: (data) => qc.setQueryData(queryKeys.ranking(committeeId), data),
+  });
+}
+
 export function useAwards(committeeId: string | undefined) {
   return useQuery({ queryKey: queryKeys.awards(committeeId ?? ''), queryFn: () => api.getAwards(committeeId!), enabled: !!committeeId });
 }

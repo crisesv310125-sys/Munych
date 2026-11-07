@@ -104,7 +104,9 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | GET | `/committees/{committee_id}/ranking` | admin | `get_committee_ranking` | — | `RankingOut` |
 | GET | `/committees/{committee_id}/awards` | admin | `list_committee_awards` | — | `AwardsOut` |
 | PUT | `/committees/{committee_id}/awards` | admin | `replace_committee_awards` | `AwardIn[]` | `AwardsOut` |
-| GET | `/events/{event_id}/export.xlsx` | admin | `export_event_xlsx` | — | archivo `.xlsx` |
+| PUT | `/committees/{committee_id}/tiebreak` | admin | `set_committee_tiebreak` | `TiebreakIn` | `RankingOut` |
+| GET | `/events/{event_id}/export.xlsx` | admin | `export_event_xlsx` | query `ExportOptions` | archivo `.xlsx` |
+| GET | `/events/{event_id}/export.csv` | admin | `export_event_csv` | query `ExportOptions` | archivo `.csv` |
 | **Publicación** | | | | | |
 | GET | `/events/{event_id}/publication-settings` | admin | `get_publication_settings` | — | `PublicationSettings` |
 | PUT | `/events/{event_id}/publication-settings` | admin | `update_publication_settings` | `PublicationSettings` | `PublicationSettings` |
@@ -126,7 +128,7 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | GET | `/vote/ballot` | token de delegado | `get_ballot` | — | `BallotOut` |
 | POST | `/vote/ballot` | token de delegado | `submit_peer_vote` | `PeerVotesIn` | `BallotOut` |
 
-Total: **57 operaciones**.
+Total: **59 operaciones**.
 
 ---
 
@@ -222,13 +224,17 @@ Total: **57 operaciones**.
 ### 3.7 bis Votación de delegados (`voting`)
 
 - Los delegados **no tienen cuenta**: el admin genera un token por delegado (`POST /events/{id}/voter-tokens` con `link_base`, p. ej. `https://<panel>/#/votar/`) y lo reparte como enlace o QR. El token, el enlace y el QR (SVG) **solo** vienen en esa respuesta; en la BD queda su SHA-256. Sin `delegate_ids` genera para quien no tenga acceso vigente; con `delegate_ids` los regenera y revoca los anteriores. `409 CONFLICT` si en el tipo de evento no votan delegados.
-- **Voto entre pares por premios** (desde 2026-11-06): cada delegado vota **una sola vez por comité, al final**, eligiendo Mejor delegado, Delegado distinguido y Mención de honor. Las delegaciones deben ser distintas y ninguna la propia; si el comité tiene menos de 3 candidatas, solo se votan los primeros N premios (`awards`).
+- **Código corto de respaldo** (2026-11-07): cada acceso trae además `code` (10 caracteres sin 0/O/1/I/L, p. ej. `K7M2Q-9XH4T`, ~50 bits) para escribirlo a mano si la cámara no lee el QR. Sirve igual que el token en `Authorization: Bearer` (se aceptan minúsculas, espacios y guiones). Como el token, solo llega al generarlo y en la BD queda su hash. Los accesos generados antes no tienen código: hay que regenerarlos.
+- **Voto entre pares por premios** (desde 2026-11-06): cada delegado vota **una sola vez por comité, al final**, eligiendo Mejor delegado, Delegado distinguido y Mención honorífica (los mismos nombres que los premios oficiales). Las delegaciones deben ser distintas y ninguna la propia; si el comité tiene menos de 3 candidatas, solo se votan los primeros N premios (`awards`).
 - **Ventana por comité** (admin): `PUT /committees/{id}/peer-vote` `{ opens_at?, closes_at? }` abre (o programa) la votación; `opens_at` null = ahora y `closes_at` null = abierta hasta cerrarla. Reabrir quita el cierre anterior y conserva los votos. `POST /committees/{id}/peer-vote/close` la cierra ya. **Abrir una sesión** (`POST /committees/{id}/sessions/{n}/open`) también abre el voto entre pares del comité en la misma transacción, salvo que ya esté abierto (se respeta su cierre programado), que el evento esté cerrado o que en el tipo de evento no voten delegados; si estaba programado o cerrado, queda abierto desde ahora y sin cierre. `GET /events/{id}/peer-vote` da por comité `status`, fechas, `voters` (delegados) y `submitted` (cuántos ya votaron). Estado (`PeerVoteStatus`): `not_scheduled` (sin apertura) · `scheduled` (aún no llega `opens_at`, o el evento no está `active`) · `open` · `closed` (pasó `closes_at` o el evento se cerró). `409 CONFLICT` si en el tipo de evento no votan delegados; `409 EVENT_CLOSED` con el evento cerrado; `422 VALIDATION_ERROR` si el cierre no es posterior a la apertura y a ahora.
 - **`GET /vote/ballot`** (`Authorization: Bearer <token>`): delegación propia, comité, sesiones (`sessions_total`, `sessions_closed`), ventana (`peer_vote`), peso del rol delegados (`weight`, %), premios a votar, delegaciones candidatas (todas menos la suya) y, si ya votó, `picks`, `submitted_at` y `receipt` (comprobante legible `SIGLAS-XXXX-XX`). El panel la consulta cada 20 s.
 - **`POST /vote/ballot`** `{ picks: [{ award_type, delegation_id }] }`: un pick por premio de `awards`. Errores: `401 UNAUTHORIZED` (token inválido, revocado o vencido), `409 SESSION_CLOSED` (la votación aún no abre o ya cerró), `409 EVENT_CLOSED`, `409 CONFLICT` (ya votó: **no se puede cambiar**), `422 VALIDATION_ERROR` (faltan premios o delegación repetida), `403 FORBIDDEN` (su propia delegación), `404 NOT_FOUND` (delegación de otro comité).
 - Límite por token (no por IP, porque comparten el wifi): 20 GET/min y 30 POST/min.
 - **`PUT /committees/{committee_id}/awards`**: array JSON `[{ award_type, delegation_id, position }]` (`position` vale 1 por defecto) que reemplaza los premios. Superar un cupo **no bloquea**: solo añade avisos a `quota_warnings`.
 - **`GET /events/{event_id}/export.xlsx`**: libro de Excel con una hoja **Resumen**, una hoja de ranking por comité y una hoja **Detalle** (delegado × sesión × juez × criterio). Las fechas van en la zona horaria del evento.
+- **`GET /events/{event_id}/export.csv`** (2026-11-07): el ranking de todos los comités en una sola tabla (UTF-8 con BOM, comas, punto decimal): comité, siglas, posición, empate, delegación, institución, delegados, nota (y nota por rol si el evento tiene varios), premios y avisos. Sin detalle por juez.
+- **Opciones de exportación** (query, ambos formatos; por defecto, todo): `committee_id` (repetible; sin él, todos los comités), `include_scores` (nota), `include_details` (hoja Detalle, solo XLSX), `include_comments` (comentarios de los jueces en el Detalle), `include_judge_names` (si es `false`, el Detalle dice «Juez 1», «Juez 2»… por comité). El panel los manda desde la pantalla Exportar.
+- **Desempate manual** (2026-11-07): `PUT /committees/{id}/tiebreak` `{ delegation_ids }` guarda el orden que decide el admin para las delegaciones que **siguen empatadas** tras el desempate automático. Un empate se resuelve solo si el orden incluye a **todas** sus delegaciones; las demás ids se ignoran; lista vacía = quitar los desempates. Las delegaciones desempatadas llevan `tied: false` y `manual_tiebreak: true`. Se aplica en el ranking, la instantánea, la página pública y los exports. `409 EVENT_CLOSED` con el evento cerrado (hay que desempatar antes de cerrar); `404 NOT_FOUND` si alguna delegación es de otro comité.
 
 ### 3.8 Publicación (`results`)
 
@@ -449,6 +455,12 @@ type RankingEntry = {
     delegate_id: uuid; session_number: number | null; judge_id: uuid | null
   }[]
   role_scores: Partial<Record<VoterRole, number | null>>   // 0–100; null = rol sin votos
+  manual_tiebreak: boolean                        // su lugar lo decidió el admin en un empate
+}
+type TiebreakIn = { delegation_ids: uuid[] /* ≤ 500; [] = quitar desempates */ }
+type ExportOptions = {                            // query de export.xlsx / export.csv
+  committee_id?: uuid[]; include_scores?: boolean; include_details?: boolean
+  include_comments?: boolean; include_judge_names?: boolean   // todos = true por defecto
 }
 type VoterRole  = "judge" | "chair" | "staff" | "delegate"
 type RankingOut = {
@@ -469,6 +481,7 @@ type GeneratedTokenOut = {
   delegate_id: uuid; full_name: string; country_code: string | null; character_name: string | null
   committee_name: string; committee_acronym: string
   token: string; url: string; qr_svg: string; expires_at: datetime
+  code: string   // código corto de respaldo, p. ej. "K7M2Q-9XH4T": sirve igual que el token
 }
 type RevokeTokensIn = { delegate_ids: uuid[] }
 type PeerAwardType  = "best_delegate" | "outstanding_delegate" | "honorable_mention"  // 3 / 2 / 1 puntos
@@ -481,7 +494,8 @@ type CommitteePeerVoteOut = PeerVoteWindowOut & {
 }
 type BallotOut = {
   voter_name: string; own_delegation: BallotDelegation
-  event_name: string; event_status: EventStatus; committee_name: string; committee_acronym: string
+  event_name: string; event_slug: string; event_status: EventStatus
+  committee_name: string; committee_acronym: string
   sessions_total: number; sessions_closed: number
   peer_vote: PeerVoteWindowOut
   weight: number                                   // % del rol delegados en el puntaje final
@@ -522,6 +536,10 @@ type PublicDocument = {
     ranking: { position: number; delegation: PublicDelegation
                delegates: string[]; score: number | null }[] | null
   }[]
+  // Ranking general del evento (2026-11-07): todas las delegaciones con nota, de mayor a menor;
+  // notas iguales comparten lugar. null si show_ranking = false.
+  general_ranking: { position: number; committee: { slug: string; name: string; acronym: string }
+                     delegation: PublicDelegation; delegates: string[]; score: number | null }[] | null
   published_at: datetime
   version: number
 }
@@ -532,7 +550,7 @@ type UnpublishOut = { revalidated: boolean }
 ```
 
 Reglas de privacidad del documento público:
-- `ranking` vale `null` si `show_ranking = false`.
+- `ranking` y `general_ranking` valen `null` si `show_ranking = false`.
 - `score` vale `null` salvo que `show_scores = true`.
 - `institution` vale `null` si `show_institution = false`.
 - Con `name_format = hidden`, `delegates` es `[]`.
@@ -653,6 +671,7 @@ El auth hook lee esta tabla para añadir el claim `app_role` al JWT.
 | `award_quotas` | jsonb | `{"best_delegate":1,"outstanding_delegate":2,...}` |
 | `peer_vote_opens_at` | timestamptz \| null | apertura del voto entre pares; null = sin programar |
 | `peer_vote_closes_at` | timestamptz \| null | cierre; null = abierto hasta que el admin lo cierre · `> peer_vote_opens_at` |
+| `tiebreak_order` | uuid[] | desempate manual: delegaciones en el orden que decidió el admin · `= '{}'` |
 
 #### `app.delegations`
 | Columna | Tipo | Notas |
@@ -710,6 +729,7 @@ Accesos de los delegados (sin cuenta). El token en claro nunca se guarda.
 | `delegate_id` | uuid → `delegates` | `on delete cascade` · un solo token vigente (`revoked_at is null`) por delegado |
 | `event_id` | uuid → `events` | |
 | `token_hash` | text | SHA-256 en hexadecimal, **único** |
+| `code_hash` | text \| null | SHA-256 de `"code:"` + código corto normalizado, **único**; null en accesos de antes del 2026-11-07 |
 | `expires_at` | timestamptz | `ends_on` + 2 días |
 | `revoked_at`, `last_used_at` | timestamptz \| null | |
 | `created_by` | uuid \| null → `auth.users` | |

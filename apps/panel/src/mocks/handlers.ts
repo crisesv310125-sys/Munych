@@ -175,13 +175,24 @@ interface MockVoterToken {
 }
 /** token en claro → acceso (en el backend solo se guarda el hash). */
 const voterTokens = new Map<string, MockVoterToken>();
+/** Código corto de respaldo (normalizado, sin guion) → token. En el backend se guarda su hash. */
+const voterCodes = new Map<string, string>();
+const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+function newVoterCode(): string {
+  const raw = Array.from(crypto.getRandomValues(new Uint32Array(10)), (n) => CODE_ALPHABET[n % CODE_ALPHABET.length]).join('');
+  return `${raw.slice(0, 5)}-${raw.slice(5)}`;
+}
+/** El token del header, o el que corresponde si mandaron el código corto. */
+function tokenFromCredential(credential: string): string {
+  return voterCodes.get(credential.toUpperCase().replace(/[^A-Z0-9]/g, '')) ?? credential;
+}
 
 // Voto entre pares (2026-11-06): una boleta por delegado con Mejor delegado, Delegado
-// distinguido y Mención de honor (3/2/1 puntos). Como app.peer_votes del backend.
+// distinguido y Mención honorífica (3/2/1 puntos). Como app.peer_votes del backend.
 const PEER_AWARDS: Array<{ award_type: PeerAwardType; label: string; points: number }> = [
   { award_type: 'best_delegate', label: 'Mejor delegado', points: 3 },
   { award_type: 'outstanding_delegate', label: 'Delegado distinguido', points: 2 },
-  { award_type: 'honorable_mention', label: 'Mención de honor', points: 1 },
+  { award_type: 'honorable_mention', label: 'Mención honorífica', points: 1 },
 ];
 const PEER_MAX_POINTS = 3;
 interface MockPeerVote {
@@ -350,12 +361,44 @@ function computeRanking(committeeId: string): RankingEntry[] {
       role_scores: Object.keys(weights).length > 1 ? entry.roleScores : { judge: entry.score },
     });
   });
-  return result;
+  return applyManualTiebreak(result, tiebreakOrders.get(committeeId) ?? []);
+}
+
+function rankingOut(committeeId: string) {
+  const eventType = eventOfCommittee(findCommittee(committeeId)!).event_type;
+  return {
+    items: computeRanking(committeeId),
+    quota_warnings: awardsOut(committeeId).quota_warnings,
+    event_type: eventType,
+    role_weights: ROLE_WEIGHTS[eventType],
+  };
+}
+
+/** Desempate manual del admin (como results.domain.ranking.apply_manual_tiebreak). */
+const tiebreakOrders = new Map<string, string[]>();
+function applyManualTiebreak(entries: RankingEntry[], order: string[]): RankingEntry[] {
+  if (order.length === 0) return entries;
+  const out: RankingEntry[] = [];
+  for (let i = 0; i < entries.length; ) {
+    let group = [entries[i]];
+    while (i + group.length < entries.length && entries[i + group.length].tied && entries[i + group.length].position === entries[i].position) {
+      group.push(entries[i + group.length]);
+    }
+    const start = entries[i].position;
+    if (group.length > 1 && group[0].score !== null && group.every((e) => order.includes(e.delegation_id))) {
+      group = [...group]
+        .sort((a, b) => order.indexOf(a.delegation_id) - order.indexOf(b.delegation_id))
+        .map((e, k) => ({ ...e, position: start + k, tied: false, manual_tiebreak: true }));
+    }
+    out.push(...group);
+    i += group.length;
+  }
+  return out;
 }
 
 const AWARD_LABEL: Record<AwardType, string> = {
   best_delegate: 'Mejor delegado',
-  outstanding_delegate: 'Delegado sobresaliente',
+  outstanding_delegate: 'Delegado distinguido',
   honorable_mention: 'Mención honorífica',
   verbal_commendation: 'Mención verbal',
 };
@@ -829,13 +872,17 @@ export const handlers = [
   http.get(`${BASE}/committees/:committeeId/ranking`, ({ params }) => {
     const committeeId = String(params.committeeId);
     if (!findCommittee(committeeId)) return notFound();
-    const eventType = eventOfCommittee(findCommittee(committeeId)!).event_type;
-    return HttpResponse.json({
-      items: computeRanking(committeeId),
-      quota_warnings: awardsOut(committeeId).quota_warnings,
-      event_type: eventType,
-      role_weights: ROLE_WEIGHTS[eventType],
-    });
+    return HttpResponse.json(rankingOut(committeeId));
+  }),
+  http.put(`${BASE}/committees/:committeeId/tiebreak`, async ({ params, request }) => {
+    const committee = findCommittee(params.committeeId);
+    if (!committee) return notFound('Comité no encontrado');
+    if (isEventClosed(committee.event_id)) return problem(409, 'EVENT_CLOSED', 'El evento está cerrado');
+    const { delegation_ids } = (await request.json()) as { delegation_ids: string[] };
+    const known = new Set(committeeDelegations(committee.id).map((d) => d.id));
+    if (delegation_ids.some((id) => !known.has(id))) return notFound('Alguna delegación no pertenece a este comité');
+    tiebreakOrders.set(committee.id, [...new Set(delegation_ids)]);
+    return HttpResponse.json(rankingOut(committee.id));
   }),
   http.get(`${BASE}/committees/:committeeId/awards`, ({ params }) => {
     if (!findCommittee(params.committeeId)) return notFound();
@@ -856,6 +903,33 @@ export const handlers = [
     if (!findEvent(params.eventId)) return notFound();
     return new HttpResponse(new Blob(['mock-xlsx']), {
       headers: { 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+    });
+  }),
+  http.get(`${BASE}/events/:eventId/export.csv`, ({ params, request }) => {
+    if (!findEvent(params.eventId)) return notFound();
+    const url = new URL(request.url);
+    const wanted = url.searchParams.getAll('committee_id');
+    const withScores = url.searchParams.get('include_scores') !== 'false';
+    const cell = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const lines = [['Comité', 'Siglas', 'Posición', 'Empate', 'Delegación', 'Institución', 'Delegados', ...(withScores ? ['Nota'] : [])]];
+    committees
+      .filter((c) => c.event_id === params.eventId && (wanted.length === 0 || wanted.includes(c.id)))
+      .forEach((c) =>
+        computeRanking(c.id).forEach((r) =>
+          lines.push([
+            c.name,
+            c.acronym,
+            String(r.position),
+            r.tied ? 'Sí' : '',
+            r.country_code ?? r.character_name ?? '',
+            r.institution ?? '',
+            r.delegates.map((d) => d.full_name).join(', '),
+            ...(withScores ? [r.score === null ? '' : r.score.toFixed(2)] : []),
+          ]),
+        ),
+      );
+    return new HttpResponse(`﻿${lines.map((l) => l.map(cell).join(',')).join('\r\n')}`, {
+      headers: { 'Content-Type': 'text/csv; charset=utf-8' },
     });
   }),
 
@@ -1068,7 +1142,9 @@ export const handlers = [
         if (t.delegate_id === p.id && !t.revoked_at) t.revoked_at = issued;
       });
       const token = crypto.randomUUID().replace(/-/g, '');
+      const code = newVoterCode();
       voterTokens.set(token, { delegate_id: p.id, event_id: event.id, issued_at: issued, revoked_at: null, last_used_at: null });
+      voterCodes.set(code.replace('-', ''), token);
       const url = `${body.link_base}${token}`;
       return {
         delegate_id: p.id,
@@ -1078,6 +1154,7 @@ export const handlers = [
         committee_name: c.name,
         committee_acronym: c.acronym,
         token,
+        code,
         url,
         // En los mocks no se genera un QR real: un recuadro con el texto basta para la vista previa.
         qr_svg: `<svg xmlns="http://www.w3.org/2000/svg" width="116" height="116"><rect width="116" height="116" fill="#fff" stroke="#000"/><text x="58" y="62" font-size="10" text-anchor="middle">QR (mock)</text></svg>`,
@@ -1146,7 +1223,7 @@ export const handlers = [
   // ---- Boleta del delegado (voto entre pares) ----
   ...(['get', 'post'] as const).map((method) =>
     http[method](`${BASE}/vote/ballot`, async ({ request }) => {
-      const token = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
+      const token = tokenFromCredential(request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '');
       const access = voterTokens.get(token);
       if (!access || access.revoked_at) return problem(401, 'UNAUTHORIZED', 'Tu acceso no es válido o ya venció. Pide uno nuevo al staff del evento');
       access.last_used_at = now();
@@ -1200,6 +1277,7 @@ export const handlers = [
         voter_name: found.delegate.full_name,
         own_delegation: { delegation_id: found.delegation.id, country_code: found.delegation.country_code, character_name: found.delegation.character_name },
         event_name: event.name,
+        event_slug: event.slug,
         event_status: event.status,
         committee_name: committee.name,
         committee_acronym: committee.acronym,

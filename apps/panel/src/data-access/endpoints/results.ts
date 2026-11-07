@@ -5,6 +5,17 @@ export function getRanking(committeeId: string): Promise<RankingResponse> {
   return apiFetch<RankingResponse>(`/committees/${committeeId}/ranking`);
 }
 
+/**
+ * Desempate manual: orden de las delegaciones que siguen empatadas. Un empate se resuelve
+ * solo si el orden incluye a todas sus delegaciones; lista vacía = quitar los desempates.
+ */
+export function setTiebreak(committeeId: string, delegationIds: string[]): Promise<RankingResponse> {
+  return apiFetch<RankingResponse>(`/committees/${committeeId}/tiebreak`, {
+    method: 'PUT',
+    body: { delegation_ids: delegationIds },
+  });
+}
+
 export function getAwards(committeeId: string): Promise<AwardsResponse> {
   return apiFetch<AwardsResponse>(`/committees/${committeeId}/awards`);
 }

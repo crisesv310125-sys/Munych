@@ -435,6 +435,8 @@ export interface RankingEntry {
   incomplete_flags: IncompleteFlag[];
   /** Nota 0–100 por rol que vota; null = nadie de ese rol calificó (su peso se reparte). */
   role_scores: Partial<Record<VoterRole, number | null>>;
+  /** Su posición la decidió el admin al resolver un empate (PUT /committees/{id}/tiebreak). */
+  manual_tiebreak?: boolean;
 }
 
 /** (RankingOut) */
@@ -484,6 +486,8 @@ export interface GeneratedVoterToken {
   committee_name: string;
   committee_acronym: string;
   token: string;
+  /** Código corto de respaldo (p. ej. K7M2Q-9XH4T): sirve igual que el token, para escribirlo a mano. */
+  code: string;
   url: string;
   qr_svg: string;
   expires_at: string;
@@ -542,6 +546,8 @@ export interface Ballot {
   voter_name: string;
   own_delegation: BallotDelegation;
   event_name: string;
+  /** Para enlazar a los resultados públicos del evento. */
+  event_slug: string;
   event_status: EventStatus;
   committee_name: string;
   committee_acronym: string;

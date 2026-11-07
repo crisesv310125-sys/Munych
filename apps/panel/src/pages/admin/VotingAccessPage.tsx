@@ -173,7 +173,7 @@ export function VotingAccessPage() {
             <span className={styles.panelTitle}>Voto entre pares por comité</span>
           </div>
           <div style={{ padding: '12px 20px 0', fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
-            Los delegados eligen Mejor delegado, Delegado distinguido y Mención de honor (3, 2 y 1 puntos), una sola vez y sin
+            Los delegados eligen Mejor delegado, Delegado distinguido y Mención honorífica (3, 2 y 1 puntos), una sola vez y sin
             votar por su propia delegación. La votación se abre sola al abrir una sesión del comité; también puedes abrirla o
             cerrarla aquí.
           </div>

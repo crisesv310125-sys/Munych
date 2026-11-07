@@ -52,7 +52,14 @@ export function ExportPage() {
     setExportError('');
     setGenerating(true);
     try {
-      const { blob, filename } = await exportEventFile(eventId, event?.slug);
+      // PDF aún no existe (espera el diseño de Héctor): se descarga el XLSX.
+      const { blob, filename } = await exportEventFile(eventId, event?.slug, format === 'CSV' ? 'csv' : 'xlsx', {
+        committeeIds: selectedCommittees.length === list.length ? undefined : selectedCommittees.map((c) => c.id),
+        includeScores: content.total,
+        includeDetails: content.breakdown,
+        includeComments: content.comments,
+        includeJudgeNames: content.judgeNames,
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -146,9 +153,15 @@ export function ExportPage() {
                 );
               })}
             </div>
-            {format !== 'XLSX' && (
+            {format === 'PDF' && (
               <span style={{ fontSize: 11, color: 'var(--muted)' }}>
-                Por ahora el backend solo genera XLSX; se descargará ese formato. // TODO(cliente): confirmar si PDF/CSV están en el alcance.
+                El PDF (reporte y diplomas) llegará con el diseño de MUNYCH; por ahora se descargará el XLSX.
+              </span>
+            )}
+            {format === 'CSV' && (
+              <span style={{ fontSize: 11, color: 'var(--muted)' }}>
+                El CSV trae el ranking de los comités elegidos en una sola tabla; el desglose, los comentarios y los nombres de
+                jueces solo van en el XLSX.
               </span>
             )}
           </div>

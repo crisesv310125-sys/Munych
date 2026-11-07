@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getBallot, submitPeerVote } from '../../data-access/endpoints';
@@ -11,13 +11,15 @@ import s from './VotePage.module.css';
 /**
  * Decisión de diseño (2026-11-06): boleta del delegado, pública (sin login de Supabase),
  * según `handoff-votacion-delegados` (pantallas 3a, 3c–3g). Los delegados ya no usan la
- * rúbrica: una sola vez por comité eligen Mejor delegado, Delegado distinguido y Mención
+ * rúbrica: una sola vez por comité eligen Mejor delegado, Delegado distinguido y Mención honorífica
  * de honor (3 / 2 / 1 puntos). El delegado entra con el enlace o QR personal
  * `#/votar/<token>`; el token se guarda en este navegador y se quita de la URL.
  */
 
 const TOKEN_KEY = 'munych.voter-token';
 const POLL_MS = 20_000;
+/** Raíz de la página pública de resultados (p. ej. https://resultados.<dominio>); vacía = sin enlace. */
+const PUBLIC_RESULTS_URL = (import.meta.env.VITE_PUBLIC_RESULTS_URL ?? '').replace(/\/$/, '');
 const WIDE_QUERY = '(min-width: 960px)';
 /** En escritorio, cuántas delegaciones se ven antes de «Mostrar las N». */
 const DESK_VISIBLE = 12;
@@ -25,7 +27,7 @@ const DESK_VISIBLE = 12;
 const QUESTIONS: Record<PeerAwardType, string> = {
   best_delegate: '¿Qué delegación tuvo el mejor desempeño?',
   outstanding_delegate: '¿Qué delegación merece el premio a Delegado distinguido?',
-  honorable_mention: '¿Qué delegación merece una Mención de honor?',
+  honorable_mention: '¿Qué delegación merece una Mención honorífica?',
 };
 
 function readStoredToken(): string {
@@ -115,6 +117,19 @@ function useWide(): boolean {
 
 // ---- Piezas comunes ----
 
+/** Olvida el acceso en este teléfono (dispositivos compartidos). El QR o el código siguen sirviendo. */
+const ExitContext = createContext<(() => void) | null>(null);
+
+function ExitButton() {
+  const exit = useContext(ExitContext);
+  if (!exit) return null;
+  return (
+    <button type="button" className={s.exitBtn} onClick={exit} aria-label="Salir: olvidar mi acceso en este teléfono">
+      Salir
+    </button>
+  );
+}
+
 function Page({ dark, children }: { dark?: boolean; children: ReactNode }) {
   return <div className={`${s.page} ${dark ? s.dark : s.light}`}>{children}</div>;
 }
@@ -126,7 +141,17 @@ function StateTop({ ballot, dark }: { ballot: Ballot; dark?: boolean }) {
       <span className={s.identityLine}>
         {delegationName(ballot.own_delegation)} · {ballot.committee_name}
       </span>
+      <ExitButton />
     </div>
+  );
+}
+
+function PublicResultsLink({ ballot }: { ballot: Ballot }) {
+  if (!PUBLIC_RESULTS_URL) return null;
+  return (
+    <a className={s.btnOutline} href={`${PUBLIC_RESULTS_URL}/es/${ballot.event_slug}`} target="_blank" rel="noreferrer">
+      Ver resultados públicos
+    </a>
   );
 }
 
@@ -160,9 +185,25 @@ function SessionsBar({ total, closed }: { total: number; closed: number }) {
 
 // ---- Pantallas ----
 
+const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+
+/**
+ * Lo que se manda como credencial: el código corto de respaldo normalizado (10 caracteres,
+ * sin guiones) o el token largo del enlace. Vacío si no parece ninguno de los dos.
+ */
+function credentialFrom(input: string): string {
+  const value = input.trim();
+  const code = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length === 10 && [...code].every((c) => CODE_ALPHABET.includes(c))) return code;
+  // Si pegan el enlace completo, el token es lo que va después de /votar/.
+  const token = value.split('/votar/').pop() ?? '';
+  return /^[A-Za-z0-9_-]{20,64}$/.test(token) ? token : '';
+}
+
 /** Entrada con código cuando no hay token (o el guardado ya no sirve). */
 function CodeEntry({ message, onSubmit }: { message?: string; onSubmit: (token: string) => void }) {
   const [code, setCode] = useState('');
+  const credential = credentialFrom(code);
   return (
     <Page dark>
       <div className={s.column}>
@@ -170,13 +211,13 @@ function CodeEntry({ message, onSubmit }: { message?: string; onSubmit: (token: 
           className={s.stateMain}
           onSubmit={(e) => {
             e.preventDefault();
-            if (code.length >= 20) onSubmit(code);
+            if (credential) onSubmit(credential);
           }}
         >
           <span className={s.eyebrowGold}>Voto entre pares</span>
           <h1 className={s.stateTitle}>Entra a tu boleta.</h1>
           <p className={s.body}>
-            Escanea el QR de tu gafete o abre el enlace que te dio el staff. Si tienes el código, pégalo aquí.
+            Escanea el QR de tu gafete. Si la cámara no lo lee, escribe aquí el código que viene debajo del QR.
           </p>
           {message && (
             <p className={s.errorDark} role="alert">
@@ -191,13 +232,13 @@ function CodeEntry({ message, onSubmit }: { message?: string; onSubmit: (token: 
             className={s.codeInput}
             style={{ marginTop: 0 }}
             value={code}
-            onChange={(e) => setCode(e.target.value.trim())}
+            onChange={(e) => setCode(e.target.value)}
             autoComplete="off"
-            autoCapitalize="off"
+            autoCapitalize="characters"
             spellCheck={false}
-            placeholder="Pega tu código"
+            placeholder="K7M2Q-9XH4T"
           />
-          <button type="submit" className={s.btnGold} disabled={code.length < 20}>
+          <button type="submit" className={s.btnGold} disabled={!credential}>
             Entrar
           </button>
         </form>
@@ -300,6 +341,11 @@ function Closed({ ballot }: { ballot: Ballot }) {
           </p>
           <div className={s.callout}>¿Un problema técnico? Avisa a la mesa de tu comité.</div>
         </div>
+        {PUBLIC_RESULTS_URL && (
+          <div className={s.stateFooter}>
+            <PublicResultsLink ballot={ballot} />
+          </div>
+        )}
       </div>
     </Page>
   );
@@ -328,7 +374,10 @@ function Submitted({ ballot }: { ballot: Ballot }) {
   return (
     <Page>
       <div className={s.column}>
-        <div className={s.done}>
+        <div className={s.exitRow}>
+          <ExitButton />
+        </div>
+        <div className={s.done} style={{ paddingTop: 24 }}>
           <span className={s.doneCheck} aria-hidden="true">
             ✓
           </span>
@@ -652,6 +701,7 @@ function BallotForm({ ballot, token }: { ballot: Ballot; token: string }) {
               <span className={s.chipOwn}>{delegationChip(ballot.own_delegation)}</span>
               {delegationName(ballot.own_delegation)}
             </span>
+            <ExitButton />
           </div>
         </header>
         <div className={s.desk}>
@@ -733,7 +783,10 @@ function BallotForm({ ballot, token }: { ballot: Ballot; token: string }) {
       <header className={s.ballotHeader}>
         <div className={s.headerRow}>
           <Identity ballot={ballot} />
-          {closesAt && <span className={s.badgeCountdown}>Cierra {hhmm(closesAt)}</span>}
+          <div className={s.topRight} style={{ gap: 8 }}>
+            {closesAt && <span className={s.badgeCountdown}>Cierra {hhmm(closesAt)}</span>}
+            <ExitButton />
+          </div>
         </div>
         <div className={s.questionBlock}>
           <div className={s.stepRow}>
@@ -830,12 +883,22 @@ export function VotePage() {
   }
   if (isLoading || !ballot) return <Loading failed={!!error} />;
 
-  // Con voto registrado siempre se muestra el comprobante, nunca «ya cerró».
-  if (ballot.picks.length > 0) return <Submitted ballot={ballot} />;
-  const status = ballot.event_status === 'closed' ? 'closed' : ballot.peer_vote.status;
-  if (status === 'closed') return <Closed ballot={ballot} />;
-  if (status !== 'open') return <NotOpen ballot={ballot} onElapsed={onElapsed} />;
-  if (ballot.awards.length === 0) return <NoCandidates ballot={ballot} />;
-  // La key reinicia la boleta en curso si cambian los premios (p. ej. otra delegación).
-  return <BallotForm key={ballot.awards.map((a) => a.award_type).join()} ballot={ballot} token={token} />;
+  function exit() {
+    qc.removeQueries({ queryKey: queryKeys.ballot(token) });
+    storeToken('');
+    setToken('');
+  }
+
+  return <ExitContext.Provider value={exit}>{screenFor(ballot)}</ExitContext.Provider>;
+
+  function screenFor(ballot: Ballot) {
+    // Con voto registrado siempre se muestra el comprobante, nunca «ya cerró».
+    if (ballot.picks.length > 0) return <Submitted ballot={ballot} />;
+    const status = ballot.event_status === 'closed' ? 'closed' : ballot.peer_vote.status;
+    if (status === 'closed') return <Closed ballot={ballot} />;
+    if (status !== 'open') return <NotOpen ballot={ballot} onElapsed={onElapsed} />;
+    if (ballot.awards.length === 0) return <NoCandidates ballot={ballot} />;
+    // La key reinicia la boleta en curso si cambian los premios (p. ej. otra delegación).
+    return <BallotForm key={ballot.awards.map((a) => a.award_type).join()} ballot={ballot} token={token} />;
+  }
 }

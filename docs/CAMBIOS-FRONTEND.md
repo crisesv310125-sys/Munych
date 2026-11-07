@@ -287,7 +287,23 @@ Los delegados **ya no usan la rúbrica**. Votan **una sola vez por comité, al f
 - **Abrir una sesión abre el voto entre pares** (petición del cliente, 2026-11-06): lo hace el backend al abrir la sesión (`VotingService.open_with_session`), así que funciona desde Comités y desde Sesiones. El panel refresca la ventana (`['peer-vote']`) tras abrir sesiones; MSW hace lo mismo. Textos de la boleta (3e) y de Votación ajustados.
 - **Sesiones** (petición del cliente, 2026-11-06): el select de arriba filtra por **comité** («Todos los comités» o uno) en vez de elegir el número de sesión; se quitaron «Abrir en todos» / «Cerrar en todos», y cada sesión conserva su Abrir/Cerrar. El subtítulo cuenta las sesiones abiertas de lo que se ve.
 
-`TODO(cliente)` de este hito: confirmar que no hay votos por rúbrica reales en `app.delegate_votes` antes de aplicar la migración (se borran); URL de la página pública para el CTA de 3f; ¿el delegado debe poder salir (cerrar sesión) en dispositivos compartidos?
+`TODO(cliente)` de este hito (13): confirmar que no hay votos por rúbrica reales en `app.delegate_votes` antes de aplicar la migración (se borran). _(La URL de la página pública y el «Salir» se resolvieron en el hito 14.)_
+
+---
+
+## Hito 14 — Lo que faltaba de la bóveda (2026-11-07)
+
+Comparación con la bóveda de Obsidian (`Documents\Proyectos`): todo lo programable menos los PDF de exportación (esperan el diseño de Héctor). La rúbrica por rol se descartó: basta con una rúbrica por comité, que ya existía. Backend: migraciones `20261107000100_voter_short_codes` y `20261107000200_manual_tiebreak`.
+
+- **Nombres de premios unificados** (los de la bóveda): Mejor delegado · Delegado distinguido · Mención honorífica · Mención verbal. Antes convivían «destacado», «sobresaliente», «distinguido» y «Mención de honor». Backend (`AWARD_LABELS`, y la boleta usa los mismos), panel, mocks y página pública (es; en sin cambios).
+- **Código corto de respaldo** para entrar a votar si la cámara no lee el QR: `GeneratedVoterToken.code` (p. ej. `K7M2Q-9XH4T`). Va impreso debajo de cada QR (con la dirección donde escribirlo) y en el CSV de accesos; la pantalla «Entra a tu boleta» lo acepta (o el enlace completo pegado). La hoja de QR y el CSV muestran el nombre del país en vez del código ISO. Los accesos generados antes no tienen código: hay que regenerarlos.
+- **Boleta**: botón **Salir** (patrón de 3h) en todas las pantallas con boleta cargada: olvida el acceso en ese teléfono (el QR o el código siguen sirviendo). **«Ver resultados públicos»** en 3f, si se configura `VITE_PUBLIC_RESULTS_URL` (enlaza a `<url>/es/<evento>`; `BallotOut.event_slug` nuevo). Sin la variable el botón no aparece.
+- **Exportar**: las opciones de la pantalla ya llegan al backend (comités elegidos; nota; desglose = hoja Detalle; comentarios; nombres de jueces o «Juez 1, 2…»). **CSV real** (`export.csv`): ranking plano de los comités elegidos, con nota por rol si el evento la tiene. PDF sigue descargando el XLSX, con aviso.
+- **Decisión de diseño — desempate manual** en Resultados: los empates que quedan tras el criterio de mayor peso los decide el admin (reunión del 2026-10-28). Al expandir una fila empatada, bloque «Desempate» con «Gana el desempate»; las ya desempatadas llevan la etiqueta «DESEMPATE MANUAL» y botones «Subir», «Bajar» y «Deshacer desempate». Solo con `Button` y `StatusBadge` existentes. Hay que desempatar **antes de cerrar** el evento (luego el ranking queda fijo).
+- **Decisión de diseño — ranking general** en la página del evento (`apps/public`), debajo de los comités: todas las delegaciones del evento por nota, con su comité, reutilizando `RankingTable` (columna «Comité — delegado(s)», buscador también por comité). Solo si la publicación tiene «Mostrar ranking»; puntajes solo con «Mostrar puntajes». Textos en es/en en `lib/i18n.ts`. Las notas de comités con rúbricas distintas se comparan tal cual (todas son 0–100).
+- **Sesiones**: el select de arriba filtra por comité (ver hito 13).
+
+`TODO(cliente)` de este hito: URL definitiva de la página pública para `VITE_PUBLIC_RESULTS_URL` (en `.env.production`); ¿el ranking general debe mezclar comités con rúbricas distintas o solo mostrarse por tipo de comité?
 
 ---
 

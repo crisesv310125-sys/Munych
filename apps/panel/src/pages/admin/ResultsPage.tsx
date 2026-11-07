@@ -17,6 +17,7 @@ import {
   usePublishEvent,
   useRanking,
   useSetAwards,
+  useSetTiebreak,
   useUnpublishEvent,
   useUpdatePublicationSettings,
 } from '../../data-access/hooks';
@@ -27,7 +28,7 @@ import styles from './AdminShared.module.css';
 
 const AWARD_TYPES: Array<{ id: AwardType; label: string }> = [
   { id: 'best_delegate', label: 'Mejor delegado' },
-  { id: 'outstanding_delegate', label: 'Delegado sobresaliente' },
+  { id: 'outstanding_delegate', label: 'Delegado distinguido' },
   { id: 'honorable_mention', label: 'Mención honorífica' },
   { id: 'verbal_commendation', label: 'Mención verbal' },
 ];
@@ -83,6 +84,46 @@ export function ResultsPage() {
   const scoredResults = results.filter((r) => r.score !== null);
   const overallAvg = scoredResults.length === 0 ? 0 : scoredResults.reduce((s, r) => s + (r.score ?? 0), 0) / scoredResults.length;
   const COLS = `70px 2.2fr repeat(${Math.max(criteria.length, 1)}, 1fr) 110px`;
+
+  // ---- Desempate manual (los empates los decide el admin) ----
+  const setTiebreak = useSetTiebreak(committeeId);
+  const [tiebreakError, setTiebreakError] = useState('');
+  const eventClosed = event?.status === 'closed';
+  /** Orden manual vigente: las delegaciones ya desempatadas, en su orden del ranking. */
+  const manualOrder = results.filter((x) => x.manual_tiebreak).map((x) => x.delegation_id);
+  const tiedWith = (r: RankingEntry) => results.filter((x) => x.tied && x.position === r.position);
+  const manualGroupOf = (r: RankingEntry) => results.filter((x) => x.manual_tiebreak && x.score === r.score);
+
+  async function saveTiebreak(order: string[]) {
+    setTiebreakError('');
+    try {
+      await setTiebreak.mutateAsync(order);
+    } catch (err) {
+      setTiebreakError(errorMessage(err));
+    }
+  }
+
+  /** Resuelve el empate poniendo a `r` primero; el resto del grupo queda en su orden actual. */
+  function putFirst(r: RankingEntry) {
+    const rest = tiedWith(r).filter((x) => x.delegation_id !== r.delegation_id);
+    void saveTiebreak([...manualOrder, r.delegation_id, ...rest.map((x) => x.delegation_id)]);
+  }
+
+  /** Mueve a `r` un lugar arriba (-1) o abajo (+1) dentro de su empate ya resuelto. */
+  function move(r: RankingEntry, step: -1 | 1) {
+    const group = manualGroupOf(r).map((x) => x.delegation_id);
+    const i = group.indexOf(r.delegation_id);
+    const j = i + step;
+    if (j < 0 || j >= group.length) return;
+    [group[i], group[j]] = [group[j], group[i]];
+    void saveTiebreak([...manualOrder.filter((id) => !group.includes(id)), ...group]);
+  }
+
+  /** Vuelve a dejar empatado el grupo de `r`. */
+  function undoTiebreak(r: RankingEntry) {
+    const group = manualGroupOf(r).map((x) => x.delegation_id);
+    void saveTiebreak(manualOrder.filter((id) => !group.includes(id)));
+  }
 
   // ---- Premios ----
   const { data: awards } = useAwards(committeeId);
@@ -238,6 +279,7 @@ export function ResultsPage() {
                 {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 {delegationLabel(r)}
                 {r.tied && <StatusBadge tone="progress" label="EMPATE" />}
+                {r.manual_tiebreak && <StatusBadge tone="none" label="DESEMPATE MANUAL" />}
               </span>
               {criteria.map((k) => (
                 <span key={k.id} style={{ fontSize: 14, color: 'var(--ink)' }}>
@@ -288,6 +330,57 @@ export function ResultsPage() {
                         Un rol sin votos («—») no cuenta como 0: su peso se reparte entre los demás roles.
                       </span>
                     )}
+                  </div>
+                )}
+                {(r.tied || r.manual_tiebreak) && (
+                  <div style={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <span style={{ fontSize: 11, letterSpacing: '.1em', color: 'var(--muted)', fontWeight: 600 }}>DESEMPATE</span>
+                    {r.tied ? (
+                      <span style={{ fontSize: 12, color: 'var(--ink)', lineHeight: 1.5 }}>
+                        Empata con{' '}
+                        {tiedWith(r)
+                          .filter((x) => x.delegation_id !== r.delegation_id)
+                          .map(delegationLabel)
+                          .join(', ')}{' '}
+                        incluso por el criterio de mayor peso. El empate lo decides tú.
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 12, color: 'var(--ink)', lineHeight: 1.5 }}>
+                        Lugar decidido por ti en un empate. Cambia el orden o deshazlo.
+                      </span>
+                    )}
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                      {r.tied && (
+                        <Button variant="secondary" onClick={() => putFirst(r)} disabled={eventClosed || setTiebreak.isPending}>
+                          Gana el desempate
+                        </Button>
+                      )}
+                      {r.manual_tiebreak && (
+                        <>
+                          <Button
+                            variant="secondary"
+                            onClick={() => move(r, -1)}
+                            disabled={eventClosed || setTiebreak.isPending || manualGroupOf(r)[0]?.delegation_id === r.delegation_id}
+                          >
+                            Subir
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => move(r, 1)}
+                            disabled={eventClosed || setTiebreak.isPending || manualGroupOf(r).at(-1)?.delegation_id === r.delegation_id}
+                          >
+                            Bajar
+                          </Button>
+                          <Button variant="danger" onClick={() => undoTiebreak(r)} disabled={eventClosed || setTiebreak.isPending}>
+                            Deshacer desempate
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    {eventClosed && (
+                      <span style={{ fontSize: 11, color: 'var(--muted)' }}>El evento está cerrado: el ranking ya no cambia.</span>
+                    )}
+                    {tiebreakError && <span style={{ color: '#C0392B', fontSize: 12 }}>{tiebreakError}</span>}
                   </div>
                 )}
                 {r.incomplete_flags.length > 0 && (

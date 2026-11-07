@@ -195,6 +195,41 @@
   letter-spacing: 0.04em;
 }
 
+/* «Salir» (patrón de 3h): olvida el acceso en este teléfono. */
+.exitBtn {
+  flex: none;
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: var(--white);
+  font: 500 13px/1 var(--sans);
+  cursor: pointer;
+  transition: border-color 140ms ease;
+}
+
+.exitBtn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.light .exitBtn {
+  border-color: var(--border-outline);
+  color: var(--ink);
+}
+
+.light .exitBtn:hover {
+  border-color: var(--ink);
+}
+
+.exitRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 16px 0;
+}
+
 /* ---- Botones ---- */
 
 .btn {
@@ -208,6 +243,7 @@
   border-radius: 10px;
   border: 1px solid transparent;
   font: 600 15px/1.2 var(--sans);
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color 140ms ease,
@@ -226,6 +262,7 @@
 }
 
 .btn:focus-visible,
+.exitBtn:focus-visible,
 .linkBtn:focus-visible,
 .option:focus-visible,
 .step:focus-visible {

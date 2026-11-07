@@ -56,10 +56,17 @@ export interface PublicCommittee {
   ranking: PublicRankingItem[] | null;
 }
 
+/** Una delegación del ranking general del evento (todas las de todos los comités, por nota). */
+export interface PublicGeneralRankingItem extends PublicRankingItem {
+  committee: { slug: string; name: string; acronym: string };
+}
+
 export interface PublicResultsDocument {
   event: PublicEventInfo;
   settings: PublicationSettings;
   committees: PublicCommittee[];
+  /** null si el ranking no se publica; ausente en documentos publicados antes del 2026-11-07. */
+  general_ranking?: PublicGeneralRankingItem[] | null;
   published_at: string;
   version: number;
 }

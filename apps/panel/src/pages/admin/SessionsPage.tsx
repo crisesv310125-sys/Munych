@@ -197,13 +197,14 @@ export function SessionsPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <span className={styles.topbarTitle}>Sesiones</span>
           <span className={styles.topbarSub}>
-            {filterId ? visible[0]?.c.name : `${list.length} comités`} ·{' '}
+            {filterId ? visible[0]?.c.name : list.length === 1 ? '1 comité' : `${list.length} comités`} ·{' '}
             {openCount === 1 ? '1 sesión abierta' : `${openCount} sesiones abiertas`}
           </span>
         </div>
-        {list.length > 1 && (
+        {/* Filtro por comité: siempre visible si hay comités (con uno solo, también). */}
+        {list.length > 0 && (
           <div className={styles.topbarActions}>
-            <Select aria-label="Comité" value={filterId} onChange={(e) => setCommitteeFilter(e.target.value)}>
+            <Select aria-label="Filtrar por comité" value={filterId} onChange={(e) => setCommitteeFilter(e.target.value)}>
               <option value="">Todos los comités</option>
               {list.map((c) => (
                 <option key={c.id} value={c.id}>

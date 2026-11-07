@@ -155,8 +155,9 @@ export function ExportPage() {
             </div>
             {format === 'PDF' && (
               <span style={{ fontSize: 11, color: 'var(--muted)' }}>
-                Acta de resultados oficial: resumen de premiación y ranking de cada comité. Los nombres siguen el formato de la
-                publicación; no incluye jueces ni comentarios.
+                Acta de resultados: resumen de premiación y ranking de cada comité. Las casillas de contenido añaden el desglose
+                por criterio y las calificaciones por sesión, con nombres de jueces y comentarios si los marcas (entonces el acta
+                avisa de que es un documento interno).
               </span>
             )}
             {format === 'CSV' && (

@@ -905,6 +905,14 @@ export const handlers = [
       headers: { 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
     });
   }),
+  http.get(`${BASE}/events/:eventId/export.pdf`, ({ params }) => {
+    if (!findEvent(params.eventId)) return notFound();
+    // PDF mínimo válido de una página: en los mocks no se genera el acta real.
+    const pdf =
+      '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n' +
+      '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF';
+    return new HttpResponse(new Blob([pdf]), { headers: { 'Content-Type': 'application/pdf' } });
+  }),
   http.get(`${BASE}/events/:eventId/export.csv`, ({ params, request }) => {
     if (!findEvent(params.eventId)) return notFound();
     const url = new URL(request.url);

@@ -52,8 +52,8 @@ export function ExportPage() {
     setExportError('');
     setGenerating(true);
     try {
-      // PDF aún no existe (espera el diseño de Héctor): se descarga el XLSX.
-      const { blob, filename } = await exportEventFile(eventId, event?.slug, format === 'CSV' ? 'csv' : 'xlsx', {
+      const ext = format === 'CSV' ? 'csv' : format === 'PDF' ? 'pdf' : 'xlsx';
+      const { blob, filename } = await exportEventFile(eventId, event?.slug, ext, {
         committeeIds: selectedCommittees.length === list.length ? undefined : selectedCommittees.map((c) => c.id),
         includeScores: content.total,
         includeDetails: content.breakdown,
@@ -155,7 +155,8 @@ export function ExportPage() {
             </div>
             {format === 'PDF' && (
               <span style={{ fontSize: 11, color: 'var(--muted)' }}>
-                El PDF (reporte y diplomas) llegará con el diseño de MUNYCH; por ahora se descargará el XLSX.
+                Acta de resultados oficial: resumen de premiación y ranking de cada comité. Los nombres siguen el formato de la
+                publicación; no incluye jueces ni comentarios.
               </span>
             )}
             {format === 'CSV' && (

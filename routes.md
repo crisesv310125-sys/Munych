@@ -107,6 +107,7 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | PUT | `/committees/{committee_id}/tiebreak` | admin | `set_committee_tiebreak` | `TiebreakIn` | `RankingOut` |
 | GET | `/events/{event_id}/export.xlsx` | admin | `export_event_xlsx` | query `ExportOptions` | archivo `.xlsx` |
 | GET | `/events/{event_id}/export.csv` | admin | `export_event_csv` | query `ExportOptions` | archivo `.csv` |
+| GET | `/events/{event_id}/export.pdf` | admin | `export_event_pdf` | query `ExportOptions` | acta `.pdf` |
 | **Publicación** | | | | | |
 | GET | `/events/{event_id}/publication-settings` | admin | `get_publication_settings` | — | `PublicationSettings` |
 | PUT | `/events/{event_id}/publication-settings` | admin | `update_publication_settings` | `PublicationSettings` | `PublicationSettings` |
@@ -128,7 +129,7 @@ Rol: **—** público · **any** cualquier usuario autenticado · **admin** · *
 | GET | `/vote/ballot` | token de delegado | `get_ballot` | — | `BallotOut` |
 | POST | `/vote/ballot` | token de delegado | `submit_peer_vote` | `PeerVotesIn` | `BallotOut` |
 
-Total: **59 operaciones**.
+Total: **60 operaciones**.
 
 ---
 
@@ -233,7 +234,8 @@ Total: **59 operaciones**.
 - **`PUT /committees/{committee_id}/awards`**: array JSON `[{ award_type, delegation_id, position }]` (`position` vale 1 por defecto) que reemplaza los premios. Superar un cupo **no bloquea**: solo añade avisos a `quota_warnings`.
 - **`GET /events/{event_id}/export.xlsx`**: libro de Excel con una hoja **Resumen**, una hoja de ranking por comité y una hoja **Detalle** (delegado × sesión × juez × criterio). Las fechas van en la zona horaria del evento.
 - **`GET /events/{event_id}/export.csv`** (2026-11-07): el ranking de todos los comités en una sola tabla (UTF-8 con BOM, comas, punto decimal): comité, siglas, posición, empate, delegación, institución, delegados, nota (y nota por rol si el evento tiene varios), premios y avisos. Sin detalle por juez.
-- **Opciones de exportación** (query, ambos formatos; por defecto, todo): `committee_id` (repetible; sin él, todos los comités), `include_scores` (nota), `include_details` (hoja Detalle, solo XLSX), `include_comments` (comentarios de los jueces en el Detalle), `include_judge_names` (si es `false`, el Detalle dice «Juez 1», «Juez 2»… por comité). El panel los manda desde la pantalla Exportar.
+- **`GET /events/{event_id}/export.pdf`** (2026-11-07): **acta de resultados** según la muestra oficial de MUNYCH («Acta de resultados - muestra oficial»). Portada (marca, evento, sede, fechas, zona horaria, hora de generación con su UTC, tipo de evento con los pesos por rol, totales de comités, delegaciones y premios, y el **resumen de premiación** de todos los comités) y una sección por comité («Comité n de N», tipo, delegaciones / con nota / premios, premios asignados o aviso de que no hay, y el **ranking** con posición, empate, delegación con su código ISO, delegados, institución, nota y premios; las delegaciones sin nota van al final sin posición). Pie en todas las páginas. Los nombres de los delegados siguen el `name_format` de la publicación (por defecto «Ana P.»: hay menores); nunca incluye jueces ni comentarios. Respeta `committee_id` e `include_scores`. Carta (US Letter), generado con reportlab.
+- **Opciones de exportación** (query, todos los formatos; por defecto, todo): `committee_id` (repetible; sin él, todos los comités), `include_scores` (nota), `include_details` (hoja Detalle, solo XLSX), `include_comments` (comentarios de los jueces en el Detalle), `include_judge_names` (si es `false`, el Detalle dice «Juez 1», «Juez 2»… por comité). El panel los manda desde la pantalla Exportar.
 - **Desempate manual** (2026-11-07): `PUT /committees/{id}/tiebreak` `{ delegation_ids }` guarda el orden que decide el admin para las delegaciones que **siguen empatadas** tras el desempate automático. Un empate se resuelve solo si el orden incluye a **todas** sus delegaciones; las demás ids se ignoran; lista vacía = quitar los desempates. Las delegaciones desempatadas llevan `tied: false` y `manual_tiebreak: true`. Se aplica en el ranking, la instantánea, la página pública y los exports. `409 EVENT_CLOSED` con el evento cerrado (hay que desempatar antes de cerrar); `404 NOT_FOUND` si alguna delegación es de otro comité.
 
 ### 3.8 Publicación (`results`)

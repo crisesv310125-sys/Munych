@@ -49,7 +49,7 @@ export interface ExportOptions {
 export async function exportEventFile(
   eventId: string,
   slug?: string,
-  format: 'xlsx' | 'csv' = 'xlsx',
+  format: 'xlsx' | 'csv' | 'pdf' = 'xlsx',
   options: ExportOptions = {},
 ): Promise<{ blob: Blob; filename: string }> {
   const params = new URLSearchParams();

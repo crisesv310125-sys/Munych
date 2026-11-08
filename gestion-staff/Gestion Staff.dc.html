@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestión de staff</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#F5F7FA; color:#1B2733; font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums; }
+  button { font-family:inherit; }
+  .frame { width:1340px; background:#F5F7FA; border:1px solid #E3E8EF; border-radius:12px; overflow:hidden; display:flex; box-shadow:0 12px 34px rgba(11,42,74,.10); }
+  .sb { width:232px; flex:none; background:#0B2A4A; padding:22px 16px; display:flex; flex-direction:column; gap:26px; }
+  .sb-brand { display:flex; align-items:center; gap:10px; padding:0 6px; }
+  .sb-mark { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.1); border:1px solid rgba(201,162,39,.5); display:flex; align-items:center; justify-content:center; color:#C9A227; font-family:'Playfair Display',serif; font-weight:700; font-size:14px; }
+  .nv { padding:10px 12px; border-radius:7px; color:rgba(255,255,255,.68); font-size:13px; display:flex; align-items:center; justify-content:space-between; }
+  .nv-new { font-size:8.5px; letter-spacing:.12em; font-weight:700; color:#0B2A4A; background:#C9A227; border-radius:4px; padding:2px 5px; }
+  .sb-ev { margin-top:auto; padding:12px; border-radius:8px; background:rgba(255,255,255,.06); display:flex; flex-direction:column; gap:4px; }
+  .top { background:#fff; border-bottom:1px solid #E3E8EF; padding:16px 28px; display:flex; align-items:center; justify-content:space-between; }
+  .me { width:34px; height:34px; border-radius:50%; background:#F2F4F8; border:1px solid #E3E8EF; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#0B2A4A; }
+  .search { width:230px; border:1px solid #CBD5E1; border-radius:8px; padding:9px 12px; font-size:13px; color:#98A6B5; background:#fff; }
+  .btn { border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .ct { padding:24px 28px; display:flex; flex-direction:column; gap:18px; }
+  .card { background:#fff; border:1px solid #E3E8EF; border-radius:10px; }
+  .kpi { background:#fff; border:1px solid #E3E8EF; border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:6px; }
+  .kpi-l { font-size:11px; letter-spacing:.1em; color:#5B6B7C; font-weight:600; text-transform:uppercase; }
+  .kpi-v { font-family:'Playfair Display',serif; font-size:32px; font-weight:600; color:#0B2A4A; line-height:1; }
+  .row { display:grid; gap:16px; padding:14px 20px; border-bottom:1px solid #EEF1F5; align-items:center; }
+  .row.hd { padding:11px 20px; font-size:11px; letter-spacing:.08em; color:#5B6B7C; font-weight:600; }
+  .bd { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; padding:4px 9px; border-radius:999px; white-space:nowrap; letter-spacing:.02em; }
+  .bd i { width:6px; height:6px; border-radius:50%; }
+  .av { border-radius:50%; color:#fff; font-weight:600; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  .tag { border-radius:9px; color:#fff; font-weight:700; letter-spacing:.04em; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  .aw { font-size:11px; font-weight:600; color:#0B2A4A; background:#F2F4F8; border:1px solid #E3E8EF; border-radius:999px; padding:3px 9px; white-space:nowrap; }
+  .note { font-size:12px; line-height:1.55; color:#5B6B7C; background:#fff; border:1px dashed #CBD5E1; border-radius:10px; padding:12px 16px; }
+  .note b { color:#1B2733; }
+  .th-wrap { background:#fff; border-bottom:1px solid #E3E8EF; padding:20px 28px 0; }
+  .tab { font-size:13px; color:#5B6B7C; padding:0 2px 12px; border-bottom:2px solid transparent; }
+  .tab-n { font-size:11px; color:#98A6B5; font-weight:500; margin-left:3px; }
+  .mini { display:flex; flex-direction:column; gap:4px; }
+  .mini-v { font-family:'Playfair Display',serif; font-size:22px; font-weight:600; color:#0B2A4A; line-height:1; }
+  .rl { font-size:11px; font-weight:600; color:#0B2A4A; background:#F2F4F8; border-radius:5px; padding:3px 8px; }
+  .panel { width:360px; flex:none; background:#F5F7FA; border-left:1px solid #E3E8EF; padding:22px 24px; display:flex; flex-direction:column; gap:16px; }
+  .fl { display:flex; flex-direction:column; gap:6px; }
+  .fl-l { font-size:12px; font-weight:600; color:#1B2733; }
+  .in { display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #CBD5E1; border-radius:8px; padding:10px 12px; font-size:13px; }
+  .seg { display:flex; background:#F2F4F8; border-radius:8px; padding:3px; gap:3px; }
+  .seg span { flex:1; text-align:center; padding:8px 10px; border-radius:6px; font-size:12.5px; color:#5B6B7C; }
+  .cb { width:17px; height:17px; border-radius:5px; border:1px solid #CBD5E1; background:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; flex:none; }
+  .tg { width:40px; height:22px; border-radius:999px; padding:2px; display:flex; align-items:center; flex:none; }
+  .tg i { width:18px; height:18px; border-radius:50%; background:#fff; }
+  .pick { display:flex; align-items:center; gap:10px; background:#fff; border-radius:9px; padding:10px 12px; }
+  .callout { background:#FBF4DF; border:1px solid #F0E2B6; color:#8A6F12; border-radius:9px; padding:11px 13px; font-size:12px; line-height:1.5; }
+  .dash { border:1px dashed #CBD5E1; border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:4px; background:#fff; }
+  .sc { padding:14px 18px; border-right:1px solid #E3E8EF; display:flex; flex-direction:column; gap:5px; }
+  .sc-v { font-size:13px; font-weight:600; color:#1B2733; }
+  .md { width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; }
+  .sum-row { display:flex; align-items:center; gap:12px; background:#fff; border:1px solid #E3E8EF; border-radius:10px; padding:12px 14px; }
+  .opt { display:flex; gap:11px; align-items:flex-start; border-radius:10px; padding:12px 13px; }
+  .st { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+</style>
+</helmet>
+
+<div style="max-width:1420px;margin:0 auto;padding:48px 32px 96px;display:flex;flex-direction:column;gap:56px">
+  <header style="display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #E3E8EF;padding-bottom:28px">
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:34px;height:34px;border-radius:50%;background:#0B2A4A;display:flex;align-items:center;justify-content:center;color:#C9A227;font-family:'Playfair Display',serif;font-weight:700;font-size:16px">M</div><span style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#5B6B7C;font-weight:600">MUNYCH Association</span></div>
+    <h1 style="margin:0;font-family:'Playfair Display',serif;font-weight:600;font-size:46px;line-height:1.05;color:#0B2A4A">Gestión de staff</h1>
+    <p style="margin:0;max-width:720px;color:#5B6B7C;font-size:15px;line-height:1.6;text-wrap:pretty">Nueva sección del panel admin de MUN Scoring. Cada <b style="color:#1B2733">tipo de staff</b> (Prensa, Escritura, Pajes…) tiene sus <b style="color:#1B2733">miembros</b>, su propia <b style="color:#1B2733">rúbrica</b> para evaluar a los candidatos que le tocan y sus <b style="color:#1B2733">premios propios</b>. Opcionalmente, su promedio cuenta en la nota staff del ranking.</p>
+  </header>
+  <section style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font-family:'Playfair Display',serif;font-size:13px;color:#C9A227;font-weight:600">01–06</span><h2 style="margin:0;font-family:'Playfair Display',serif;font-size:28px;font-weight:600;color:#0B2A4A">Panel de administración · Staff</h2><span style="font-size:12px;color:#5B6B7C">1340 px · sidebar fijo + contenido + panel lateral de 410 px</span></div>
+    <div style="display:flex;flex-direction:column;gap:44px">
+      <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="01 Tipos de staff">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5B6B7C;font-weight:600">01 · Staff · Tipos de staff</span><span style="font-size:12px;color:#98A6B5">Lista de tipos con miembros, rúbrica, premios propios y avance</span></div>
+        <div class="frame" style="min-height:800px">
+  <div class="sb">
+    <div class="sb-brand"><div class="sb-mark">M</div><div style="display:flex;flex-direction:column"><span style="font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:600">MUNYCH</span><span style="font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.5)">ADMIN</span></div></div>
+    <nav style="display:flex;flex-direction:column;gap:2px"><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Dashboard</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Comités</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Países</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Jueces</span><span class="nv" style="background:rgba(255,255,255,.12);color:#fff;font-weight:600">Staff<span class="nv-new">NUEVO</span></span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Criterios</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Resultados</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Exportar</span></nav>
+    <div class="sb-ev"><span style="font-size:11px;color:rgba(255,255,255,.55)">Evento activo</span><span style="font-size:13px;color:#fff;font-weight:600">MUNYCH 2026</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative">
+    <div class="top">
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#0B2A4A">Staff</span><span style="font-size:12px;color:#5B6B7C">MUNYCH 2026 · 5 tipos de staff · 30 miembros</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><span class="search">Buscar staff o persona…</span><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">+ Nuevo tipo de staff</button><div class="me">SG</div></div>
+    </div>
+    <div class="ct">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+        <div class="kpi"><span class="kpi-l">TIPOS DE STAFF</span><span class="kpi-v">5</span><span style="font-size:11px;color:#5B6B7C">4 configurados · 1 pendiente</span></div>
+        <div class="kpi"><span class="kpi-l">MIEMBROS</span><span class="kpi-v">30</span><span style="font-size:11px;color:#5B6B7C">27 con acceso activo</span></div>
+        <div class="kpi"><span class="kpi-l">PREMIOS PROPIOS</span><span class="kpi-v">7</span><span style="font-size:11px;color:#5B6B7C">3 asignados · 4 por decidir</span></div>
+        <div class="kpi" style="background:#0B2A4A;border-color:#0B2A4A"><span class="kpi-l" style="color:rgba(255,255,255,.6)">AVANCE DE EVALUACIÓN</span><span class="kpi-v" style="color:#C9A227">68%</span><div style="height:5px;border-radius:3px;background:rgba(255,255,255,.16);overflow:hidden;margin-top:2px"><div style="width:68%;height:100%;background:#C9A227"></div></div></div>
+      </div>
+      <div class="card" style="overflow:hidden"><div class="row hd" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px"><span>TIPO DE STAFF</span><span>EVALÚA</span><span>MIEMBROS</span><span>RÚBRICA</span><span>PREMIOS PROPIOS</span><span>NOTA STAFF</span><span>AVANCE</span><span style="text-align:right">ESTADO</span></div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px;background:#F5F9FF" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#418FDE;font-size:12px">PR</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Prensa</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Evalúa artículos y coberturas de los delegados de prensa.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Delegados de prensa</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">VG</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">RS</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">CO</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">MI</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">6 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">5 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDA</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Mejor periodista</span><span class="aw">Mención de prensa ×2</span></div>
+      <div><span style="font-size:11.5px;color:#5B6B7C">Solo premios</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:71%;height:100%;background:#C9A227"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">71%</span></div><span style="font-size:10.5px;color:#5B6B7C">34 de 48 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#2F6BA8;font-size:12px">ES</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Escritura</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Califica los escritos de posición de cada delegación.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Escritos de posición</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">AM</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">JT</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">NB</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">PL</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">8 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">5 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDA</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Mejor escrito de defensa · por comité</span></div>
+      <div><span style="font-size:11.5px;color:#5B6B7C">Solo premios</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:82%;height:100%;background:#C9A227"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">82%</span></div><span style="font-size:10.5px;color:#5B6B7C">120 de 146 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#C9A227;font-size:12px">PJ</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Pajes y protocolo</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Observa conducta, protocolo y trato al staff en sala.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Delegaciones</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">SR</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">BT</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">IC</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">FM</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">12 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">3 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDA</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Delegación más diplomática</span></div>
+      <div><span style="font-size:11.5px;font-weight:600;color:#1F6B52">Cuenta 10 % en nota staff</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:100%;height:100%;background:#2F8F6E"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">100%</span></div><span style="font-size:10.5px;color:#5B6B7C">146 de 146 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>COMPLETO</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#123B63;font-size:12px">CR</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Crisis</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Backroom del gabinete: evalúa directivas y respuesta a eventos.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Delegados · Gabinete de Crisis</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">AL</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">MV</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">RP</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">CS</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">4 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">4 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#FBECEB;color:#A1322D"><i style="background:#C2413B"></i>SUMA 85 %</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Mejor directiva de crisis</span></div>
+      <div><span style="font-size:11.5px;color:#5B6B7C">Solo premios</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:2.5%;height:100%;background:#98A6B5"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">0%</span></div><span style="font-size:10.5px;color:#5B6B7C">0 de 12 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#F2F4F8;color:#5B6B7C"><i style="background:#98A6B5"></i>SIN INICIAR</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#98A6B5;font-size:12px">FO</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Fotografía</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Cobertura visual del evento.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">—</span>
+      <div style="display:flex;align-items:center"><span style="font-size:12px;color:#98A6B5">Sin miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">Sin rúbrica</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span style="font-size:12px;color:#98A6B5">—</span></div>
+      <div><span style="font-size:12px;color:#98A6B5">—</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:12px;color:#98A6B5">—</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#F2F4F8;color:#5B6B7C"><i style="background:#98A6B5"></i>SIN CONFIGURAR</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div></div>
+      <div class="note"><b>Cómo funciona.</b> Cada tipo de staff evalúa a su propio grupo de candidatos con su rúbrica y entrega sus premios propios (p. ej. Prensa → Mejor periodista). Solo los tipos marcados con <b>“Cuenta en nota staff”</b> aportan al peso Staff del ranking general.</div>
+    </div>
+  </div>
+</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="02 Prensa — Miembros">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5B6B7C;font-weight:600">02 · Staff · Prensa — Miembros</span><span style="font-size:12px;color:#98A6B5">Quiénes son de ese staff, rol, comités asignados y acceso</span></div>
+        <div class="frame" style="min-height:860px">
+  <div class="sb">
+    <div class="sb-brand"><div class="sb-mark">M</div><div style="display:flex;flex-direction:column"><span style="font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:600">MUNYCH</span><span style="font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.5)">ADMIN</span></div></div>
+    <nav style="display:flex;flex-direction:column;gap:2px"><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Dashboard</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Comités</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Países</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Jueces</span><span class="nv" style="background:rgba(255,255,255,.12);color:#fff;font-weight:600">Staff<span class="nv-new">NUEVO</span></span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Criterios</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Resultados</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Exportar</span></nav>
+    <div class="sb-ev"><span style="font-size:11px;color:rgba(255,255,255,.55)">Evento activo</span><span style="font-size:13px;color:#fff;font-weight:600">MUNYCH 2026</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative">
+    <div class="top">
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;color:#5B6B7C"><span style="color:#418FDE;font-weight:600">Staff</span> <span style="color:#98A6B5">/</span> Prensa</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#0B2A4A">Staff</span><span style="font-size:12px;color:#5B6B7C">MUNYCH 2026 · 5 tipos de staff · 30 miembros</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Exportar lista</button><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">+ Añadir miembro</button><div class="me">SG</div></div>
+    </div>
+    <div style="display:flex;flex:1;min-height:0">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="th-wrap">
+      <div style="display:flex;align-items:center;gap:14px"><span class="tag" style="width:42px;height:42px;background:#418FDE;font-size:12px">PR</span>
+        <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;color:#0B2A4A;line-height:1.1">Prensa</span><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span></div>
+        <div style="font-size:12px;color:#5B6B7C;margin-top:3px">Evalúa a <b style="color:#1B2733;font-weight:600">delegados de prensa</b> · solo premios, no cuenta en la nota staff</div></div>
+        <div style="display:flex;align-items:center;gap:18px;flex:none">
+          <div class="mini"><span class="kpi-l">MIEMBROS</span><span class="mini-v">6</span></div>
+          <div class="mini"><span class="kpi-l">CANDIDATOS</span><span class="mini-v">16</span></div>
+          <div class="mini"><span class="kpi-l">AVANCE</span><div style="display:flex;align-items:center;gap:8px"><span class="mini-v">71%</span><div style="width:54px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:71%;height:100%;background:#C9A227"></div></div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:16px"><span class="tab" style="color:#0B2A4A;border-bottom-color:#0B2A4A;font-weight:600">Miembros <span class="tab-n">6</span></span><span class="tab" style-hover="color:#0B2A4A">Rúbrica <span class="tab-n">5 criterios</span></span><span class="tab" style-hover="color:#0B2A4A">Premios <span class="tab-n">2</span></span><span class="tab" style-hover="color:#0B2A4A">Configuración <span class="tab-n"></span></span></div>
+    </div>
+        <div class="ct" style="padding-top:18px">
+          <div class="card" style="overflow:hidden"><div class="row hd" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px"><span>MIEMBRO · ROL</span><span>ASIGNADO A</span><span>EVALUADOS</span><span>ACCESO</span><span></span></div><div class="row" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0"><span class="av" style="width:30px;height:30px;background:#0B2A4A;font-size:11px">VG</span><div style="min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:#1B2733">Valeria Gómez</span><span class="rl" style="background:#0B2A4A;color:#fff">Coordinadora</span></div><div style="font-size:11.5px;color:#5B6B7C">valeria.gomez@munych.org</div></div></div>
+      <div><span style="font-size:12.5px;color:#1B2733">Todos los comités</span></div><div><div style="display:flex;align-items:center;gap:8px"><div style="width:70px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:75%;height:100%;background:#C9A227"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733">12/16</span></div></div><div><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>ACTIVO</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0"><span class="av" style="width:30px;height:30px;background:#123B63;font-size:11px">RS</span><div style="min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:#1B2733">Rodrigo Salas</span><span class="rl">Evaluador</span></div><div style="font-size:11.5px;color:#5B6B7C">rodrigo.salas@munych.org</div></div></div>
+      <div><span style="font-size:12.5px;color:#1B2733">AG · CS</span></div><div><div style="display:flex;align-items:center;gap:8px"><div style="width:70px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:100%;height:100%;background:#2F8F6E"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733">8/8</span></div></div><div><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>ACTIVO</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0"><span class="av" style="width:30px;height:30px;background:#418FDE;font-size:11px">CO</span><div style="min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:#1B2733">Camila Ortega</span><span class="rl">Evaluadora</span></div><div style="font-size:11.5px;color:#5B6B7C">camila.o@gmail.com</div></div></div>
+      <div><span style="font-size:12.5px;color:#1B2733">DISEC · ECOSOC</span></div><div><div style="display:flex;align-items:center;gap:8px"><div style="width:70px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:75%;height:100%;background:#C9A227"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733">6/8</span></div></div><div><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>ACTIVO</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0"><span class="av" style="width:30px;height:30px;background:#5B6B7C;font-size:11px">MI</span><div style="min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:#1B2733">Mateo Ibarra</span><span class="rl">Evaluador</span></div><div style="font-size:11.5px;color:#5B6B7C">mateo.ibarra@gmail.com</div></div></div>
+      <div><span style="font-size:12.5px;color:#1B2733">CIJ</span></div><div><div style="display:flex;align-items:center;gap:8px"><div style="width:70px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:2.5%;height:100%;background:#98A6B5"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733">0/8</span></div></div><div><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>INVITADO</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0"><span class="av" style="width:30px;height:30px;background:#0B2A4A;font-size:11px">LF</span><div style="min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:#1B2733">Lucía Fernández</span><span class="rl">Evaluadora</span></div><div style="font-size:11.5px;color:#5B6B7C">lucia.f@munych.org</div></div></div>
+      <div><span style="font-size:12.5px;color:#1B2733">Gabinete de Crisis</span></div><div><div style="display:flex;align-items:center;gap:8px"><div style="width:70px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:100%;height:100%;background:#2F8F6E"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733">8/8</span></div></div><div><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>ACTIVO</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:2.6fr 1.2fr 1.1fr 1fr 48px;background:#F5F9FF" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0"><span class="av" style="width:30px;height:30px;background:#123B63;font-size:11px">DR</span><div style="min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600;color:#1B2733">Daniel Rojas</span><span class="rl">Evaluador</span></div><div style="font-size:11.5px;color:#5B6B7C">daniel.rojas@gmail.com</div></div></div>
+      <div><span style="font-size:12.5px;color:#98A6B5">Sin asignar</span></div><div><span style="font-size:12px;color:#98A6B5">—</span></div><div><span class="bd" style="background:#F2F4F8;color:#5B6B7C"><i style="background:#98A6B5"></i>SIN INVITAR</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div></div>
+          <div class="dash" style-hover="border-color:#418FDE"><span style="font-size:13px;font-weight:600;color:#0B2A4A">+ Añadir otra persona</span><span style="font-size:12px;color:#5B6B7C">Busca entre jueces y staff del evento, o invita por correo</span></div>
+        </div>
+      </div><div class="panel">
+      <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#0B2A4A">Editar miembro</span><span style="color:#5B6B7C;font-size:15px">✕</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><span class="av" style="width:40px;height:40px;background:#123B63;font-size:13px">DR</span><div><div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A">Daniel Rojas</div><div style="font-size:12px;color:#5B6B7C">daniel.rojas@gmail.com · también en Fotografía</div></div></div>
+      <div class="fl"><span class="fl-l">Rol en el staff</span>
+        <div class="seg"><span>Coordinador</span><span style="background:#fff;color:#0B2A4A;font-weight:600;box-shadow:0 1px 2px rgba(11,42,74,.12)">Evaluador</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="fl-l">Asignar a comités</span>
+        <div class="pick" style="border:1px solid #E3E8EF" style-hover="border-color:#418FDE"><span class="cb"></span><span style="flex:1;font-size:13px;font-weight:500;color:#5B6B7C">Todos los comités</span><span style="font-size:11px;color:#98A6B5;font-weight:600"></span></div>
+        <div class="pick" style="border:1px solid #0B2A4A" style-hover="border-color:#418FDE"><span class="cb" style="background:#0B2A4A;border-color:#0B2A4A;color:#fff">✓</span><span style="flex:1;font-size:13px;font-weight:600;color:#1B2733">Asamblea General</span><span style="font-size:11px;color:#98A6B5;font-weight:600">AG</span></div>
+        <div class="pick" style="border:1px solid #0B2A4A" style-hover="border-color:#418FDE"><span class="cb" style="background:#0B2A4A;border-color:#0B2A4A;color:#fff">✓</span><span style="flex:1;font-size:13px;font-weight:600;color:#1B2733">Consejo de Seguridad</span><span style="font-size:11px;color:#98A6B5;font-weight:600">CS</span></div>
+        <div class="pick" style="border:1px solid #E3E8EF" style-hover="border-color:#418FDE"><span class="cb"></span><span style="flex:1;font-size:13px;font-weight:500;color:#5B6B7C">ECOSOC</span><span style="font-size:11px;color:#98A6B5;font-weight:600">ECOSOC</span></div>
+        <div class="pick" style="border:1px solid #E3E8EF" style-hover="border-color:#418FDE"><span class="cb"></span><span style="flex:1;font-size:13px;font-weight:500;color:#5B6B7C">Corte Internacional de Justicia</span><span style="font-size:11px;color:#98A6B5;font-weight:600">CIJ</span></div>
+      </div>
+      <div class="callout">Prensa recomienda <b>mínimo 2 evaluadores por candidato</b>. Con esta asignación, AG y CS quedan cubiertos por 3 evaluadores.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto"><button class="btn" style="background:#0B2A4A;color:#fff;border:0;width:100%" style-hover="background:#123B63">Guardar y enviar invitación</button><span style="text-align:center;font-size:11px;color:#5B6B7C">Recibirá un enlace personal para evaluar solo a los candidatos de Prensa.</span></div>
+    </div></div>
+  </div>
+</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="03 Prensa — Rúbrica">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5B6B7C;font-weight:600">03 · Staff · Prensa — Rúbrica</span><span style="font-size:12px;color:#98A6B5">Rúbrica propia del tipo de staff (suma 100 %)</span></div>
+        <div class="frame" style="min-height:900px">
+  <div class="sb">
+    <div class="sb-brand"><div class="sb-mark">M</div><div style="display:flex;flex-direction:column"><span style="font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:600">MUNYCH</span><span style="font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.5)">ADMIN</span></div></div>
+    <nav style="display:flex;flex-direction:column;gap:2px"><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Dashboard</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Comités</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Países</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Jueces</span><span class="nv" style="background:rgba(255,255,255,.12);color:#fff;font-weight:600">Staff<span class="nv-new">NUEVO</span></span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Criterios</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Resultados</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Exportar</span></nav>
+    <div class="sb-ev"><span style="font-size:11px;color:rgba(255,255,255,.55)">Evento activo</span><span style="font-size:13px;color:#fff;font-weight:600">MUNYCH 2026</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative">
+    <div class="top">
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;color:#5B6B7C"><span style="color:#418FDE;font-weight:600">Staff</span> <span style="color:#98A6B5">/</span> Prensa</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#0B2A4A">Staff</span><span style="font-size:12px;color:#5B6B7C">MUNYCH 2026 · 5 tipos de staff · 30 miembros</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Usar plantilla</button><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">+ Añadir criterio</button><div class="me">SG</div></div>
+    </div>
+    <div style="display:flex;flex:1;min-height:0">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="th-wrap">
+      <div style="display:flex;align-items:center;gap:14px"><span class="tag" style="width:42px;height:42px;background:#418FDE;font-size:12px">PR</span>
+        <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;color:#0B2A4A;line-height:1.1">Prensa</span><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span></div>
+        <div style="font-size:12px;color:#5B6B7C;margin-top:3px">Evalúa a <b style="color:#1B2733;font-weight:600">delegados de prensa</b> · solo premios, no cuenta en la nota staff</div></div>
+        <div style="display:flex;align-items:center;gap:18px;flex:none">
+          <div class="mini"><span class="kpi-l">MIEMBROS</span><span class="mini-v">6</span></div>
+          <div class="mini"><span class="kpi-l">CANDIDATOS</span><span class="mini-v">16</span></div>
+          <div class="mini"><span class="kpi-l">AVANCE</span><div style="display:flex;align-items:center;gap:8px"><span class="mini-v">71%</span><div style="width:54px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:71%;height:100%;background:#C9A227"></div></div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:16px"><span class="tab" style-hover="color:#0B2A4A">Miembros <span class="tab-n">6</span></span><span class="tab" style="color:#0B2A4A;border-bottom-color:#0B2A4A;font-weight:600">Rúbrica <span class="tab-n">5 criterios</span></span><span class="tab" style-hover="color:#0B2A4A">Premios <span class="tab-n">2</span></span><span class="tab" style-hover="color:#0B2A4A">Configuración <span class="tab-n"></span></span></div>
+    </div>
+        <div class="ct" style="padding-top:18px"><div class="card" style="display:grid;grid-template-columns:repeat(4,1fr) auto;align-items:center">
+      <div class="sc"><span class="kpi-l">EVALÚA A</span><span class="sc-v">Delegados de prensa</span></div>
+      <div class="sc"><span class="kpi-l">ALCANCE</span><span class="sc-v">Todos los comités</span></div>
+      <div class="sc"><span class="kpi-l">EVALUADORES</span><span class="sc-v">Mín. 2 · escala 0–10</span></div>
+      <div class="sc"><span class="kpi-l">NOTA STAFF</span><span class="sc-v">No cuenta</span></div>
+      <span style="padding:0 20px;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="card" style="overflow:hidden"><div class="row hd" style="grid-template-columns:24px 1.5fr 2.5fr 112px 44px"><span></span><span>CRITERIO</span><span>DESCRIPCIÓN PARA EL EVALUADOR</span><span style="text-align:right">PESO</span><span></span></div><div class="row" style="grid-template-columns:24px 1.5fr 2.5fr 112px 44px;background:#F5F9FF" style-hover="background:#F9FAFC">
+      <span style="color:#CBD5E1;font-size:16px">⠿</span>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:2px;background:#0B2A4A;flex:none"></span><span style="font-size:14px;font-weight:600;color:#1B2733">Calidad periodística</span></div>
+      <span style="font-size:12px;color:#5B6B7C;line-height:1.45">Relevancia, veracidad y ángulo de las notas publicadas.</span>
+      <div style="justify-self:end;display:flex;align-items:center;gap:10px"><div style="width:52px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:60%;height:100%;background:#418FDE"></div></div><span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A;min-width:40px;text-align:right">30%</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:24px 1.5fr 2.5fr 112px 44px" style-hover="background:#F9FAFC">
+      <span style="color:#CBD5E1;font-size:16px">⠿</span>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:2px;background:#123B63;flex:none"></span><span style="font-size:14px;font-weight:600;color:#1B2733">Investigación y fuentes</span></div>
+      <span style="font-size:12px;color:#5B6B7C;line-height:1.45">Uso de datos, citas y contraste de fuentes.</span>
+      <div style="justify-self:end;display:flex;align-items:center;gap:10px"><div style="width:52px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:50%;height:100%;background:#418FDE"></div></div><span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A;min-width:40px;text-align:right">25%</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:24px 1.5fr 2.5fr 112px 44px" style-hover="background:#F9FAFC">
+      <span style="color:#CBD5E1;font-size:16px">⠿</span>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:2px;background:#2F6BA8;flex:none"></span><span style="font-size:14px;font-weight:600;color:#1B2733">Redacción y estilo</span></div>
+      <span style="font-size:12px;color:#5B6B7C;line-height:1.45">Claridad, ortografía y estilo periodístico.</span>
+      <div style="justify-self:end;display:flex;align-items:center;gap:10px"><div style="width:52px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:40%;height:100%;background:#418FDE"></div></div><span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A;min-width:40px;text-align:right">20%</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:24px 1.5fr 2.5fr 112px 44px" style-hover="background:#F9FAFC">
+      <span style="color:#CBD5E1;font-size:16px">⠿</span>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:2px;background:#418FDE;flex:none"></span><span style="font-size:14px;font-weight:600;color:#1B2733">Cobertura de comités</span></div>
+      <span style="font-size:12px;color:#5B6B7C;line-height:1.45">Variedad de comités y momentos cubiertos.</span>
+      <div style="justify-self:end;display:flex;align-items:center;gap:10px"><div style="width:52px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:30%;height:100%;background:#418FDE"></div></div><span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A;min-width:40px;text-align:right">15%</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:24px 1.5fr 2.5fr 112px 44px" style-hover="background:#F9FAFC">
+      <span style="color:#CBD5E1;font-size:16px">⠿</span>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:2px;background:#7BB4E9;flex:none"></span><span style="font-size:14px;font-weight:600;color:#1B2733">Puntualidad de entregas</span></div>
+      <span style="font-size:12px;color:#5B6B7C;line-height:1.45">Entrega dentro de los cierres de edición.</span>
+      <div style="justify-self:end;display:flex;align-items:center;gap:10px"><div style="width:52px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:20%;height:100%;background:#418FDE"></div></div><span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A;min-width:40px;text-align:right">10%</span></div>
+      <span style="justify-self:end;font-size:12px;font-weight:600;color:#418FDE">Editar</span>
+    </div><div class="row" style="grid-template-columns:1fr auto;background:#F5F9FF"><div style="display:flex;align-items:center;gap:12px"><span style="font-size:13px;font-weight:600;color:#1B2733">Suma total de pesos</span><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDO</span></div><span style="font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#0B2A4A">100%</span></div></div>
+          <span style="font-size:11.5px;color:#5B6B7C">Arrastra <span style="color:#CBD5E1">⠿</span> para cambiar el orden en que el evaluador ve los criterios. Cambiar pesos con evaluaciones ya hechas recalcula las notas; no borra lo capturado.</span>
+        </div>
+      </div><div class="panel">
+      <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#0B2A4A">Editar criterio</span><span style="color:#5B6B7C;font-size:15px">✕</span></div>
+      <label class="fl"><span class="fl-l">Nombre</span><span class="in" style="color:#1B2733">Calidad periodística</span></label>
+      <label class="fl"><span class="fl-l">Descripción para el evaluador</span><span class="in" style="min-height:62px;align-items:flex-start;line-height:1.5">Relevancia, veracidad y ángulo de las notas publicadas.</span></label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label class="fl"><span class="fl-l">Escala</span><span class="in" style="color:#1B2733">0 – 10 ▾</span></label><label class="fl"><span class="fl-l">Paso</span><span class="in" style="color:#1B2733">0.5 ▾</span></label></div>
+      <div class="fl"><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="fl-l">Peso</span><span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#0B2A4A">30%</span></div>
+        <div style="position:relative;height:26px;display:flex;align-items:center"><div style="width:100%;height:4px;border-radius:2px;background:#E3E8EF"><div style="width:60%;height:100%;background:#0B2A4A;border-radius:2px"></div></div><span style="position:absolute;left:calc(60% - 13px);width:26px;height:26px;border-radius:50%;background:#0B2A4A;border:3px solid #fff;box-shadow:0 1px 4px rgba(11,42,74,.35)"></span></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#98A6B5"><span>0%</span><span>50%</span></div></div>
+      <div style="background:#F5F7FA;border:1px solid #E3E8EF;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px">
+        <span class="kpi-l">REPARTO ACTUAL</span>
+        <div style="display:flex;height:10px;border-radius:5px;overflow:hidden"><span style="width:30%;background:#0B2A4A"></span><span style="width:25%;background:#123B63"></span><span style="width:20%;background:#2F6BA8"></span><span style="width:15%;background:#418FDE"></span><span style="width:10%;background:#7BB4E9"></span></div>
+        <div style="display:flex;flex-direction:column;gap:5px"><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#5B6B7C"><i style="width:8px;height:8px;border-radius:2px;background:#0B2A4A"></i>Calidad periodística · 30%</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#5B6B7C"><i style="width:8px;height:8px;border-radius:2px;background:#123B63"></i>Investigación y fuentes · 25%</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#5B6B7C"><i style="width:8px;height:8px;border-radius:2px;background:#2F6BA8"></i>Redacción y estilo · 20%</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#5B6B7C"><i style="width:8px;height:8px;border-radius:2px;background:#418FDE"></i>Cobertura de comités · 15%</span><span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#5B6B7C"><i style="width:8px;height:8px;border-radius:2px;background:#7BB4E9"></i>Puntualidad de entregas · 10%</span></div>
+        <span style="font-size:11px;color:#1F6B52;font-weight:600">5 criterios · suma 100% · sin sobrantes</span>
+      </div>
+      <div class="callout" style="background:#EAF3FC;border-color:#CFE3F7;color:#2F6BA8">La escala es solo para el evaluador. Para el ranking de premios la nota se normaliza a <b>0–100</b>.</div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:auto"><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Cancelar</button><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">Guardar</button></div>
+    </div></div>
+  </div>
+</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="04 Prensa — Premios">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5B6B7C;font-weight:600">04 · Staff · Prensa — Premios</span><span style="font-size:12px;color:#98A6B5">Premios propios del staff y ranking de candidatos</span></div>
+        <div class="frame" style="min-height:900px">
+  <div class="sb">
+    <div class="sb-brand"><div class="sb-mark">M</div><div style="display:flex;flex-direction:column"><span style="font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:600">MUNYCH</span><span style="font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.5)">ADMIN</span></div></div>
+    <nav style="display:flex;flex-direction:column;gap:2px"><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Dashboard</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Comités</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Países</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Jueces</span><span class="nv" style="background:rgba(255,255,255,.12);color:#fff;font-weight:600">Staff<span class="nv-new">NUEVO</span></span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Criterios</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Resultados</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Exportar</span></nav>
+    <div class="sb-ev"><span style="font-size:11px;color:rgba(255,255,255,.55)">Evento activo</span><span style="font-size:13px;color:#fff;font-weight:600">MUNYCH 2026</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative">
+    <div class="top">
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:11px;color:#5B6B7C"><span style="color:#418FDE;font-weight:600">Staff</span> <span style="color:#98A6B5">/</span> Prensa</span><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#0B2A4A">Staff</span><span style="font-size:12px;color:#5B6B7C">MUNYCH 2026 · 5 tipos de staff · 30 miembros</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Exportar ranking</button><div class="me">SG</div></div>
+    </div>
+    <div style="display:flex;flex:1;min-height:0">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="th-wrap">
+      <div style="display:flex;align-items:center;gap:14px"><span class="tag" style="width:42px;height:42px;background:#418FDE;font-size:12px">PR</span>
+        <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:10px"><span style="font-family:'Playfair Display',serif;font-size:25px;font-weight:600;color:#0B2A4A;line-height:1.1">Prensa</span><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span></div>
+        <div style="font-size:12px;color:#5B6B7C;margin-top:3px">Evalúa a <b style="color:#1B2733;font-weight:600">delegados de prensa</b> · solo premios, no cuenta en la nota staff</div></div>
+        <div style="display:flex;align-items:center;gap:18px;flex:none">
+          <div class="mini"><span class="kpi-l">MIEMBROS</span><span class="mini-v">6</span></div>
+          <div class="mini"><span class="kpi-l">CANDIDATOS</span><span class="mini-v">16</span></div>
+          <div class="mini"><span class="kpi-l">AVANCE</span><div style="display:flex;align-items:center;gap:8px"><span class="mini-v">71%</span><div style="width:54px;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:71%;height:100%;background:#C9A227"></div></div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:16px"><span class="tab" style-hover="color:#0B2A4A">Miembros <span class="tab-n">6</span></span><span class="tab" style-hover="color:#0B2A4A">Rúbrica <span class="tab-n">5 criterios</span></span><span class="tab" style="color:#0B2A4A;border-bottom-color:#0B2A4A;font-weight:600">Premios <span class="tab-n">2</span></span><span class="tab" style-hover="color:#0B2A4A">Configuración <span class="tab-n"></span></span></div>
+    </div>
+        <div class="ct" style="padding-top:18px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><div class="kpi-l">PREMIO</div><div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:#0B2A4A;margin-top:3px">Mejor periodista</div></div><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>ASIGNADO</span></div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12px"><span style="color:#5B6B7C">Ganadores</span><span style="color:#1B2733;font-weight:600">1</span><span style="color:#5B6B7C">Ámbito</span><span style="color:#1B2733">Todo el evento</span><span style="color:#5B6B7C">Selección</span><span style="color:#1B2733">Mayor nota de la rúbrica</span><span style="color:#5B6B7C">Desempate</span><span style="color:#1B2733">Calidad periodística</span></div>
+    </div>
+      <div class="card" style="padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div><div class="kpi-l">PREMIO</div><div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:#0B2A4A;margin-top:3px">Mención de prensa</div></div><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>1 DE 2</span></div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12px"><span style="color:#5B6B7C">Ganadores</span><span style="color:#1B2733;font-weight:600">2</span><span style="color:#5B6B7C">Ámbito</span><span style="color:#1B2733">Todo el evento</span><span style="color:#5B6B7C">Selección</span><span style="color:#1B2733">Siguientes 2 notas</span><span style="color:#5B6B7C">Desempate</span><span style="color:#1B2733">Investigación y fuentes</span></div>
+    </div>
+    </div>
+    <span style="font-size:12px;font-weight:600;color:#418FDE;margin-top:-6px">+ Añadir premio</span><div class="card" style="overflow:hidden"><div style="padding:14px 20px;border-bottom:1px solid #E3E8EF;display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;font-weight:600;color:#1B2733">Ranking de candidatos · Delegados de prensa</span><span style="font-size:11.5px;color:#5B6B7C">Promedio de evaluadores, normalizado a 0–100</span></div><div class="row hd" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr"><span>POS.</span><span>CANDIDATO · MEDIO · COMITÉS</span><span>EVALUACIONES</span><span style="text-align:right">NOTA</span><span style="text-align:right">PREMIO</span></div><div class="row" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr;background:#FDFBF3" style-hover="background:#F9FAFC">
+      <div><span class="md" style="background:#C9A227;color:#fff">1</span></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Sofía Méndez</div><div style="font-size:11.5px;color:#5B6B7C">The MUNYCH Times · AG · CS · Crisis</div></div>
+      <span style="font-size:12px;color:#5B6B7C;font-weight:400">3 de 2 mín.</span>
+      <span style="justify-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#0B2A4A">92.40</span>
+      <div style="justify-self:end"><span class="aw" style="background:#FBF4DF;color:#8A6F12;border-color:#F0E2B6">✓ Mejor periodista</span></div>
+    </div><div class="row" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr" style-hover="background:#F9FAFC">
+      <div><span class="md" style="background:#CBD5E1;color:#1B2733">2</span></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Andrés Pineda</div><div style="font-size:11.5px;color:#5B6B7C">Diplomatic Post · CS · ECOSOC</div></div>
+      <span style="font-size:12px;color:#5B6B7C;font-weight:400">3 de 2 mín.</span>
+      <span style="justify-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#0B2A4A">89.75</span>
+      <div style="justify-self:end"><span class="aw" style="background:#E7F4EF;color:#1F6B52;border-color:#CDE9DE">✓ Mención de prensa</span></div>
+    </div><div class="row" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr" style-hover="background:#F9FAFC">
+      <div><span class="md" style="background:#D8A47F;color:#fff">3</span></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Paula Ríos</div><div style="font-size:11.5px;color:#5B6B7C">Agencia MUN · AG · DISEC</div></div>
+      <span style="font-size:12px;color:#5B6B7C;font-weight:400">2 de 2 mín.</span>
+      <span style="justify-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#0B2A4A">88.10</span>
+      <div style="justify-self:end"><span style="font-size:12px;font-weight:600;color:#418FDE">Asignar mención ›</span></div>
+    </div><div class="row" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr" style-hover="background:#F9FAFC">
+      <div><span class="md" style="background:#F2F4F8;color:#5B6B7C">4</span></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Iker Domínguez</div><div style="font-size:11.5px;color:#5B6B7C">The MUNYCH Times · CIJ</div></div>
+      <span style="font-size:12px;color:#5B6B7C;font-weight:400">2 de 2 mín.</span>
+      <span style="justify-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#0B2A4A">84.30</span>
+      <div style="justify-self:end"><span style="font-size:12px;color:#98A6B5">—</span></div>
+    </div><div class="row" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr" style-hover="background:#F9FAFC">
+      <div><span class="md" style="background:#F2F4F8;color:#5B6B7C">5</span></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Renata Cruz</div><div style="font-size:11.5px;color:#5B6B7C">Diplomatic Post · ECOSOC</div></div>
+      <span style="font-size:12px;color:#A1322D;font-weight:600">1 de 2 mín.</span>
+      <span style="justify-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#0B2A4A">81.05</span>
+      <div style="justify-self:end"><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>FALTAN EVALUACIONES</span></div>
+    </div><div class="row" style="grid-template-columns:50px 2.2fr 1fr 80px 1.5fr" style-hover="background:#F9FAFC">
+      <div><span style="font-size:12px;color:#98A6B5;padding-left:8px">—</span></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Tomás Vega</div><div style="font-size:11.5px;color:#5B6B7C">Agencia MUN · Crisis</div></div>
+      <span style="font-size:12px;color:#A1322D;font-weight:600">0 de 2 mín.</span>
+      <span style="justify-self:end;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:#98A6B5">—</span>
+      <div style="justify-self:end"><span class="bd" style="background:#F2F4F8;color:#5B6B7C"><i style="background:#98A6B5"></i>SIN EVALUAR</span></div>
+    </div></div></div>
+      </div><div class="panel">
+      <span style="font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#0B2A4A">Premios de Prensa</span>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="sum-row" style="border-color:#0B2A4A"><span class="cb" style="background:#0B2A4A;border-color:#0B2A4A;color:#fff">✓</span><div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:#1B2733">Mejor periodista</div><div style="font-size:12px;color:#5B6B7C">Sofía Méndez · 92.40</div></div></div>
+        <div class="sum-row" style="border-color:#0B2A4A"><span class="cb" style="background:#0B2A4A;border-color:#0B2A4A;color:#fff">✓</span><div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:#1B2733">Mención de prensa · 1</div><div style="font-size:12px;color:#5B6B7C">Andrés Pineda · 89.75</div></div></div>
+        <div class="sum-row" style="border-style:dashed"><span class="cb"></span><div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:#5B6B7C">Mención de prensa · 2</div><div style="font-size:12px;color:#98A6B5">Sugerido: Paula Ríos · 88.10</div></div><span style="font-size:12px;font-weight:600;color:#418FDE">Asignar</span></div>
+      </div>
+      <div class="callout">La nota de la rúbrica <b>solo sugiere</b>. El admin confirma cada premio; puede elegir a otro candidato si lo justifica.</div>
+      <div class="callout" style="background:#EAF3FC;border-color:#CFE3F7;color:#2F6BA8">Los premios de staff salen en el acta en una sección <b>Premios especiales</b>, después del resumen de premiación.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto"><button class="btn" disabled style="background:#F2F4F8;color:#98A6B5;border:1px solid #E3E8EF;cursor:not-allowed;width:100%">Confirmar premios de Prensa</button><span style="text-align:center;font-size:11px;color:#5B6B7C">Falta asignar 1 mención</span></div>
+    </div></div>
+  </div>
+</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="05 Nuevo tipo de staff">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5B6B7C;font-weight:600">05 · Staff · Nuevo tipo de staff</span><span style="font-size:12px;color:#98A6B5">Asistente en 4 pasos — paso 2: evaluación y premios</span></div>
+        <div class="frame" style="min-height:900px">
+  <div class="sb">
+    <div class="sb-brand"><div class="sb-mark">M</div><div style="display:flex;flex-direction:column"><span style="font-family:'Playfair Display',serif;font-size:15px;color:#fff;font-weight:600">MUNYCH</span><span style="font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.5)">ADMIN</span></div></div>
+    <nav style="display:flex;flex-direction:column;gap:2px"><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Dashboard</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Comités</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Países</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Jueces</span><span class="nv" style="background:rgba(255,255,255,.12);color:#fff;font-weight:600">Staff<span class="nv-new">NUEVO</span></span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Criterios</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Resultados</span><span class="nv" style-hover="background:rgba(255,255,255,.06);color:#FFFFFF">Exportar</span></nav>
+    <div class="sb-ev"><span style="font-size:11px;color:rgba(255,255,255,.55)">Evento activo</span><span style="font-size:13px;color:#fff;font-weight:600">MUNYCH 2026</span></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;position:relative">
+    <div class="top">
+      <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#0B2A4A">Staff</span><span style="font-size:12px;color:#5B6B7C">MUNYCH 2026 · 5 tipos de staff · 30 miembros</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><span class="search">Buscar staff o persona…</span><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">+ Nuevo tipo de staff</button><div class="me">SG</div></div>
+    </div>
+    <div class="ct"><div class="card" style="overflow:hidden"><div class="row hd" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px"><span>TIPO DE STAFF</span><span>EVALÚA</span><span>MIEMBROS</span><span>RÚBRICA</span><span>PREMIOS PROPIOS</span><span>NOTA STAFF</span><span>AVANCE</span><span style="text-align:right">ESTADO</span></div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px;background:#F5F9FF" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#418FDE;font-size:12px">PR</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Prensa</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Evalúa artículos y coberturas de los delegados de prensa.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Delegados de prensa</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">VG</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">RS</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">CO</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">MI</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">6 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">5 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDA</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Mejor periodista</span><span class="aw">Mención de prensa ×2</span></div>
+      <div><span style="font-size:11.5px;color:#5B6B7C">Solo premios</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:71%;height:100%;background:#C9A227"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">71%</span></div><span style="font-size:10.5px;color:#5B6B7C">34 de 48 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#2F6BA8;font-size:12px">ES</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Escritura</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Califica los escritos de posición de cada delegación.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Escritos de posición</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">AM</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">JT</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">NB</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">PL</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">8 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">5 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDA</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Mejor escrito de defensa · por comité</span></div>
+      <div><span style="font-size:11.5px;color:#5B6B7C">Solo premios</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:82%;height:100%;background:#C9A227"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">82%</span></div><span style="font-size:10.5px;color:#5B6B7C">120 de 146 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#FBF4DF;color:#8A6F12"><i style="background:#C9A227"></i>EN CURSO</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#C9A227;font-size:12px">PJ</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Pajes y protocolo</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Observa conducta, protocolo y trato al staff en sala.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Delegaciones</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">SR</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">BT</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">IC</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">FM</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">12 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">3 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>VÁLIDA</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Delegación más diplomática</span></div>
+      <div><span style="font-size:11.5px;font-weight:600;color:#1F6B52">Cuenta 10 % en nota staff</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:100%;height:100%;background:#2F8F6E"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">100%</span></div><span style="font-size:10.5px;color:#5B6B7C">146 de 146 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#E7F4EF;color:#1F6B52"><i style="background:#2F8F6E"></i>COMPLETO</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#123B63;font-size:12px">CR</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Crisis</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Backroom del gabinete: evalúa directivas y respuesta a eventos.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">Delegados · Gabinete de Crisis</span>
+      <div style="display:flex;align-items:center"><span style="margin-left:0px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#5B6B7C;font-size:11px">AL</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#0B2A4A;font-size:11px">MV</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#123B63;font-size:11px">RP</span></span><span style="margin-left:-8px;border:2px solid #fff;border-radius:50%;display:inline-flex"><span class="av" style="width:26px;height:26px;background:#418FDE;font-size:11px">CS</span></span><span style="font-size:12px;color:#5B6B7C;margin-left:8px">4 miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">4 criterios</span><div style="margin-top:4px"><span class="bd" style="background:#FBECEB;color:#A1322D"><i style="background:#C2413B"></i>SUMA 85 %</span></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span class="aw">Mejor directiva de crisis</span></div>
+      <div><span style="font-size:11.5px;color:#5B6B7C">Solo premios</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;align-items:center;gap:10px"><div style="width:100%;height:6px;border-radius:3px;background:#E3E8EF;overflow:hidden"><div style="width:2.5%;height:100%;background:#98A6B5"></div></div><span style="font-size:12px;font-weight:600;color:#1B2733;min-width:34px;text-align:right">0%</span></div><span style="font-size:10.5px;color:#5B6B7C">0 de 12 evaluaciones</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#F2F4F8;color:#5B6B7C"><i style="background:#98A6B5"></i>SIN INICIAR</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div><div class="row" style="grid-template-columns:2.7fr 1.15fr 1.3fr 1fr 1.6fr .95fr 1.35fr 96px" style-hover="background:#F9FAFC">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0"><span class="tag" style="width:34px;height:34px;background:#98A6B5;font-size:12px">FO</span><div style="min-width:0"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Fotografía</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4">Cobertura visual del evento.</div></div></div>
+      <span style="font-size:12.5px;color:#1B2733">—</span>
+      <div style="display:flex;align-items:center"><span style="font-size:12px;color:#98A6B5">Sin miembros</span></div>
+      <div><span style="font-size:12.5px;color:#1B2733">Sin rúbrica</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px"><span style="font-size:12px;color:#98A6B5">—</span></div>
+      <div><span style="font-size:12px;color:#98A6B5">—</span></div>
+      <div style="display:flex;flex-direction:column;gap:5px"><span style="font-size:12px;color:#98A6B5">—</span></div>
+      <div style="justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:6px"><span class="bd" style="background:#F2F4F8;color:#5B6B7C"><i style="background:#98A6B5"></i>SIN CONFIGURAR</span><span style="font-size:12px;font-weight:600;color:#418FDE">Abrir ›</span></div>
+    </div></div></div><div style="position:absolute;inset:0;background:rgba(11,42,74,.42);display:flex;align-items:flex-start;justify-content:center;padding-top:36px">
+      <div style="width:720px;background:#fff;border-radius:12px;box-shadow:0 18px 40px rgba(11,42,74,.14);display:flex;flex-direction:column;overflow:hidden">
+        <div style="padding:20px 24px 16px;border-bottom:1px solid #E3E8EF">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="kpi-l">NUEVO TIPO DE STAFF</div><div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#0B2A4A;margin-top:2px">Oratoria</div></div><span style="color:#5B6B7C;font-size:16px">✕</span></div>
+          <div style="display:flex;gap:22px;margin-top:14px"><div style="display:flex;align-items:center;gap:8px"><span class="st" style="background:#2F8F6E;color:#fff">✓</span><span style="font-size:12px;font-weight:600;color:#1B2733">Datos</span></div><div style="display:flex;align-items:center;gap:8px"><span class="st" style="background:#0B2A4A;color:#fff">2</span><span style="font-size:12px;font-weight:700;color:#0B2A4A">Evaluación y premios</span></div><div style="display:flex;align-items:center;gap:8px"><span class="st" style="background:#F2F4F8;color:#5B6B7C">3</span><span style="font-size:12px;font-weight:500;color:#5B6B7C">Rúbrica</span></div><div style="display:flex;align-items:center;gap:8px"><span class="st" style="background:#F2F4F8;color:#5B6B7C">4</span><span style="font-size:12px;font-weight:500;color:#5B6B7C">Miembros</span></div></div>
+        </div>
+        <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;flex-direction:column;gap:8px"><span class="fl-l">¿Qué evalúa este staff?</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div class="opt" style="border:1px solid #E3E8EF;background:#fff" style-hover="border-color:#418FDE"><span style="width:16px;height:16px;border-radius:50%;border:1.5px solid #CBD5E1;flex:none"></span><div><div style="font-size:13px;font-weight:600;color:#1B2733">Delegaciones</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4;margin-top:2px">Una nota por país o personaje (p. ej. pajes, protocolo).</div></div></div>
+              <div class="opt" style="border:1.5px solid #0B2A4A;background:#F5F9FF" style-hover="border-color:#418FDE"><span style="width:16px;height:16px;border-radius:50%;border:5px solid #0B2A4A;background:#fff;flex:none"></span><div><div style="font-size:13px;font-weight:600;color:#1B2733">Delegados individuales</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4;margin-top:2px">Una nota por persona; en delegaciones dobles, por separado.</div></div></div>
+              <div class="opt" style="border:1px solid #E3E8EF;background:#fff" style-hover="border-color:#418FDE"><span style="width:16px;height:16px;border-radius:50%;border:1.5px solid #CBD5E1;flex:none"></span><div><div style="font-size:13px;font-weight:600;color:#1B2733">Escritos de posición</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4;margin-top:2px">Un documento por delegación; se califica el escrito, no la sesión.</div></div></div>
+              <div class="opt" style="border:1px solid #E3E8EF;background:#fff" style-hover="border-color:#418FDE"><span style="width:16px;height:16px;border-radius:50%;border:1.5px solid #CBD5E1;flex:none"></span><div><div style="font-size:13px;font-weight:600;color:#1B2733">Delegados de prensa</div><div style="font-size:11.5px;color:#5B6B7C;line-height:1.4;margin-top:2px">Solo participantes inscritos como prensa.</div></div></div>
+            </div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="fl"><span class="fl-l">Alcance</span><div class="seg"><span style="background:#fff;color:#0B2A4A;font-weight:600;box-shadow:0 1px 2px rgba(11,42,74,.12)">Todos los comités</span><span>Elegir comités</span></div></div>
+            <div class="fl"><span class="fl-l">Evaluadores mínimos por candidato</span><div class="in" style="justify-content:space-between"><span style="color:#5B6B7C">−</span><b style="color:#1B2733">2</b><span style="color:#5B6B7C">+</span></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px"><span class="fl-l">Premios que otorga</span>
+            <div style="display:grid;grid-template-columns:2fr 90px 1.2fr 24px;gap:10px;align-items:center">
+              <span class="in">Mejor orador</span><span class="in" style="justify-content:center">1</span><span class="in" style="justify-content:space-between">Por comité <span style="color:#5B6B7C">▾</span></span><span style="color:#98A6B5;text-align:center">✕</span>
+              <span class="in">Mención de oratoria</span><span class="in" style="justify-content:center">2</span><span class="in" style="justify-content:space-between">Todo el evento <span style="color:#5B6B7C">▾</span></span><span style="color:#98A6B5;text-align:center">✕</span>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:#418FDE">+ Añadir premio</span>
+            <span style="font-size:11px;color:#5B6B7C">“Por comité” entrega 1 ganador en cada comité del alcance (8 premios en MUNYCH 2026).</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:#F5F7FA;border-radius:10px;padding:12px 14px">
+            <div><div style="font-size:13px;font-weight:600;color:#1B2733">Cuenta para la nota staff del ranking</div><div style="font-size:11.5px;color:#5B6B7C;margin-top:2px">Si se activa, su promedio entra en el peso Staff del tipo de evento (MUN regular · 10 %). Si no, solo decide sus premios.</div></div><span class="tg" style="background:#CBD5E1;justify-content:flex-start"><i></i></span></div>
+          <div class="fl"><span class="fl-l">Empezar la rúbrica desde</span><span class="in" style="justify-content:space-between">Plantilla · Oratoria (4 criterios) <span style="color:#5B6B7C">▾</span></span></div>
+        </div>
+        <div style="padding:14px 24px;border-top:1px solid #E3E8EF;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:#418FDE">‹ Datos</span><div style="display:flex;gap:10px"><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Cancelar</button><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">Siguiente: rúbrica ›</button></div></div>
+      </div></div>
+  </div>
+</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px" data-screen-label="06 Estados">
+        <div style="display:flex;align-items:baseline;gap:12px"><span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#5B6B7C;font-weight:600">06 · Staff · Estados</span><span style="font-size:12px;color:#98A6B5">Sin miembros · rúbrica inválida · evaluaciones insuficientes</span></div>
+        <div style="width:1340px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px"><div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <span class="kpi-l">A · STAFF SIN MIEMBROS</span>
+      <div style="display:flex;align-items:center;gap:12px"><span class="tag" style="width:34px;height:34px;background:#98A6B5;font-size:12px">FO</span><div><div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A">Fotografía</div><div style="font-size:11.5px;color:#5B6B7C">Sin rúbrica · sin premios</div></div></div>
+      <div class="dash" style="margin:0;align-items:center;text-align:center;padding:22px"><span style="font-size:13px;font-weight:600;color:#0B2A4A">Este staff todavía no tiene miembros</span><span style="font-size:12px;color:#5B6B7C">Añade al menos un coordinador para poder enviar invitaciones.</span><div style="margin-top:6px"><button class="btn" style="background:#0B2A4A;color:#fff;border:0" style-hover="background:#123B63">+ Añadir miembro</button></div></div>
+      <span style="font-size:11px;color:#5B6B7C">En la lista de tipos aparece como <b>SIN CONFIGURAR</b> y no entra en el avance global.</span>
+    </div><div class="card" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <span class="kpi-l">B · RÚBRICA QUE NO SUMA 100 %</span>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#0B2A4A">Crisis · rúbrica</div>
+      <div><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid #EEF1F5"><span style="color:#1B2733">Calidad de la directiva</span><span style="font-family:'Playfair Display',serif;font-weight:600;color:#0B2A4A">35%</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid #EEF1F5"><span style="color:#1B2733">Realismo y consecuencias</span><span style="font-family:'Playfair Display',serif;font-weight:600;color:#0B2A4A">25%</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid #EEF1F5"><span style="color:#1B2733">Coordinación con el backroom</span><span style="font-family:'Playfair Display',serif;font-weight:600;color:#0B2A4A">15%</span></div><div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid #EEF1F5"><span style="color:#1B2733">Creatividad</span><span style="font-family:'Playfair Display',serif;font-weight:600;color:#0B2A4A">10%</span></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#FBECEB;border:1px solid #F2CFCC;border-radius:8px;padding:10px 12px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;font-weight:600;color:#A1322D">Suma total</span><span class="bd" style="background:#FBECEB;color:#A1322D"><i style="background:#C2413B"></i>FALTAN 15 %</span></div><span style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#A1322D">85%</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;color:#5B6B7C">No se puede guardar ni abrir la evaluación hasta llegar a 100 %.</span><button class="btn" disabled style="background:#F2F4F8;color:#98A6B5;border:1px solid #E3E8EF;cursor:not-allowed">Guardar</button></div>
+    </div><div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <span class="kpi-l">C · CANDIDATO CON EVALUACIONES INSUFICIENTES</span>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #E3E8EF;border-radius:10px"><span style="font-size:12px;color:#98A6B5;width:22px">5</span><div style="flex:1"><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#0B2A4A">Renata Cruz</div><div style="font-size:11.5px;color:#A1322D;font-weight:600">1 de 2 evaluaciones mínimas</div></div><span style="font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:#98A6B5">81.05</span></div>
+      <div class="callout">Con menos evaluaciones que el mínimo, la nota se muestra en gris y el candidato <b>no recibe sugerencia de premio</b>. El admin puede asignarlo igual, con confirmación.</div>
+      <div style="display:flex;gap:8px"><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Recordar a evaluadores</button><button class="btn" style="background:#fff;color:#0B2A4A;border:1px solid #CBD5E1" style-hover="border-color:#0B2A4A">Asignar evaluador</button></div>
+    </div></div>
+      </div></div>
+  </section>
+</div>
+</x-dc>
+</body>
+</html>

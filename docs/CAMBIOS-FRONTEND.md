@@ -307,7 +307,23 @@ Comparación con la bóveda de Obsidian (`Documents\Proyectos`): todo lo program
 
 - **Hoja de QR en PDF** (2026-11-07, a partir de la muestra «Accesos de votación MUNYCH»): en Votación, tras generar los accesos, «Descargar hoja de QR (PDF para imprimir)» pide al backend `voter-tokens/sheet.pdf` con los accesos recién generados (9 tarjetas por hoja, por comité, con QR, nombre, delegación y código de respaldo). Sustituye a la hoja HTML de `lib/voterSheets.ts`; el CSV sigue igual.
 
-`TODO(cliente)` de este hito: diseño de los **diplomas** (el acta ya está); URL definitiva de la página pública para `VITE_PUBLIC_RESULTS_URL` (en `.env.production`); ¿el ranking general debe mezclar comités con rúbricas distintas o solo mostrarse por tipo de comité?
+`TODO(cliente)` del hito 14: diseño de los **diplomas** (el acta ya está); URL definitiva de la página pública para `VITE_PUBLIC_RESULTS_URL` (en `.env.production`); ¿el ranking general debe mezclar comités con rúbricas distintas o solo mostrarse por tipo de comité?
+
+---
+
+## Hito 15 — Gestión de staff (2026-11-08)
+
+Handoff `gestion-staff/` (6 pantallas). **Decisión de diseño**: pantallas nuevas con tokens existentes; los tokens nuevos del handoff (error, info) viven solo en `pages/admin/staff/Staff.module.css`. Backend: módulo `staff` y migración `20261108000100_staff` (solo tablas nuevas).
+
+- **El staff es de la organización**, no de un evento: tipos, personas, rúbricas y premios se definen una vez. Se administra desde el admin general (sidebar «Staff» y botón «Staff de la organización» en Eventos; `#/admin/staff`, con selector de evento) y también desde cada evento (`#/admin/eventos/:id/staff`, con ese evento fijo). El avance, los candidatos, el ranking y los premios (asignación y confirmación) son del evento elegido.
+- **01 Tipos de staff**: KPIs, tabla y nota «Cómo funciona». **05 Asistente**: pasos Datos y Evaluación y premios; al continuar crea el tipo con la plantilla elegida y abre la Rúbrica (los pasos 3–4 se terminan en las pestañas).
+- **02 Miembros**: tabla, panel «Editar miembro» (rol, comités, cobertura mínima, correo), «Añadir otra persona» (staff y jueces de la organización o persona nueva), exmiembros (sus evaluaciones cuentan o no) y «Exportar lista» (CSV). **Invitación**: no se manda correo desde el sistema; «Guardar y enviar invitación» genera el enlace personal (solo se muestra una vez) con «Copiar enlace» y «Enviar por correo» (abre el correo del admin).
+- **03 Rúbrica**: borrador local con arrastre ⠿, panel «Editar criterio» (escala, paso, peso 0–50 %, reparto actual) y «Guardar rúbrica» solo si suma 100 %. La escala se bloquea si ya hay evaluaciones. **Configuración**: nombre, siglas, color, a quién evalúa, alcance, mínimo y «Cuenta en el ranking» (Solo premios · Nota staff · Nota mesa).
+- **04 Premios**: tarjetas (desempate editable), ranking del evento con filtro por comité, panel con los lugares, sugerencias, asignación a otro candidato con confirmación, «Confirmar premios» y «Reabrir premios».
+- **Vista del miembro** (`#/staff/evaluar/<token>`, sin cuenta): lista por staff y evento abierto, y formulario móvil del juez (`CriterionSlider`, ahora con prop `step`) con autoguardado.
+- Mocks: `src/mocks/staffHandlers.ts`.
+
+`TODO(cliente)`: criterios de las plantillas de rúbrica; qué evalúan el Comité Organizador y el Grupo Superior de Gestión; la sección **Premios especiales** del acta y de la página pública (aún no salen ahí).
 
 ---
 

@@ -24,6 +24,9 @@ const loaders = {
   ExportPage: () => import('./pages/admin/ExportPage').then((m) => m.ExportPage),
   VotingAccessPage: () => import('./pages/admin/VotingAccessPage').then((m) => m.VotingAccessPage),
   VotePage: () => import('./pages/vote/VotePage').then((m) => m.VotePage),
+  StaffPage: () => import('./pages/admin/staff/StaffPage').then((m) => m.StaffPage),
+  StaffTypePage: () => import('./pages/admin/staff/StaffTypePage').then((m) => m.StaffTypePage),
+  StaffEvaluatePage: () => import('./pages/staff/StaffEvaluatePage').then((m) => m.StaffEvaluatePage),
 } satisfies Record<string, () => Promise<ComponentType>>;
 
 const lazy = (name: keyof typeof loaders) => async () => ({ Component: await loaders[name]() });
@@ -39,6 +42,9 @@ const router = createHashRouter(
       {/* Boleta pública del delegado: entra con su token, sin cuenta (ADR-005). */}
       <Route path="/votar" lazy={lazy('VotePage')} />
       <Route path="/votar/:token" lazy={lazy('VotePage')} />
+      {/* Evaluación del staff: entra con su enlace personal, sin cuenta (hito 15). */}
+      <Route path="/staff/evaluar" lazy={lazy('StaffEvaluatePage')} />
+      <Route path="/staff/evaluar/:token" lazy={lazy('StaffEvaluatePage')} />
 
       <Route path="/juez" lazy={lazy('JudgeLayout')}>
         <Route index lazy={lazy('DashboardPage')} />
@@ -50,12 +56,17 @@ const router = createHashRouter(
       <Route path="/admin" lazy={lazy('AdminLayout')}>
         <Route index element={<Navigate to="eventos" replace />} />
         <Route path="eventos" lazy={lazy('EventsPage')} />
+        {/* El staff es de la organización: también se administra fuera de un evento. */}
+        <Route path="staff" lazy={lazy('StaffPage')} />
+        <Route path="staff/:typeId" lazy={lazy('StaffTypePage')} />
         <Route path="eventos/:eventId" lazy={lazy('EventScopeLayout')}>
           <Route index lazy={lazy('AdminDashboardPage')} />
           <Route path="comites" lazy={lazy('CommitteesPage')} />
           <Route path="sesiones" lazy={lazy('SessionsPage')} />
           <Route path="paises" lazy={lazy('CountriesPage')} />
           <Route path="jueces" lazy={lazy('JudgesPage')} />
+          <Route path="staff" lazy={lazy('StaffPage')} />
+          <Route path="staff/:typeId" lazy={lazy('StaffTypePage')} />
           <Route path="criterios" lazy={lazy('CriteriaPage')} />
           <Route path="resultados" lazy={lazy('ResultsPage')} />
           <Route path="exportar" lazy={lazy('ExportPage')} />

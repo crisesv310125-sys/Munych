@@ -33,8 +33,12 @@ const ERROR_MESSAGES: Record<string, string> = {
   INTERNAL_ERROR: 'Error inesperado del servidor.',
 };
 
-/** Códigos genéricos cuyo `detail` del backend (ya en español) dice más que el mensaje fijo. */
-const DETAIL_FIRST = new Set(['VALIDATION_ERROR', 'CONFLICT']);
+/**
+ * Códigos genéricos cuyo `detail` del backend (ya en español) dice más que el mensaje fijo.
+ * NOT_FOUND incluido: «Evento no encontrado» o «Algún delegado no pertenece a este evento»
+ * explican el problema; «No se encontró el recurso» no.
+ */
+const DETAIL_FIRST = new Set(['VALIDATION_ERROR', 'CONFLICT', 'NOT_FOUND']);
 
 export function translateErrorCode(code: string, fallback?: string): string {
   if (DETAIL_FIRST.has(code) && fallback) return fallback;

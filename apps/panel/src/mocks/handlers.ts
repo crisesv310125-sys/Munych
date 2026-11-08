@@ -60,6 +60,7 @@ import {
   rubrics,
   sessionsByCommittee,
 } from './fixtures';
+import { staffHandlers } from './staffHandlers';
 
 /**
  * Emulación en memoria del backend descrito en routes.md: mismas rutas, mismas formas y los
@@ -1317,4 +1318,6 @@ export const handlers = [
       return HttpResponse.json(ballot);
     }),
   ),
+  // Gestión de staff (hito 15).
+  ...staffHandlers,
 ];

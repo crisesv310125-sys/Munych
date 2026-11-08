@@ -15,9 +15,11 @@ interface CriterionSliderProps {
   max?: number;
   /** Descriptor del nivel actualmente seleccionado (p. ej. de una rúbrica 1-4). */
   descriptor?: string;
+  /** Paso del slider (las rúbricas de staff usan 0.5). Por defecto 1. */
+  step?: number;
 }
 
-export function CriterionSlider({ name, weight, value, onChange, min = 0, max = 100, descriptor }: CriterionSliderProps) {
+export function CriterionSlider({ name, weight, value, onChange, min = 0, max = 100, descriptor, step = 1 }: CriterionSliderProps) {
   const current = value ?? min;
   return (
     <div className={styles.card}>
@@ -33,7 +35,7 @@ export function CriterionSlider({ name, weight, value, onChange, min = 0, max = 
         className="sl"
         min={min}
         max={max}
-        step={1}
+        step={step}
         value={current}
         onChange={(e) => onChange(Number(e.target.value))}
       />

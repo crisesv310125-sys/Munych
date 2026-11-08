@@ -90,6 +90,10 @@ export function EventsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+          {/* Decisión de diseño (hito 15): el staff es de la organización y sirve para todos los eventos. */}
+          <Button variant="secondary" onClick={() => navigate('/admin/staff')}>
+            Staff de la organización
+          </Button>
           <Button onClick={openCreate}>+ Nuevo evento</Button>
         </div>
       </div>

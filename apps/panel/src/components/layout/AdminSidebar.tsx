@@ -1,12 +1,20 @@
-import { ArrowLeft, CalendarDays, CalendarClock, Download, Flag, LayoutDashboard, Landmark, LogOut, QrCode, SlidersHorizontal, Trophy, Users } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, CalendarDays, CalendarClock, Download, Flag, LayoutDashboard, Landmark, LogOut, QrCode, SlidersHorizontal, Trophy, Users } from 'lucide-react';
 import { useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useAppState } from '../../state/AppStateContext';
 import { useEvent } from '../../data-access/hooks';
 import { delegatesVote } from '../../lib/statusLabels';
 import type { EventType } from '../../data-access/apiTypes';
 import styles from './AdminSidebar.module.css';
+import staffStyles from '../../pages/admin/staff/Staff.module.css';
 
-function eventNav(eventId: string, eventType: EventType) {
+interface NavItem {
+  path: string;
+  label: string;
+  Icon: typeof Users;
+  isNew?: boolean;
+}
+
+function eventNav(eventId: string, eventType: EventType): NavItem[] {
   const base = `/admin/eventos/${eventId}`;
   const voting = delegatesVote(eventType);
   return [
@@ -16,6 +24,8 @@ function eventNav(eventId: string, eventType: EventType) {
     { path: `${base}/paises`, label: 'Países', Icon: Flag },
     // En eventos con votación, aquí también se asignan la mesa y el staff.
     { path: `${base}/jueces`, label: voting ? 'Evaluadores' : 'Jueces', Icon: Users },
+    // Decisión de diseño (hito 15): gestión de staff, entre Jueces y Criterios.
+    { path: `${base}/staff`, label: 'Staff', Icon: BadgeCheck, isNew: true },
     // Decisión de diseño (hito 12): accesos de los delegados, solo si votan.
     ...(voting ? [{ path: `${base}/votacion`, label: 'Votación', Icon: QrCode }] : []),
     { path: `${base}/criterios`, label: 'Criterios', Icon: SlidersHorizontal },
@@ -59,7 +69,7 @@ export function AdminSidebar({ open, onNavigate }: { open?: boolean; onNavigate?
             Todos los eventos
           </button>
           <nav className={styles.nav}>
-            {eventNav(event.id, event.event_type).map(({ path, label, Icon }) => {
+            {eventNav(event.id, event.event_type).map(({ path, label, Icon, isNew }) => {
               const active = path === `/admin/eventos/${event.id}` ? location.pathname === path : location.pathname.startsWith(path);
               return (
                 <button
@@ -69,6 +79,7 @@ export function AdminSidebar({ open, onNavigate }: { open?: boolean; onNavigate?
                 >
                   <Icon className={styles.linkIcon} strokeWidth={2} />
                   {label}
+                  {isNew && <span className={staffStyles.navBadge}>NUEVO</span>}
                 </button>
               );
             })}
@@ -76,9 +87,21 @@ export function AdminSidebar({ open, onNavigate }: { open?: boolean; onNavigate?
         </>
       ) : (
         <nav className={styles.nav}>
-          <button className={`${styles.link} ${styles.linkActive}`} onClick={() => go('/admin/eventos')}>
+          <button
+            className={`${styles.link} ${location.pathname.startsWith('/admin/eventos') ? styles.linkActive : ''}`}
+            onClick={() => go('/admin/eventos')}
+          >
             <CalendarDays className={styles.linkIcon} strokeWidth={2} />
             Eventos
+          </button>
+          {/* Decisión de diseño (hito 15): el staff es de la organización, no de un evento. */}
+          <button
+            className={`${styles.link} ${location.pathname.startsWith('/admin/staff') ? styles.linkActive : ''}`}
+            onClick={() => go('/admin/staff')}
+          >
+            <BadgeCheck className={styles.linkIcon} strokeWidth={2} />
+            Staff
+            <span className={staffStyles.navBadge}>NUEVO</span>
           </button>
         </nav>
       )}

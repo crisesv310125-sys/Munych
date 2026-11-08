@@ -240,6 +240,32 @@ Total: **61 operaciones**.
 - **Opciones de exportación** (query, todos los formatos; por defecto, todo): `committee_id` (repetible; sin él, todos los comités), `include_scores` (nota), `include_details` (hoja Detalle, solo XLSX), `include_comments` (comentarios de los jueces en el Detalle), `include_judge_names` (si es `false`, el Detalle dice «Juez 1», «Juez 2»… por comité). El panel los manda desde la pantalla Exportar.
 - **Desempate manual** (2026-11-07): `PUT /committees/{id}/tiebreak` `{ delegation_ids }` guarda el orden que decide el admin para las delegaciones que **siguen empatadas** tras el desempate automático. Un empate se resuelve solo si el orden incluye a **todas** sus delegaciones; las demás ids se ignoran; lista vacía = quitar los desempates. Las delegaciones desempatadas llevan `tied: false` y `manual_tiebreak: true`. Se aplica en el ranking, la instantánea, la página pública y los exports. `409 EVENT_CLOSED` con el evento cerrado (hay que desempatar antes de cerrar); `404 NOT_FOUND` si alguna delegación es de otro comité.
 
+### 3.7 ter Gestión de staff (`staff`, 2026-11-08)
+
+El staff es de la **organización**, no de un evento: tipos de staff, personas, miembros, rúbricas y premios se definen una vez. Lo que depende de un evento (candidatos, avance, ranking, asignación y confirmación de premios) usa un **evento de contexto**: `?event_id=` en las rutas que devuelven detalle, o, si se omite, el evento activo más reciente de la organización. Solo admin, salvo las dos rutas del enlace personal. Nada se borra: tipos y premios se archivan (`archived: true`) y los miembros se quitan con `removed_at`, conservando sus evaluaciones.
+
+| Método | Ruta | Qué hace |
+| --- | --- | --- |
+| GET | `/staff?event_id=` | Tipos con avance, premios y estado; `events` (los de la organización) y el evento de contexto |
+| POST | `/staff-types` | Nuevo tipo (`StaffTypeIn`: a quién evalúa, alcance, mínimo de evaluadores, `counts_as`, plantilla de rúbrica, premios) |
+| GET / PATCH | `/staff-types/{id}?event_id=` | Detalle (miembros, rúbrica, premios con lugares) / configuración |
+| PUT | `/staff-types/{id}/rubric` | Rúbrica completa: pesos de 0 a 50 que suman 100 (`422 WEIGHTS_MUST_SUM_100`); cambiar la escala con evaluaciones da `409` |
+| GET | `/staff-people` | Personas del staff y jueces de la organización (para añadir) |
+| POST | `/staff-types/{id}/members` | Añade una persona existente (`person_id`) o nueva (`person`) |
+| PATCH | `/staff-members/{id}` | Rol, comités, `evaluations_count` (exmiembros), `restore` |
+| POST | `/staff-members/{id}/remove` | Quita al miembro (sus evaluaciones se conservan) |
+| PATCH | `/staff-people/{id}` | Nombre, correo, puesto |
+| POST | `/staff-people/{id}/link` | Enlace personal (`link_base` + token). El token solo llega aquí; vence 2 días después del último evento abierto |
+| GET | `/staff-types/{id}/ranking?event_id=&committee_id=` | Ranking sugerido del evento y premios con sugerencias |
+| POST / PATCH | `/staff-types/{id}/awards`, `/staff-awards/{id}` | Premios propios (`archived: true` los quita) |
+| PUT | `/staff-awards/{id}/assignment` | Asigna (o vacía) un lugar en un evento: `{ event_id, committee_id?, position, candidate_id, override_reason? }` |
+| POST | `/staff-types/{id}/awards/confirm` | `{ event_id, confirmed }`: congela (todos asignados) o reabre los premios de ese evento |
+| GET | `/staff/me` | (Enlace personal) sus asignaciones por tipo y evento no cerrado, con rúbrica y candidatos |
+| PUT | `/staff/evaluations` | (Enlace personal) autoguardado `{ member_id, event_id, candidate_id, values, comment? }` |
+
+- **Nota**: por evaluación, Σ (valor normalizado a 0–100 × peso / 100), solo con todos los criterios; por candidato, el promedio. Solo entran al ranking sugerido quienes tienen evaluaciones ≥ mínimo.
+- **Cuenta en el ranking** (`counts_as`): `staff` o `chair` (Mesa Directiva). Si algún tipo con rúbrica válida cuenta para un peso en el comité, ese peso sale de los tipos de staff (promediados entre sí) y no de las cuentas con ese rol en `committee_judges`.
+
 ### 3.8 Publicación (`results`)
 
 - **`GET /publication/preview`**: devuelve el documento exacto que se publicaría, sin guardarlo.

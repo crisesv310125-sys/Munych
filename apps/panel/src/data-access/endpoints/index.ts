@@ -8,4 +8,5 @@ export * from './sessions';
 export * from './results';
 export * from './publication';
 export * from './voting';
+export * from './staff';
 export * as judgeApi from './judgeApi';

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getEventDocument, getPublishedDocuments } from '../../../../lib/data';
+import { EMPTY_SLUG, getEventDocument, getPublishedDocuments } from '../../../../lib/data';
 import { getDictionary, type Locale } from '../../../../lib/i18n';
 import { committeeView, eventView } from '../../../../lib/view';
 import { SiteHeader } from '../../../../components/SiteHeader';
@@ -14,7 +14,9 @@ import styles from '../../../../components/public.module.css';
 // Export estático: una página por comité de cada evento publicado (por cada idioma del layout).
 export async function generateStaticParams() {
   const docs = await getPublishedDocuments();
-  return docs.flatMap((d) => d.committees.map((c) => ({ eventSlug: d.event.slug, committeeSlug: c.slug })));
+  const params = docs.flatMap((d) => d.committees.map((c) => ({ eventSlug: d.event.slug, committeeSlug: c.slug })));
+  // Sin comités publicados, una ruta de relleno (da 404): el export estático no admite una lista vacía.
+  return params.length ? params : [{ eventSlug: EMPTY_SLUG, committeeSlug: EMPTY_SLUG }];
 }
 
 interface PageProps {

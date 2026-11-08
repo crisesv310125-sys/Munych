@@ -24,6 +24,14 @@ export async function getPublishedDocuments(): Promise<PublicResultsDocument[]> 
   return (data as { data: PublicResultsDocument }[]).map((row) => row.data);
 }
 
+/**
+ * Slug de relleno para `generateStaticParams()` cuando no hay nada publicado: con
+ * `output: 'export'`, Next.js falla si una ruta dinámica devuelve una lista vacía
+ * («missing generateStaticParams()»). Ningún evento ni comité tiene este slug, así que esa
+ * página da 404 y el sitio queda solo con el portal («Todavía no hay eventos…»).
+ */
+export const EMPTY_SLUG = '__sin-resultados';
+
 export async function getEventDocument(eventSlug: string): Promise<PublicResultsDocument | null> {
   if (useMocks) {
     return MOCK_PUBLIC_DOCUMENTS[eventSlug] ?? null;

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getEventDocument, getPublishedDocuments } from '../../../lib/data';
+import { EMPTY_SLUG, getEventDocument, getPublishedDocuments } from '../../../lib/data';
 import { getDictionary, type Locale } from '../../../lib/i18n';
 import { committeeView, delegationCount, eventView, generalRankingView, specialAwardsView } from '../../../lib/view';
 import { SpecialAwards } from '../../../components/SpecialAwards';
@@ -13,7 +13,8 @@ import styles from '../../../components/public.module.css';
 // Export estático: una página por evento publicado en el momento del build (por cada idioma del layout).
 export async function generateStaticParams() {
   const docs = await getPublishedDocuments();
-  return docs.map((d) => ({ eventSlug: d.event.slug }));
+  // Sin eventos publicados, una ruta de relleno (da 404): el export estático no admite una lista vacía.
+  return docs.length ? docs.map((d) => ({ eventSlug: d.event.slug })) : [{ eventSlug: EMPTY_SLUG }];
 }
 
 interface PageProps {

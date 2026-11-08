@@ -4,6 +4,7 @@ import type {
   StaffAssignAwardIn,
   StaffAwardIn,
   StaffAwardPatch,
+  StaffInviteIn,
   StaffMemberIn,
   StaffMemberPatch,
   StaffPersonIn,
@@ -23,6 +24,7 @@ export const staffKeys = {
   type: (typeId: string, eventId: string) => ['staff', 'type', typeId, eventId] as const,
   ranking: (typeId: string, eventId: string, committeeId: string) => ['staff', 'ranking', typeId, eventId, committeeId] as const,
   people: ['staff', 'people'] as const,
+  eventStaff: (eventId: string) => ['staff', 'event-staff', eventId] as const,
 };
 
 export function useStaffOverview(eventId: string) {
@@ -117,6 +119,33 @@ export function useAssignStaffAward() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ awardId, body }: { awardId: string; body: StaffAssignAwardIn }) => api.assignStaffAward(awardId, body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: staffKeys.all }),
+  });
+}
+
+// ---- Personas del evento ----
+
+export function useEventStaff(eventId: string | undefined) {
+  return useQuery({ queryKey: staffKeys.eventStaff(eventId ?? ''), queryFn: () => api.listEventStaff(eventId!), enabled: !!eventId });
+}
+
+export function useInviteToEvent(eventId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: StaffInviteIn) => api.inviteToEvent(eventId, body),
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: staffKeys.all });
+      void qc.invalidateQueries({ queryKey: ['judges'] });
+      // La invitación asigna comités (juez o mesa): se refrescan las asignaciones.
+      void qc.invalidateQueries({ queryKey: ['committee'] });
+    },
+  });
+}
+
+export function useResendStaffAccess() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (memberId: string) => api.resendStaffAccess(memberId),
     onSuccess: () => qc.invalidateQueries({ queryKey: staffKeys.all }),
   });
 }

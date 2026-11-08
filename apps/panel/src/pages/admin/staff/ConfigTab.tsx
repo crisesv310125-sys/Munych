@@ -3,7 +3,7 @@ import { Button } from '@munych/ui/components/Button';
 import { ConfirmDialog } from '../../../components/ConfirmDialog';
 import { useUpdateStaffType } from '../../../data-access/staffHooks';
 import { errorMessage } from '../../../data-access/errors';
-import type { StaffCountsAs, StaffEvaluates, StaffTypeDetail } from '../../../data-access/staffTypes';
+import type { StaffAccessMode, StaffCountsAs, StaffEvaluates, StaffTypeDetail } from '../../../data-access/staffTypes';
 import { Counter, OptionCard, Segmented, StaffTypeTag } from './staffUi';
 import { EVALUATES, formatNumber } from './staffLabels';
 import shared from '../AdminShared.module.css';
@@ -34,6 +34,7 @@ export function ConfigTab({
   const [committeeIds, setCommitteeIds] = useState<string[]>(type.committee_ids);
   const [minEvaluators, setMinEvaluators] = useState(type.min_evaluators);
   const [countsAs, setCountsAs] = useState<StaffCountsAs>(type.counts_as);
+  const [access, setAccess] = useState<StaffAccessMode>(type.access);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
@@ -53,6 +54,7 @@ export function ConfigTab({
         committee_ids: scope === 'all' ? [] : committeeIds,
         min_evaluators: minEvaluators,
         counts_as: countsAs,
+        access,
       });
       setSaved(true);
     } catch (err) {
@@ -172,6 +174,23 @@ export function ConfigTab({
             })}
           </div>
         )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span className={styles.fieldLabel}>¿Cómo entra la gente de este staff?</span>
+          <Segmented
+            value={access}
+            onChange={setAccess}
+            options={[
+              { value: 'link', label: 'QR por correo' },
+              { value: 'account', label: 'Cuenta con contraseña' },
+            ]}
+          />
+          <span className={styles.small}>
+            {access === 'link'
+              ? 'Al invitarlos reciben un correo con su QR personal y evalúan con la rúbrica de este staff, sin cuenta.'
+              : 'Al invitarlos reciben un correo para crear su contraseña y califican en el panel del juez, con rol de mesa en su comité (como la Mesa Directiva).'}
+          </span>
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span className={styles.fieldLabel}>Cuenta en el ranking general</span>

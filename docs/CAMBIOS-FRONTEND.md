@@ -324,6 +324,8 @@ Handoff `gestion-staff/` (6 pantallas). **Decisión de diseño**: pantallas nuev
 - Mocks: `src/mocks/staffHandlers.ts`.
 - **Premios especiales**: los premios del staff **confirmados** en el evento salen en el acta PDF (sección «02 Premios especiales» tras el resumen de premiación: Staff · Premio · Pos. · Delegación/candidato · Delegados · Institución · Nota) y en la página pública (`apps/public`, `components/SpecialAwards.tsx`, debajo de los comités y antes del ranking general; reutiliza las tarjetas de premios, textos es/en en `lib/i18n.ts`). El documento público trae `special_awards` (nombres según `name_format`, institución y nota según la publicación). Se leen al publicar: si el staff confirma después de cerrar el evento, basta con volver a publicar.
 
+- **Tipos en el admin general, personas en el evento** (2026-11-08): en `#/admin/staff` solo se administran los tipos (rúbrica, premios y configuración, incluido «¿Cómo entra?»: QR por correo o cuenta con contraseña); no hay personas ni avance. Dentro del evento, Staff muestra las personas (solo lectura), el avance y los premios del evento. Las personas se invitan en **Jueces** con «+ Invitar»: se elige el rol (Juez solo si el evento tiene jueces, o un tipo de staff) y los comités (obligatorio para tipos con contraseña). Juez y Mesa reciben el correo para crear contraseña; el resto, su QR. Debajo de los jueces, «Staff con QR» con «Reenviar QR».
+
 `TODO(cliente)`: criterios de las plantillas de rúbrica; qué evalúan el Comité Organizador y el Grupo Superior de Gestión.
 
 ---

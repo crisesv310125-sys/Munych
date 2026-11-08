@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import type { ProblemJson } from '../data-access/apiTypes';
 import type {
+  EventStaffMember,
+  StaffInviteIn,
   StaffAccess,
   StaffAssignAwardIn,
   StaffAward,
@@ -276,6 +278,7 @@ function summary(t: MType): StaffTypeSummary {
     committee_ids: t.committee_ids,
     min_evaluators: t.min_evaluators,
     counts_as: t.counts_as,
+    access: t.access ?? 'link',
     criteria_count: t.criteria.length,
     weight_sum: sum(t.criteria),
     rubric_valid: validRubric(t),
@@ -369,6 +372,7 @@ function createType(body: StaffTypeIn): MType {
     committee_ids: body.all_committees ? [] : body.committee_ids,
     min_evaluators: body.min_evaluators,
     counts_as: body.counts_as,
+    access: body.access ?? 'link',
     scale_min: 0,
     scale_max: 10,
     scale_step: 0.5,
@@ -398,6 +402,18 @@ function createType(body: StaffTypeIn): MType {
       { name: 'Mejor periodista', winners: 1, scope: 'event' },
       { name: 'Mención de prensa', winners: 2, scope: 'event' },
     ],
+  });
+  createType({
+    name: 'Mesa Directiva',
+    description: 'Presidencias y vicepresidencias de los comités.',
+    evaluates: null,
+    all_committees: true,
+    committee_ids: [],
+    min_evaluators: 1,
+    counts_as: 'chair',
+    access: 'account',
+    template: 'blank',
+    awards: [],
   });
   const crisis = createType({
     name: 'Crisis',
@@ -460,6 +476,66 @@ const personByToken = (request: Request) => {
 };
 
 export const staffHandlers = [
+  // ---- Personas del evento: invitar con rol y staff con QR ----
+  http.get(`${BASE}/events/:eventId/staff-members`, () => {
+    const list: EventStaffMember[] = members
+      .filter((m) => !m.removed_at)
+      .map((m) => ({ m, t: types.find((x) => x.id === m.type_id && !x.archived), p: people.find((x) => x.id === m.person_id)! }))
+      .filter((x): x is { m: MMember; t: MType; p: MPerson } => !!x.t)
+      .map(({ m, t, p }) => ({
+        member_id: m.id,
+        person_id: p.id,
+        full_name: p.full_name,
+        email: p.email,
+        title: p.title,
+        staff_type_id: t.id,
+        staff_type: t.name,
+        code: t.code,
+        color: t.color,
+        access_mode: t.access ?? 'link',
+        role: m.role,
+        committee_ids: m.committee_ids,
+        access: access(p),
+      }));
+    return HttpResponse.json(list);
+  }),
+
+  http.post(`${BASE}/events/:eventId/invitations`, async ({ request }) => {
+    const body = (await request.json()) as StaffInviteIn;
+    const base = { email: body.email.toLowerCase(), full_name: body.full_name, emailed: true, url: null };
+    if (body.role === 'judge') return HttpResponse.json({ ...base, kind: 'judge', staff_type: null }, { status: 201 });
+    const t = typeOr404(body.staff_type_id);
+    if (!t) return problem(404, 'NOT_FOUND', 'Tipo de staff no encontrado');
+    if (t.access === 'account' && body.committee_ids.length === 0) return problem(422, 'VALIDATION_ERROR', `Elige el comité de ${t.name}`);
+    const p = addPerson(body.full_name, body.email, body.title ?? null);
+    upsertMember(t.id, p.id, body.member_role ?? 'evaluator', body.committee_ids);
+    if (t.access === 'account') return HttpResponse.json({ ...base, kind: 'account', staff_type: t.name }, { status: 201 });
+    p.token = uuid().replace(/-/g, '');
+    p.last_used_at = null;
+    return HttpResponse.json(
+      { ...base, kind: 'link', staff_type: t.name, url: `${location.origin}/#/staff/evaluar/${p.token}` },
+      { status: 201 },
+    );
+  }),
+
+  http.post(`${BASE}/staff-members/:memberId/access`, ({ params }) => {
+    const m = members.find((x) => x.id === params.memberId);
+    const p = m && people.find((x) => x.id === m.person_id);
+    const t = m && types.find((x) => x.id === m.type_id);
+    if (!m || !p || !t) return problem(404, 'NOT_FOUND', 'Miembro no encontrado');
+    if (!p.email) return problem(409, 'CONFLICT', 'Esta persona no tiene correo registrado');
+    p.token = uuid().replace(/-/g, '');
+    p.last_used_at = null;
+    return HttpResponse.json({
+      kind: 'link',
+      email: p.email,
+      full_name: p.full_name,
+      staff_type: t.name,
+      emailed: true,
+      url: `${location.origin}/#/staff/evaluar/${p.token}`,
+    });
+  }),
+
   http.get(`${BASE}/staff`, ({ request }) => {
     resolveCtx(request);
     const event = events.find((e) => e.id === ctxEvent);

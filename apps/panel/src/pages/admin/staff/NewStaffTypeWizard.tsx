@@ -6,6 +6,7 @@ import { useCommittees } from '../../../data-access/hooks';
 import { useCreateStaffType } from '../../../data-access/staffHooks';
 import { errorMessage } from '../../../data-access/errors';
 import type {
+  StaffAccessMode,
   StaffAwardIn,
   StaffAwardScope,
   StaffCountsAs,
@@ -61,6 +62,7 @@ export function NewStaffTypeWizard({ eventId, staffWeight, chairWeight, onClose,
   const [countsAs, setCountsAs] = useState<StaffCountsAs>('none');
   const [template, setTemplate] = useState<StaffRubricTemplate>('oratory');
   const [templateTouched, setTemplateTouched] = useState(false);
+  const [access, setAccess] = useState<StaffAccessMode>('link');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -96,6 +98,7 @@ export function NewStaffTypeWizard({ eventId, staffWeight, chairWeight, onClose,
         committee_ids: scope === 'all' ? [] : committeeIds,
         min_evaluators: minEvaluators,
         counts_as: countsAs,
+        access,
         template,
         awards: awards.filter((a) => a.name.trim()).map((a) => ({ ...a, name: a.name.trim() })),
       });
@@ -156,6 +159,23 @@ export function NewStaffTypeWizard({ eventId, staffWeight, chairWeight, onClose,
                   style={{ resize: 'none' }}
                 />
               </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <span className={styles.fieldLabel}>¿Cómo entra la gente de este staff?</span>
+                <div className={styles.optionGrid} role="radiogroup">
+                  <OptionCard
+                    title="QR por correo"
+                    desc="Sin cuenta: recibe su QR personal y evalúa con la rúbrica de este staff."
+                    active={access === 'link'}
+                    onClick={() => setAccess('link')}
+                  />
+                  <OptionCard
+                    title="Cuenta con contraseña"
+                    desc="Como la Mesa Directiva: crea su contraseña y califica en el panel del juez, con rol de mesa en su comité."
+                    active={access === 'account'}
+                    onClick={() => setAccess('account')}
+                  />
+                </div>
+              </div>
             </>
           )}
 

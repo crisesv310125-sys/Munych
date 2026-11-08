@@ -4,7 +4,9 @@ import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { Avatar } from '@munych/ui/components/Avatar';
 import { Button } from '@munych/ui/components/Button';
 import { Input, Select } from '@munych/ui/components/FormControls';
-import { useCommittees, useEvent, useInviteJudge, useJudges } from '../../data-access/hooks';
+import { useCommittees, useEvent, useJudges } from '../../data-access/hooks';
+import { useInviteToEvent, useStaffOverview } from '../../data-access/staffHooks';
+import { EventStaffList } from './staff/EventStaffList';
 import { committeeRoleLabel, committeeRoleOptions, delegatesVote } from '../../lib/statusLabels';
 import { errorMessage } from '../../data-access/errors';
 import { getCommitteeJudges, getCommitteeProgress, setCommitteeJudges } from '../../data-access/endpoints';
@@ -23,7 +25,7 @@ function initialsFor(name: string): string {
   return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase();
 }
 
-const EMPTY_INVITE = { name: '', email: '' };
+const EMPTY_INVITE = { name: '', email: '', title: '' };
 
 /** Cruza las asignaciones y el avance por comité (uno y otro escopeados por comité en el contrato)
  * para poder mostrar, por juez, a qué comités está asignado y su avance combinado. */
@@ -66,7 +68,13 @@ export function JudgesPage() {
   const { data: judges } = useJudges(eventId);
   const { data: committees } = useCommittees(eventId);
   const { data: event } = useEvent(eventId);
-  const inviteJudge = useInviteJudge();
+  const inviteToEvent = useInviteToEvent(eventId ?? '');
+  const { data: staffOverview } = useStaffOverview(eventId ?? '');
+  const staffTypes = staffOverview?.types ?? [];
+  // «Juez» solo en los tipos de evento que tienen jueces (no en un MUN regular).
+  const eventHasJudges = event?.event_type !== 'mun_regular';
+  const [inviteRole, setInviteRole] = useState<string>('');
+  const [inviteCommittees, setInviteCommittees] = useState<string[]>([]);
   const list = committees ?? [];
   const { committeesByJudge, progressByJudge, roleByAssignment } = useJudgeAssignments(list);
   // Con votación por roles, la cuenta se asigna como juez, mesa o staff (ver statusLabels).
@@ -152,6 +160,8 @@ export function JudgesPage() {
 
   function openInvite() {
     setInvite(EMPTY_INVITE);
+    setInviteRole(eventHasJudges ? 'judge' : '');
+    setInviteCommittees([]);
     setSaveError('');
     setInviteNotice('');
     setIsInviting(true);
@@ -162,23 +172,52 @@ export function JudgesPage() {
     setInvite(EMPTY_INVITE);
   }
 
+  function toggleInviteCommittee(id: string) {
+    setInviteCommittees((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
+  }
+
   async function handleInviteSave() {
     const full_name = invite.name.trim();
     const email = invite.email.trim();
-    if (!full_name || !email) return;
+    if (!full_name || !email || !inviteRole) return;
     setSaveError('');
     try {
-      await inviteJudge.mutateAsync({ email, full_name, event_id: eventId });
+      const out = await inviteToEvent.mutateAsync({
+        full_name,
+        email,
+        role: inviteRole === 'judge' ? 'judge' : 'staff',
+        staff_type_id: inviteRole === 'judge' ? null : inviteRole,
+        committee_ids: inviteCommittees,
+        title: invite.title.trim() || null,
+      });
       closeInvite();
-      // La API solo lista jueces que ya aceptaron la invitación: aún no se puede seleccionar.
-      setInviteNotice(`Invitación enviada a ${email}. ${full_name} aparecerá en la lista cuando la acepte; mientras, la verás en «Invitaciones pendientes».`);
+      // Juez y mesa: la API solo los lista cuando aceptan la invitación (crean su contraseña).
+      setInviteNotice(
+        out.kind === 'link'
+          ? `Se envió a ${out.email} su QR de acceso de ${out.staff_type}. ${full_name} aparece en «Staff con QR».`
+          : `Invitación enviada a ${out.email} para crear su contraseña${out.staff_type ? ` (${out.staff_type})` : ''}. ${full_name} aparecerá en la lista cuando la acepte; mientras, la verás en «Invitaciones pendientes».`,
+      );
     } catch (err) {
       setSaveError(errorMessage(err));
     }
   }
 
   const overAssigned = draftCommittees.length > 3;
-  const canInvite = invite.name.trim().length > 0 && invite.email.trim().length > 0;
+  const selectedType = staffTypes.find((t) => t.id === inviteRole);
+  const needsCommittee = selectedType?.access === 'account';
+  const canInvite =
+    invite.name.trim().length > 0 &&
+    invite.email.trim().length > 0 &&
+    !!inviteRole &&
+    (!needsCommittee || inviteCommittees.length > 0);
+  const inviteHint =
+    inviteRole === 'judge'
+      ? 'Recibirá un correo para crear su contraseña y entrar al panel del juez.'
+      : !selectedType
+        ? 'Elige el rol de la persona.'
+        : selectedType.access === 'account'
+          ? `Recibirá un correo para crear su contraseña y calificará con rol de mesa en el comité elegido.`
+          : `Recibirá un correo con su QR de acceso personal para evaluar como ${selectedType.name} (sin cuenta).`;
 
   function avatarColorFor(judge: ApiJudge) {
     return AVATAR_COLORS[judgeList.indexOf(judge) % AVATAR_COLORS.length];
@@ -196,7 +235,7 @@ export function JudgesPage() {
           </span>
         </div>
         <Button variant="gold" onClick={openInvite}>
-          + Invitar juez
+          + Invitar
         </Button>
       </div>
       <div className={styles.layoutSplit}>
@@ -236,12 +275,14 @@ export function JudgesPage() {
             );
           })}
           <PendingInvitations eventId={eventId} />
+          {/* Decisión de diseño (hito 15): staff que entra con QR (sin cuenta). */}
+          <EventStaffList eventId={eventId ?? ''} />
         </div>
         {isInviting ? (
           <div className={`${styles.sidePanel} ${styles.sidePanelNarrow}`}>
             <div className={styles.modalCard}>
               <div className={styles.modalHeader}>
-                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: 'var(--navy)' }}>Invitar juez</span>
+                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: 'var(--navy)' }}>Invitar al evento</span>
                 <button
                   onClick={closeInvite}
                   style={{ background: 'none', border: 'none', color: 'var(--state-none-dot)', fontSize: 16, cursor: 'pointer' }}
@@ -258,17 +299,59 @@ export function JudgesPage() {
                   value={invite.email}
                   onChange={(e) => setInvite({ ...invite, email: e.target.value })}
                 />
-                <span style={{ fontSize: 11, color: 'var(--muted)' }}>
-                  Se le enviará una invitación de Supabase con enlace mágico; no se define contraseña aquí.
-                </span>
+                <Select label="Rol" value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}>
+                  <option value="" disabled>
+                    Elige el rol…
+                  </option>
+                  {eventHasJudges && <option value="judge">Juez</option>}
+                  {staffTypes.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                      {t.access === 'account' ? ' (con contraseña)' : ' (QR por correo)'}
+                    </option>
+                  ))}
+                </Select>
+                {!eventHasJudges && staffTypes.length === 0 && (
+                  <span style={{ fontSize: 11, color: '#C0392B' }}>
+                    Este evento no tiene jueces y todavía no hay tipos de staff: créalos en Staff de la organización.
+                  </span>
+                )}
+                {inviteRole && inviteRole !== 'judge' && (
+                  <Input
+                    label="Puesto (opcional)"
+                    placeholder="p. ej. Presidenta de Comité"
+                    value={invite.title}
+                    onChange={(e) => setInvite({ ...invite, title: e.target.value })}
+                  />
+                )}
+                {inviteRole && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--muted)', letterSpacing: '.06em' }}>
+                      {needsCommittee ? 'COMITÉ (OBLIGATORIO)' : 'COMITÉS (OPCIONAL)'}
+                    </span>
+                    {list.map((c) => {
+                      const checked = inviteCommittees.includes(c.id);
+                      return (
+                        <label key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: 'var(--ink)', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={checked} onChange={() => toggleInviteCommittee(c.id)} />
+                          {c.name}
+                        </label>
+                      );
+                    })}
+                    {!needsCommittee && inviteRole !== 'judge' && (
+                      <span style={{ fontSize: 11, color: 'var(--muted)' }}>Sin comités: evalúa en todos los del alcance de su staff.</span>
+                    )}
+                  </div>
+                )}
+                <span style={{ fontSize: 11, color: 'var(--muted)' }}>{inviteHint}</span>
                 {saveError && <span style={{ color: '#C0392B', fontSize: 13 }}>{saveError}</span>}
               </div>
               <div className={styles.modalFooter}>
                 <Button variant="danger" onClick={closeInvite}>
                   Cancelar
                 </Button>
-                <Button onClick={handleInviteSave} disabled={!canInvite || inviteJudge.isPending}>
-                  Enviar invitación
+                <Button onClick={handleInviteSave} disabled={!canInvite || inviteToEvent.isPending}>
+                  {inviteToEvent.isPending ? 'Enviando…' : 'Enviar invitación'}
                 </Button>
               </div>
             </div>

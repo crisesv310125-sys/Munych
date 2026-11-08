@@ -35,6 +35,52 @@ export function AwardsTab({
   eventId,
   eventName,
   setActions,
+  definitionsOnly = false,
+}: {
+  type: StaffTypeDetail;
+  eventId: string;
+  eventName: string | null;
+  setActions: TopActions;
+  /** Admin general: solo se definen los premios (los ganadores se asignan en cada evento). */
+  definitionsOnly?: boolean;
+}) {
+  if (definitionsOnly) return <AwardDefinitions type={type} eventId={eventId} />;
+  return <EventAwards type={type} eventId={eventId} eventName={eventName} setActions={setActions} />;
+}
+
+/** Premios del tipo, sin ranking ni ganadores (admin general). */
+function AwardDefinitions({ type, eventId }: { type: StaffTypeDetail; eventId: string }) {
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState('');
+  return (
+    <div className={shared.content}>
+      <div className={styles.calloutInfo}>
+        Aquí se definen los premios de {type.name}; sirven para todos los eventos. Los ganadores se asignan y confirman dentro de
+        cada evento (Staff del evento → {type.name} → Premios).
+      </div>
+      <div className={styles.awardCards}>
+        {type.awards.map((a, i) => (
+          <AwardCard key={a.id} award={a} index={i} awards={type.awards} type={type} eventId={eventId} confirmed={false} onError={setError} definition />
+        ))}
+        {type.awards.length === 0 && <span className={styles.small}>Este staff todavía no entrega premios.</span>}
+      </div>
+      {adding ? (
+        <NewAwardForm type={type} eventId={eventId} onDone={() => setAdding(false)} />
+      ) : (
+        <button className={styles.linkBtn} style={{ alignSelf: 'flex-start' }} onClick={() => setAdding(true)}>
+          + Añadir premio
+        </button>
+      )}
+      {error && <span style={{ color: '#C0392B', fontSize: 13 }}>{error}</span>}
+    </div>
+  );
+}
+
+function EventAwards({
+  type,
+  eventId,
+  eventName,
+  setActions,
 }: {
   type: StaffTypeDetail;
   eventId: string;
@@ -47,7 +93,6 @@ export function AwardsTab({
   const confirm = useConfirmStaffAwards(type.id, eventId);
   const [selected, setSelected] = useState<string | null>(null);
   const [override, setOverride] = useState<{ ref: SlotRef; row: StaffRankingRow } | null>(null);
-  const [adding, setAdding] = useState(false);
   const [error, setError] = useState('');
 
   const awards = ranking?.awards ?? type.awards;
@@ -119,18 +164,13 @@ export function AwardsTab({
       <div className={shared.content} style={{ flex: 1 }}>
         <div className={styles.awardCards}>
           {awards.map((a, i) => (
-            <AwardCard key={a.id} award={a} index={i} awards={awards} type={type} eventId={eventId} confirmed={confirmed} onError={setError} />
+            // Las definiciones se editan en el admin general: aquí solo se asignan ganadores.
+            <AwardCard key={a.id} award={a} index={i} awards={awards} type={type} eventId={eventId} confirmed onError={setError} />
           ))}
-          {awards.length === 0 && <span className={styles.small}>Este staff todavía no entrega premios.</span>}
+          {awards.length === 0 && (
+            <span className={styles.small}>Este staff no entrega premios. Se definen en Staff de la organización.</span>
+          )}
         </div>
-        {!confirmed &&
-          (adding ? (
-            <NewAwardForm type={type} eventId={eventId} onDone={() => setAdding(false)} />
-          ) : (
-            <button className={styles.linkBtn} style={{ alignSelf: 'flex-start' }} onClick={() => setAdding(true)}>
-              + Añadir premio
-            </button>
-          ))}
 
         <div className={shared.panelCard}>
           <div className={shared.panelHeader} style={{ gap: 12, flexWrap: 'wrap' }}>
@@ -368,6 +408,7 @@ function AwardCard({
   eventId,
   confirmed,
   onError,
+  definition = false,
 }: {
   award: StaffAward;
   index: number;
@@ -376,6 +417,8 @@ function AwardCard({
   eventId: string;
   confirmed: boolean;
   onError: (msg: string) => void;
+  /** Admin general: sin estado de asignación (eso es de cada evento). */
+  definition?: boolean;
 }) {
   const update = useUpdateStaffAward(eventId);
   const [confirmArchive, setConfirmArchive] = useState(false);
@@ -394,7 +437,12 @@ function AwardCard({
     <div className={styles.awardCard}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 10.5, letterSpacing: '0.1em', color: 'var(--muted)', fontWeight: 600 }}>PREMIO</span>
-        {done ? <StatusBadge tone="done" label="ASIGNADO" /> : <StatusBadge tone={a.slots_assigned ? 'progress' : 'none'} label={`${a.slots_assigned} DE ${a.slots_total}`} />}
+        {!definition &&
+          (done ? (
+            <StatusBadge tone="done" label="ASIGNADO" />
+          ) : (
+            <StatusBadge tone={a.slots_assigned ? 'progress' : 'none'} label={`${a.slots_assigned} DE ${a.slots_total}`} />
+          ))}
       </div>
       <span className={styles.awardName}>{a.name}</span>
       <div className={styles.kv}>

@@ -2,6 +2,9 @@ import { apiFetch, buildQuery } from '../apiClient';
 import { ApiError } from '../errors';
 import type { ProblemJson } from '../apiTypes';
 import type {
+  EventStaffMember,
+  StaffInviteIn,
+  StaffInviteOut,
   StaffAccessLink,
   StaffAssignAwardIn,
   StaffAwardIn,
@@ -76,6 +79,22 @@ export function updateStaffPerson(personId: string, body: Partial<StaffPersonIn>
 /** Enlace personal de evaluación. El token solo llega aquí; el anterior deja de servir. */
 export function issueStaffLink(personId: string, linkBase: string): Promise<StaffAccessLink> {
   return apiFetch<StaffAccessLink>(`/staff-people/${personId}/link`, { method: 'POST', body: { link_base: linkBase } });
+}
+
+// ---- Personas del evento (pantalla de jueces) ----
+
+export function listEventStaff(eventId: string): Promise<EventStaffMember[]> {
+  return apiFetch<EventStaffMember[]>(`/events/${eventId}/staff-members`);
+}
+
+/** Invita con su rol: juez o tipo de staff (con contraseña o con QR por correo). */
+export function inviteToEvent(eventId: string, body: StaffInviteIn): Promise<StaffInviteOut> {
+  return apiFetch<StaffInviteOut>(`/events/${eventId}/invitations`, { method: 'POST', body });
+}
+
+/** QR nuevo por correo (el anterior deja de servir). */
+export function resendStaffAccess(memberId: string): Promise<StaffInviteOut> {
+  return apiFetch<StaffInviteOut>(`/staff-members/${memberId}/access`, { method: 'POST' });
 }
 
 // ---- Ranking y premios (admin, por evento) ----

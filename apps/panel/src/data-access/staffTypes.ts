@@ -8,6 +8,8 @@ export type StaffEvaluates = 'delegations' | 'delegates' | 'position_papers' | '
 /** none: solo premios · staff: peso Staff del ranking · chair: peso Mesa Directiva. */
 export type StaffCountsAs = 'none' | 'staff' | 'chair';
 export type StaffMemberRole = 'coordinator' | 'evaluator';
+/** link: QR por correo, sin cuenta · account: cuenta con contraseña y panel del juez (Mesa Directiva). */
+export type StaffAccessMode = 'link' | 'account';
 export type StaffAccess = 'not_invited' | 'invited' | 'active' | 'expired';
 export type StaffAwardScope = 'event' | 'per_committee';
 export type StaffTypeStatus = 'not_configured' | 'invalid_rubric' | 'not_started' | 'in_progress' | 'complete';
@@ -90,6 +92,7 @@ export interface StaffTypeSummary {
   committee_ids: string[];
   min_evaluators: number;
   counts_as: StaffCountsAs;
+  access: StaffAccessMode;
   criteria_count: number;
   weight_sum: number;
   rubric_valid: boolean;
@@ -170,6 +173,7 @@ export interface StaffTypeIn {
   committee_ids: string[];
   min_evaluators: number;
   counts_as: StaffCountsAs;
+  access?: StaffAccessMode;
   template: StaffRubricTemplate;
   awards: StaffAwardIn[];
 }
@@ -184,6 +188,7 @@ export interface StaffTypePatch {
   committee_ids?: string[];
   min_evaluators?: number;
   counts_as?: StaffCountsAs;
+  access?: StaffAccessMode;
   archived?: boolean;
 }
 
@@ -313,4 +318,43 @@ export interface StaffEvaluation {
   comment: string | null;
   complete: boolean;
   updated_at: string | null;
+}
+
+// ---- Personas por evento (pantalla de jueces) ----
+
+/** Invitar al evento con su rol desde el inicio: juez o un tipo de staff. */
+export interface StaffInviteIn {
+  full_name: string;
+  email: string;
+  role: 'judge' | 'staff';
+  staff_type_id?: string | null;
+  committee_ids: string[];
+  member_role?: StaffMemberRole;
+  title?: string | null;
+}
+
+export interface StaffInviteOut {
+  /** judge/account: invitación para crear contraseña · link: correo con QR. */
+  kind: 'judge' | 'account' | 'link';
+  email: string;
+  full_name: string;
+  staff_type: string | null;
+  emailed: boolean;
+  url: string | null;
+}
+
+export interface EventStaffMember {
+  member_id: string;
+  person_id: string;
+  full_name: string;
+  email: string | null;
+  title: string | null;
+  staff_type_id: string;
+  staff_type: string;
+  code: string;
+  color: string;
+  access_mode: StaffAccessMode;
+  role: StaffMemberRole;
+  committee_ids: string[];
+  access: StaffAccess;
 }

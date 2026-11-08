@@ -61,12 +61,26 @@ export interface PublicGeneralRankingItem extends PublicRankingItem {
   committee: { slug: string; name: string; acronym: string };
 }
 
+/** Premio de un tipo de staff (Prensa, Mesa Directiva…), aparte de los de comité. */
+export interface PublicSpecialAward {
+  staff: string;
+  award: string;
+  position: number;
+  winners: number;
+  committee_acronym: string | null;
+  delegation: PublicDelegation;
+  delegates: string[];
+  score: number | null;
+}
+
 export interface PublicResultsDocument {
   event: PublicEventInfo;
   settings: PublicationSettings;
   committees: PublicCommittee[];
   /** null si el ranking no se publica; ausente en documentos publicados antes del 2026-11-07. */
   general_ranking?: PublicGeneralRankingItem[] | null;
+  /** Premios del staff confirmados; ausente en documentos publicados antes del 2026-11-08. */
+  special_awards?: PublicSpecialAward[];
   published_at: string;
   version: number;
 }

@@ -264,6 +264,7 @@ El staff es de la **organización**, no de un evento: tipos de staff, personas, 
 | PUT | `/staff/evaluations` | (Enlace personal) autoguardado `{ member_id, event_id, candidate_id, values, comment? }` |
 
 - **Nota**: por evaluación, Σ (valor normalizado a 0–100 × peso / 100), solo con todos los criterios; por candidato, el promedio. Solo entran al ranking sugerido quienes tienen evaluaciones ≥ mínimo.
+- **Premios especiales**: los premios del staff confirmados en el evento salen en el acta PDF (`export.pdf`, sección «Premios especiales») y en el documento público (`special_awards`: `staff`, `award`, `position`, `winners`, `committee_acronym`, `delegation`, `delegates`, `score`; misma lista blanca que el resto). Se leen al publicar.
 - **Cuenta en el ranking** (`counts_as`): `staff` o `chair` (Mesa Directiva). Si algún tipo con rúbrica válida cuenta para un peso en el comité, ese peso sale de los tipos de staff (promediados entre sí) y no de las cuentas con ese rol en `committee_judges`.
 
 ### 3.8 Publicación (`results`)

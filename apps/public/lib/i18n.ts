@@ -92,6 +92,10 @@ const es = {
     searchLabel: 'Buscar país, comité o delegado',
     delegates: 'COMITÉ — DELEGADO(S)',
   },
+  specialAwards: {
+    title: (n: number) => `Premios especiales · ${n} ${plural(n, 'premio', 'premios')}`,
+    note: 'Otorgados por el staff del evento con su propia rúbrica.',
+  },
   share: {
     share: 'Compartir',
     pdf: 'Descargar PDF',
@@ -186,6 +190,10 @@ const en: Dictionary = {
     searchPlaceholder: 'Search country, committee or delegate…',
     searchLabel: 'Search country, committee or delegate',
     delegates: 'COMMITTEE — DELEGATE(S)',
+  },
+  specialAwards: {
+    title: (n: number) => `Special awards · ${n} ${plural(n, 'award', 'awards')}`,
+    note: 'Given by the event staff with their own rubric.',
   },
   share: {
     share: 'Share',

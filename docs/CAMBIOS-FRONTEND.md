@@ -322,8 +322,9 @@ Handoff `gestion-staff/` (6 pantallas). **Decisión de diseño**: pantallas nuev
 - **04 Premios**: tarjetas (desempate editable), ranking del evento con filtro por comité, panel con los lugares, sugerencias, asignación a otro candidato con confirmación, «Confirmar premios» y «Reabrir premios».
 - **Vista del miembro** (`#/staff/evaluar/<token>`, sin cuenta): lista por staff y evento abierto, y formulario móvil del juez (`CriterionSlider`, ahora con prop `step`) con autoguardado.
 - Mocks: `src/mocks/staffHandlers.ts`.
+- **Premios especiales**: los premios del staff **confirmados** en el evento salen en el acta PDF (sección «02 Premios especiales» tras el resumen de premiación: Staff · Premio · Pos. · Delegación/candidato · Delegados · Institución · Nota) y en la página pública (`apps/public`, `components/SpecialAwards.tsx`, debajo de los comités y antes del ranking general; reutiliza las tarjetas de premios, textos es/en en `lib/i18n.ts`). El documento público trae `special_awards` (nombres según `name_format`, institución y nota según la publicación). Se leen al publicar: si el staff confirma después de cerrar el evento, basta con volver a publicar.
 
-`TODO(cliente)`: criterios de las plantillas de rúbrica; qué evalúan el Comité Organizador y el Grupo Superior de Gestión; la sección **Premios especiales** del acta y de la página pública (aún no salen ahí).
+`TODO(cliente)`: criterios de las plantillas de rúbrica; qué evalúan el Comité Organizador y el Grupo Superior de Gestión.
 
 ---
 

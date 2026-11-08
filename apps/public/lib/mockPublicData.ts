@@ -61,6 +61,28 @@ function event(
     settings: SETTINGS,
     committees,
     general_ranking: generalRanking(committees),
+    special_awards: [
+      {
+        staff: 'Prensa',
+        award: 'Mejor periodista',
+        position: 1,
+        winners: 1,
+        committee_acronym: 'CP',
+        delegation: { country_code: null, character_name: 'The MUNYCH Times', institution: null },
+        delegates: ['Sofía M.'],
+        score: null,
+      },
+      {
+        staff: 'Prensa',
+        award: 'Mención de prensa',
+        position: 1,
+        winners: 2,
+        committee_acronym: 'CP',
+        delegation: { country_code: null, character_name: 'Diplomatic Post', institution: null },
+        delegates: ['Andrés P.'],
+        score: null,
+      },
+    ],
     published_at,
     version: 1,
   };

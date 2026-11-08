@@ -143,6 +143,25 @@ export function generalRankingView(doc: PublicResultsDocument, locale: Locale): 
   );
 }
 
+export interface SpecialAwardView extends AwardView {
+  /** Siglas del comité del candidato (o del lugar, en premios por comité). */
+  committee: string | null;
+  score: string | null;
+  position: number;
+}
+
+/** Premios del staff («Premios especiales»), aparte de los de comité. Vacío si no hay. */
+export function specialAwardsView(doc: PublicResultsDocument, locale: Locale): SpecialAwardView[] {
+  return (doc.special_awards ?? []).map((a) => ({
+    label: `${a.staff} · ${a.award}${a.winners > 1 ? ` · ${a.position}` : ''}`,
+    delegation: delegationView(a.delegation, locale),
+    delegates: a.delegates,
+    committee: a.committee_acronym,
+    score: a.score !== null ? a.score.toFixed(1) : null,
+    position: a.position,
+  }));
+}
+
 /** Delegaciones del evento; null si el evento no publica el ranking (no se puede contar). */
 export function delegationCount(committees: CommitteeView[]): number | null {
   if (!committees.some((c) => c.ranking)) return null;

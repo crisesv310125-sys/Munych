@@ -9,5 +9,14 @@
     // El panel usa HashRouter, así que el servidor solo recibe "/". Esto es una red de
     // seguridad por si algún día se pasa a rutas con historial: sirve index.html.
     "not_found_handling": "single-page-application"
+  },
+  // Logs de Workers (Observability en el dashboard). Se declaran aquí para que el siguiente
+  // despliegue no los desactive.
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+      "persist": true
+    }
   }
 }

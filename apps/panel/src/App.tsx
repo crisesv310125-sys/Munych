@@ -65,8 +65,8 @@ const router = createHashRouter(
           <Route path="sesiones" lazy={lazy('SessionsPage')} />
           <Route path="paises" lazy={lazy('CountriesPage')} />
           <Route path="jueces" lazy={lazy('JudgesPage')} />
-          <Route path="staff" lazy={lazy('StaffPage')} />
-          <Route path="staff/:typeId" lazy={lazy('StaffTypePage')} />
+          {/* El staff del evento ya no tiene pantalla propia: las personas se invitan en Jueces. */}
+          <Route path="staff/*" element={<Navigate to="../jueces" replace />} />
           <Route path="criterios" lazy={lazy('CriteriaPage')} />
           <Route path="resultados" lazy={lazy('ResultsPage')} />
           <Route path="exportar" lazy={lazy('ExportPage')} />

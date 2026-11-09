@@ -24,8 +24,6 @@ function eventNav(eventId: string, eventType: EventType): NavItem[] {
     { path: `${base}/paises`, label: 'Países', Icon: Flag },
     // En eventos con votación, aquí también se asignan la mesa y el staff.
     { path: `${base}/jueces`, label: voting ? 'Evaluadores' : 'Jueces', Icon: Users },
-    // Decisión de diseño (hito 15): gestión de staff, entre Jueces y Criterios.
-    { path: `${base}/staff`, label: 'Staff', Icon: BadgeCheck, isNew: true },
     // Decisión de diseño (hito 12): accesos de los delegados, solo si votan.
     ...(voting ? [{ path: `${base}/votacion`, label: 'Votación', Icon: QrCode }] : []),
     { path: `${base}/criterios`, label: 'Criterios', Icon: SlidersHorizontal },

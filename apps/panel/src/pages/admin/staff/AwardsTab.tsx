@@ -55,7 +55,8 @@ function AwardDefinitions({ type, eventId }: { type: StaffTypeDetail; eventId: s
   return (
     <div className={shared.content}>
       <div className={styles.calloutInfo}>
-        Aquí se definen los premios de {type.name}; sirven para todos los eventos.
+        Aquí se definen los premios de {type.name}; sirven para todos los eventos. Los ganadores se asignan y confirman dentro de
+        cada evento (Staff del evento → {type.name} → Premios).
       </div>
       <div className={styles.awardCards}>
         {type.awards.map((a, i) => (

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { getDictionary, isLocale, LOCALES } from '../../lib/i18n';
 import { FontLinks } from '../../components/FontLinks';
 import { GoogleTag } from '../../components/GoogleTag';
+import { CookieConsent } from '../../components/CookieConsent';
 
 // Export estático: se genera una copia del sitio por idioma.
 export function generateStaticParams() {
@@ -26,7 +27,10 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <GoogleTag />
         <FontLinks />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieConsent locale={locale} />
+      </body>
     </html>
   );
 }

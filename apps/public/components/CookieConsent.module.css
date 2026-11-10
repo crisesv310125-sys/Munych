@@ -1,0 +1,65 @@
+/* Decisión de diseño (2026-11-10): aviso de cookies. Solo tokens existentes de @munych/ui. */
+.banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  max-width: 720px;
+  margin: 0 auto;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-12);
+  box-shadow: var(--shadow-modal);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.text {
+  margin: 0;
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.manage {
+  position: fixed;
+  left: 12px;
+  bottom: 10px;
+  z-index: 40;
+  background: none;
+  border: none;
+  padding: 4px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .actions > * {
+    flex: 1;
+  }
+}
+
+@media print {
+  .banner,
+  .manage {
+    display: none;
+  }
+}

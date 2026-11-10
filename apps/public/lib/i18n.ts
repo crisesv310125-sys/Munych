@@ -96,6 +96,13 @@ const es = {
     title: (n: number) => `Premios especiales · ${n} ${plural(n, 'premio', 'premios')}`,
     note: 'Otorgados por el staff del evento con su propia rúbrica.',
   },
+  cookies: {
+    label: 'Aviso de cookies',
+    text: 'Usamos cookies de Google para medir de forma anónima cómo se usa esta página. Solo se activan si las aceptas; puedes rechazarlas y el sitio funciona igual.',
+    accept: 'Aceptar',
+    reject: 'Rechazar',
+    manage: 'Preferencias de cookies',
+  },
   share: {
     share: 'Compartir',
     pdf: 'Descargar PDF',
@@ -194,6 +201,13 @@ const en: Dictionary = {
   specialAwards: {
     title: (n: number) => `Special awards · ${n} ${plural(n, 'award', 'awards')}`,
     note: 'Given by the event staff with their own rubric.',
+  },
+  cookies: {
+    label: 'Cookie notice',
+    text: 'We use Google cookies to measure anonymously how this page is used. They are only turned on if you accept; you can reject them and the site works the same.',
+    accept: 'Accept',
+    reject: 'Reject',
+    manage: 'Cookie preferences',
   },
   share: {
     share: 'Share',

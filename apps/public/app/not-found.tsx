@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { Button } from '@munych/ui/components/Button';
 import { FontLinks } from '../components/FontLinks';
+import { GoogleTag } from '../components/GoogleTag';
 
 // Es el 404.html único del export estático, así que no sabe el idioma: muestra ambos.
 export default function NotFound() {
   return (
     <html lang="es">
       <head>
+        <GoogleTag />
         <title>404 · MUNYCH</title>
         <FontLinks />
       </head>

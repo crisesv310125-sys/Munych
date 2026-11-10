@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { getDictionary, isLocale, LOCALES } from '../../lib/i18n';
 import { FontLinks } from '../../components/FontLinks';
+import { GoogleTag } from '../../components/GoogleTag';
 
 // Export estático: se genera una copia del sitio por idioma.
 export function generateStaticParams() {
@@ -22,6 +23,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   return (
     <html lang={locale}>
       <head>
+        <GoogleTag />
         <FontLinks />
       </head>
       <body>{children}</body>
